@@ -1,6 +1,6 @@
 #!/bin/sh
 
-: ${brain=./brain} ${model=RD}
+: ${brain=./brain}
 
 N=4
 OMP_NUM_THREADS=$N LD_LIBRARY_PATH=VTK/lib/vtk-5.2 "$brain" \
@@ -9,7 +9,7 @@ OMP_NUM_THREADS=$N LD_LIBRARY_PATH=VTK/lib/vtk-5.2 "$brain" \
     -icx 0.28 \
     -icy 0.75 \
     -icz 0.35 \
-    -model $model \
+    -model RD \
     -nthreads $N \
     -PatFileName ./ \
     -profiler 1 \
