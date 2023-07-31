@@ -2,8 +2,7 @@ CC = g++ -O3
 LIBS = \
 	-fopenmp\
 	-fpermissive\
-	-L$(TBB_LIB_DIR) \
-	-L$(VTK_LIB_DIR) \
+	-L../INSTALL/myVTK/lib/vtk-5.2/\
 	-ldl \
 	-lm \
 	-lpthread \
