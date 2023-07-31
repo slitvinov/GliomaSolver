@@ -10,7 +10,6 @@ LIBS = \
 	-LmyVTK/lib/vtk-5.2/\
 	-lm \
 	-lpthread \
-	-ltbb \
 	-ltbbmalloc \
 	-lvtkCommon \
 	-lvtkDICOMParser \
