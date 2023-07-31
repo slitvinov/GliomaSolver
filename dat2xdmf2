@@ -29,8 +29,11 @@ try:
         nx, ny, nz = unpack('iii', file)
         nsx, nsy, nsz = nx // sx, ny // sy, nz // sz
         nsxp, nsyp, nszp = nsx + 1, nsy + 1, nsz + 1
-        seek = file.tell()
-        size = file.seek(0, os.SEEK_END) - seek
+        tell = file.tell()
+        end = file.seek(0, os.SEEK_END)
+        size = end - tell
+        itemsize = size // nx // ny // nz
+        seek = end - itemsize * nx * ny * nz
         raw = os.path.basename(path)
         type = "Float"
         precision = size // nx // ny // nz

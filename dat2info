@@ -26,9 +26,12 @@ try:
             sys.stderr.write("dat2info: error: wrong dimension '%d'\n" % dim)
             sys.exit(1)
         nx, ny, nz = unpack('iii', file)
-        seek = file.tell()
-        size = file.seek(0, os.SEEK_END) - seek
-        print(nx, ny, nz, size // nx // ny // nz)
+        tell = file.tell()
+        end = file.seek(0, os.SEEK_END)
+        size = end - tell
+        itemsize = size // nx // ny // nz
+        seek = end - itemsize * nx * ny * nz
+        print(nx, ny, nz, seek)
 except FileNotFoundError:
     sys.stderr.write("dat2info: error: fail to open '%s'\n" % path)
     sys.exit(2)
