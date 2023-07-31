@@ -1,3 +1,5 @@
+#!/bin/sh
+
 : ${brain=./brain}
 N=4
 OMP_NUM_THREADS=$N LD_LIBRARY_PATH=myVTK/lib/vtk-5.2 "$brain" \
