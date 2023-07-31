@@ -1,12 +1,44 @@
-//
-//  Likelihood_main.cpp
-//  GliomaXcode
-//
-//  Created by Lipkova on 15/06/15.
-//  Copyright (c) 2015 Lipkova. All rights reserved.
-//
+#include <cassert>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
+#include <fstream>
+#include <iostream>
+#include <limits>
+#include <map>
+#include <math.h>
+#include <sys/time.h>
+#include <vector>
+using namespace std;
 
-#include "HGG_Likelihood.h"
+#include "ArgumentParser.h"
+#include "Matrix.h"
+
+typedef Matrix::D3D<double> MatrixD3D;
+typedef Matrix::D2D<double> MatrixD2D;
+
+class HGG_Likelihood {
+private:
+  ArgumentParser parser;
+  long double _computePETLogLikelihood(MatrixD3D model);
+  long double _computeTiLogLikelihood(MatrixD3D model, int Ti);
+  long double _computeLogBernoulli(double y, double u, int Ti);
+  void _writeToFile(long double output);
+  int sgn(double d);
+
+  double PETsigma2, PETscale;
+  double slope; // same for T1 & T2(sigma2 double sigmoid, k singel sigmoid)
+  double T1uc, T2uc;
+  bool bSelectivePoints;
+  int stepPET, stepTi;
+
+public:
+  HGG_Likelihood(const int argc, const char **argv);
+  ~HGG_Likelihood(){};
+  void run();
+};
+
 
 HGG_Likelihood::HGG_Likelihood(const int argc, const char **argv)
     : parser(argc, argv) {
