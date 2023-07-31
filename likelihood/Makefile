@@ -1,6 +1,6 @@
 .POSIX:
 CXXFLAGS = -O2 -g
 S = main.cpp
-likelihood: $S ArgumentParser.h  Matrix.h
+likelihood: $S
 	$(CXX) $(CXXFLAGS) $S -o $@
 clean:; rm -f likelihood
