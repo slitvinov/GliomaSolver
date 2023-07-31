@@ -5,7 +5,7 @@
 LIBS = \
 	-fopenmp\
 	-fpermissive\
-	-LmyVTK/lib/vtk-5.2/\
+	-LVTK/lib/vtk-5.2/\
 	-ltbb \
 	-Ltbb40_20120613oss/build/linux_intel64_gcc_cc4.6.1_libc2.5_kernel2.6.18_release/\
 	-ltbbmalloc \
@@ -38,7 +38,7 @@ MRAGProfiler.o \
 MRAGWavelets_StaticData.o \
 Test.o\
 
-CPPFLAGS = \
+CXXFLAGS = \
 	-D_BLOCKSIZE_=8\
 	-D_BPD_=16\
 	-D_DIM=3\
@@ -52,9 +52,9 @@ CPPFLAGS = \
 	-IMRAG/\
 	-O3 \
 	-Wno-deprecated\
-	-ImyVTK/include/vtk-5.2/\
+	-IVTK/include/vtk-5.2/\
 	-Itbb40_20120613oss/include/\
 
 brain: $(OBJECTS); $(CXX) $^ -o $@ $(LIBS)
-.cpp.o: $(CXX) $(CPPFLAGS) -c $^ -o $@
+.cpp.o: $(CXX) $(CXXFLAGS) -c $^ -o $@
 clean:; rm -rf $(OBJECTS) brain
