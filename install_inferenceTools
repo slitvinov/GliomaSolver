@@ -1,0 +1,62 @@
+#!/bin/bash
+InstallDir=$(pwd)
+SolverDir=$(dirname "${InstallDir}")
+cd "${SolverDir}"
+mkdir -p lib
+cd lib
+LIB_BASE=$(pwd)
+
+wget tdo.sk/~janka/GliomaSolverHome/libs/lib-linux-64-bit/inference_libs.tgz
+tar -zxf inference_libs.tgz
+mv inference_libs/* .
+rm inference_libs.tgz
+rm -r inference_libs
+
+gsl_src=gsl-src
+mpich_src=mpich-3.2.1-src
+
+tar -zxf ${gsl_src}.tgz
+tar -zxf ${mpich_src}.tgz
+
+mkdir -p gsl-install
+mkdir -p mpich-install
+
+cd ${mpich_src}
+./configure --prefix="${LIB_BASE}"/mpich-install
+make
+make isntall
+export PATH="${LIB_BASE}"/mpich-install/bin:$PATH
+echo "---------------"
+echo "mpicc is set to"
+which mpicc
+echo "---------------"
+cd ../
+rm ${mpich_src}.tgz
+rm -r rm ${mpich_src}
+
+
+cd ${gsl_src}
+./autogen.sh
+sudo apt-get install libtool
+./configure --enable-maintainer-mode --disable-dynamic --prefix="${LIB_BASE}"/gsl-install
+make
+make install
+cd ../
+rm ${gsl_src}.tgz
+rm ${gsl_src}
+
+autoreconf
+automake --add-missing
+./configure CC=mpicc --prefix="${LIB_BASE}"/usr/torc --with-maxnodes=1024
+make
+make install
+export PATH="${LIB_BASE}"/usr/torc/bin:$PATH
+
+cd ../Inference
+UserName=$(hostname -s)
+cp tools.make/Makefile .
+cp tools.make/setup_linux.sh setup_${UserName}.sh
+cp tools.make/run_inference.sh .
+
+make clean
+make
