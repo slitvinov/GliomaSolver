@@ -22,27 +22,11 @@ public:
 
   Value(string content_) : content(content_) {}
 
-  double asDouble(double def = 0) const {
-    if (content == "")
-      return def;
-    return (double)atof(content.c_str());
-  }
 
   int asInt(int def = 0) const {
     if (content == "")
       return def;
     return atoi(content.c_str());
-  }
-
-  bool asBool(bool def = false) const {
-    if (content == "")
-      return def;
-    if (content == "0")
-      return false;
-    if (content == "false")
-      return false;
-
-    return true;
   }
 
   string asString(string def = "") const {
