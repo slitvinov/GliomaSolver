@@ -5,12 +5,15 @@
 LIBS_TBB = `pkg-config --libs tbb`
 CXXFLAGS_TBB = `pkg-config --cflags tbb`
 
+CXXFLAGS_VTK = -IVTK/include/vtk-5.2
+LIBS_VTK = -LVTK/lib/vtk-5.2
+
 LIBS = \
+	$(LIBS_TBB)\
+	$(LIBS_VTK)\
 	-fopenmp\
 	-fpermissive\
-	$(LIBS_TBB) \
-	-ltbbmalloc \
-	-LVTK/lib/vtk-5.2/\
+	-ltbbmalloc\
 	-lvtkCommon \
 	-lvtkDICOMParser\
 	-lvtkexpat \
@@ -54,8 +57,8 @@ CXXFLAGS = \
 	-IMRAG/\
 	-O3\
 	-Wno-deprecated\
-	-IVTK/include/vtk-5.2/\
-	$(CXXFLAGS_TBB) \
+	$(CXXFLAGS_VTK)\
+	$(CXXFLAGS_TBB)\
 
 brain: $(OBJECTS); $(CXX) $(OBJECTS) -o $@ $(LIBS)
 .cpp.o:; $(CXX) $(CXXFLAGS) -c $< -o $@
