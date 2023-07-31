@@ -5,9 +5,9 @@
 LIBS = \
 	-fopenmp\
 	-fpermissive\
-	INSTALL/tbb40_20120613oss/build/linux_intel64_gcc_cc4.6.1_libc2.5_kernel2.6.18_release/libtbb.so\
+	tbb40_20120613oss/build/linux_intel64_gcc_cc4.6.1_libc2.5_kernel2.6.18_release/libtbb.so\
 	-ldl \
-	-LINSTALL/myVTK/lib/vtk-5.2/\
+	-LmyVTK/lib/vtk-5.2/\
 	-lm \
 	-lpthread \
 	-ltbb \
@@ -65,8 +65,8 @@ CPPFLAGS = \
 	-IMRAG/\
 	-O3 \
 	-Wno-deprecated\
-	-IINSTALL/myVTK/include/vtk-5.4/\
-	-IINSTALL/tbb40_20120613oss/include/\
+	-ImyVTK/include/vtk-5.4/\
+	-Itbb40_20120613oss/include/\
 
 brain: $(OBJECTS); $(CXX) $^ -o $@ $(LIBS)
 .cpp.o: $(CXX) $(CPPFLAGS) -c $^ -o $@
