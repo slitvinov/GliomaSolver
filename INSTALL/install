@@ -1,16 +1,13 @@
 #!/bin/sh
 
-cd ${tbb}
-make clean
-make
-cd ../
-cd ${hypre}/src
-make clean
-./configure 
-make install
-cd ../../../
+(cd tbb40_20120613oss
+ make)
 
-cd makefile
+(cd hypre-2.10.0b/src
+ ./configure 
+ make install)
+
+cd ../makefile
 UserName=$(hostname -s)
 cp tools.make/make.linux make.${UserName}
 cp tools.make/Makefile .
@@ -19,7 +16,5 @@ cp tools.make/setup_linux.sh setup_${UserName}.sh
 sed -i 's|_USER_LIB_BASE_|'"${LIB_BASE}"'|g' make.${UserName}
 sed -i 's|_USER_NAME_|'"${UserName}"'|g' Makefile
 sed -i 's|_USER_LIB_BASE_|'"${LIB_BASE}"'|g' setup_${UserName}.sh
-
 source setup_${UserName}.sh
-
 cat setup_${UserName}.sh
