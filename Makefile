@@ -14,7 +14,6 @@ LIBS = \
 	-ltbbmalloc \
 	-lvtkCommon \
 	-lvtkDICOMParser \
-	-lvtkexoIIc \
 	-lvtkexpat \
 	-lvtkFiltering \
 	-lvtkfreetype \
