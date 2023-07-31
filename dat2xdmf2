@@ -26,17 +26,14 @@ try:
         if dim != 3:
             sys.stderr.write("dat2xdmf2: error: wrong dimension '%d'\n" % dim)
             sys.exit(1)
-        nx, ny, nz = unpack('iii', file)
-        nsx, nsy, nsz = nx // sx, ny // sy, nz // sz
-        nsxp, nsyp, nszp = nsx + 1, nsy + 1, nsz + 1
-        tell = file.tell()
-        end = file.seek(0, os.SEEK_END)
-        size = end - tell
-        itemsize = size // nx // ny // nz
-        seek = end - itemsize * nx * ny * nz
+        nx, ny, nz, type_id = unpack('iiii', file)
+        seek = file.tell()
+        size = file.seek(0, os.SEEK_END) - seek
         raw = os.path.basename(path)
         type = "Float"
         precision = size // nx // ny // nz
+        nsx, nsy, nsz = nx // sx, ny // sy, nz // sz
+        nsxp, nsyp, nszp = nsx + 1, nsy + 1, nsz + 1
         sys.stdout.write("""\
 <Xdmf>
   <Domain>
