@@ -17,22 +17,15 @@ LIBS = \
 	-lvtkexpat \
 	-lvtkFiltering \
 	-lvtkftgl \
-	-lvtkGraphics \
-	-lvtkHybrid \
-	-lvtkImaging \
-	-lvtkInfovis \
 	-lvtkIO \
 	-lvtkjpeg \
 	-lvtkmetaio \
 	-lvtkNetCDF \
 	-lvtkpng \
-	-lvtkRendering \
 	-lvtksqlite \
 	-lvtksys \
 	-lvtktiff \
 	-lvtkverdict \
-	-lvtkViews \
-	-lvtkWidgets \
 	-lvtkzlib \
 
 VPATH = Glioma/ MRAG/ MRAG/MRAGcore Glioma/Tests/
