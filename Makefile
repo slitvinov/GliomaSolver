@@ -2,28 +2,30 @@
 .SUFFIXES: .cpp
 .SUFFIXES: .o
 
+LIBS_TBB = `pkg-config --libs tbb`
+CXXFLAGS_TBB = `pkg-config --cflags tbb`
+
 LIBS = \
 	-fopenmp\
 	-fpermissive\
-	-LVTK/lib/vtk-5.2/\
-	-ltbb \
-	-Ltbb40_20120613oss/build/linux_intel64_gcc_cc4.6.1_libc2.5_kernel2.6.18_release/\
+	$(LIBS_TBB) \
 	-ltbbmalloc \
+	-LVTK/lib/vtk-5.2/\
 	-lvtkCommon \
-	-lvtkDICOMParser \
+	-lvtkDICOMParser\
 	-lvtkexpat \
-	-lvtkFiltering \
-	-lvtkftgl \
-	-lvtkIO \
-	-lvtkjpeg \
-	-lvtkmetaio \
-	-lvtkNetCDF \
-	-lvtkpng \
-	-lvtksqlite \
-	-lvtksys \
-	-lvtktiff \
-	-lvtkverdict \
-	-lvtkzlib \
+	-lvtkFiltering\
+	-lvtkftgl\
+	-lvtkIO\
+	-lvtkjpeg\
+	-lvtkmetaio\
+	-lvtkNetCDF\
+	-lvtkpng\
+	-lvtksqlite\
+	-lvtksys\
+	-lvtktiff\
+	-lvtkverdict\
+	-lvtkzlib\
 
 VPATH = Glioma/ MRAG/ MRAG/MRAGcore Glioma/Tests/
 
@@ -50,11 +52,11 @@ CXXFLAGS = \
 	-IGlioma/Operators/\
 	-IGlioma/Tests/\
 	-IMRAG/\
-	-O3 \
+	-O3\
 	-Wno-deprecated\
 	-IVTK/include/vtk-5.2/\
-	-Itbb40_20120613oss/include/\
+	$(CXXFLAGS_TBB) \
 
-brain: $(OBJECTS); $(CXX) $^ -o $@ $(LIBS)
+brain: $(OBJECTS); $(CXX) $(OBJECTS) -o $@ $(LIBS)
 .cpp.o: $(CXX) $(CXXFLAGS) -c $^ -o $@
 clean:; rm -rf $(OBJECTS) brain
