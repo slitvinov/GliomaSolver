@@ -65,7 +65,7 @@ CPPFLAGS = \
 	-IMRAG/\
 	-O3 \
 	-Wno-deprecated\
-	-ImyVTK/include/vtk-5.4/\
+	-ImyVTK/include/vtk-5.2/\
 	-Itbb40_20120613oss/include/\
 
 brain: $(OBJECTS); $(CXX) $^ -o $@ $(LIBS)
