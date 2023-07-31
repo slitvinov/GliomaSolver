@@ -1,8 +1,13 @@
+.SUFFIXES:
+.SUFFIXES: .cpp
+.SUFFIXES: .o
+
 CC = g++ -O3
 LIBS = \
 	-fopenmp\
 	-fpermissive\
 	-L../INSTALL/myVTK/lib/vtk-5.2/\
+	../INSTALL/tbb40_20120613oss/build/linux_intel64_gcc_cc4.6.1_libc2.5_kernel2.6.18_release/libtbb.so\
 	-ldl \
 	-lm \
 	-lpthread \
@@ -64,13 +69,5 @@ CPPFLAGS = \
 	-I../INSTALL/myVTK/include/vtk-5.4/\
 	-I../INSTALL/tbb40_20120613oss/include/\
 
-brain: $(OBJECTS)
-	$(CC) $^ -o $@ $(LIBS)
-	@echo done 
-%.o: %.cpp
-	$(CC) $(CPPFLAGS) -c $^ -o $@
-clean:
-	rm -f *.o 
-	rm -f brain 
-
-
+brain: $(OBJECTS); $(CC) $^ -o $@ $(LIBS)
+.cpp.o: $(CC) $(CPPFLAGS) -c $^ -o $@
