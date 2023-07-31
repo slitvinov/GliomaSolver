@@ -2,7 +2,3 @@
 
 (cd tbb40_20120613oss
   make)
-
-(cd hypre-2.10.0b/src
-  ./configure
-  make install)
