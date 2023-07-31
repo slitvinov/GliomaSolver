@@ -5,11 +5,9 @@
 LIBS = \
 	-fopenmp\
 	-fpermissive\
-	tbb40_20120613oss/build/linux_intel64_gcc_cc4.6.1_libc2.5_kernel2.6.18_release/libtbb.so\
-	-ldl \
 	-LmyVTK/lib/vtk-5.2/\
-	-lm \
-	-lpthread \
+	-ltbb \
+	-Ltbb40_20120613oss/build/linux_intel64_gcc_cc4.6.1_libc2.5_kernel2.6.18_release/\
 	-ltbbmalloc \
 	-lvtkCommon \
 	-lvtkDICOMParser \
