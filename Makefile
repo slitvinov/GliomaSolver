@@ -25,7 +25,6 @@ LIBS = \
 	-lvtkInfovis \
 	-lvtkIO \
 	-lvtkjpeg \
-	-lvtklibxml2 \
 	-lvtkmetaio \
 	-lvtkNetCDF \
 	-lvtkpng \
