@@ -70,3 +70,4 @@ CPPFLAGS = \
 
 brain: $(OBJECTS); $(CXX) $^ -o $@ $(LIBS)
 .cpp.o: $(CXX) $(CPPFLAGS) -c $^ -o $@
+clean:; rm -rf $(OBJECTS) brain
