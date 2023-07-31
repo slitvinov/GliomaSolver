@@ -27,7 +27,7 @@ LIBS = \
 	-lvtkverdict\
 	-lvtkzlib\
 
-VPATH = Glioma/ MRAG/ MRAG/MRAGcore Glioma/Tests/
+VPATH = Glioma MRAG MRAG/MRAGcore Glioma/Tests
 
 OBJECTS = \
 dat2VP.o \
@@ -41,7 +41,7 @@ MRAGWavelets_StaticData.o \
 Test.o\
 
 CXXFLAGS = \
-	-D_BLOCKSIZE_=8\
+	-D_BLOCKSIZE_=16\
 	-D_BPD_=16\
 	-D_DIM=3\
 	-D_FMMSILENT\
@@ -58,5 +58,5 @@ CXXFLAGS = \
 	$(CXXFLAGS_TBB) \
 
 brain: $(OBJECTS); $(CXX) $(OBJECTS) -o $@ $(LIBS)
-.cpp.o: $(CXX) $(CXXFLAGS) -c $^ -o $@
+.cpp.o:; $(CXX) $(CXXFLAGS) -c $< -o $@
 clean:; rm -rf $(OBJECTS) brain
