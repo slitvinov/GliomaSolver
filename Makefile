@@ -16,7 +16,6 @@ LIBS = \
 	-lvtkDICOMParser \
 	-lvtkexpat \
 	-lvtkFiltering \
-	-lvtkfreetype \
 	-lvtkftgl \
 	-lvtkGraphics \
 	-lvtkHybrid \
