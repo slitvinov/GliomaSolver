@@ -766,7 +766,6 @@ private:
   double PETsigma2, PETscale;
   double slope; // same for T1 & T2(sigma2 double sigmoid, k singel sigmoid)
   double T1uc, T2uc;
-  bool bSelectivePoints;
   int stepPET, stepTi;
 
 public:
@@ -792,7 +791,6 @@ HGG_Likelihood::HGG_Likelihood(const int argc, const char **argv)
     abort();
   }
 
-  bSelectivePoints = parser("-bROI").asBool(0);
   stepPET = parser("-stepPET").asInt(1);
   stepTi = parser("-stepMRI").asInt(1);
 
@@ -852,29 +850,10 @@ long double HGG_Likelihood::_computeTiLogLikelihood(MatrixD3D model, int Ti) {
 
   long double sum = 0.;
 
-  if (!bSelectivePoints) {
-    //#pragma omp parallel for reduction(+:sum)
-    for (int iz = 0; iz < dataZ; iz++)
-      for (int iy = 0; iy < dataY; iy++)
-        for (int ix = 0; ix < dataX; ix++)
-          sum += _computeLogBernoulli(model(ix, iy, iz), data(ix, iy, iz), Ti);
-  } else {
-    sprintf(filename, "ROI.dat");
-    MatrixD2D Points(filename);
-    int Npoints = Points.getSizeX();
-
-    for (int i = 0; i < Npoints; i++) {
-      int ix = Points(i, 0);
-      int iy = Points(i, 1);
-      int iz = Points(i, 2);
-
-      if ((ix % stepTi == 0) && (iy % stepTi == 0) && (iz % stepTi == 0))
-        sum += _computeLogBernoulli(model(ix, iy, iz), data(ix, iy, iz), Ti);
-    }
-
-    printf("Ti Npoints = %i \n", Npoints);
-  }
-
+  for (int iz = 0; iz < dataZ; iz++)
+    for (int iy = 0; iy < dataY; iy++)
+      for (int ix = 0; ix < dataX; ix++)
+	sum += _computeLogBernoulli(model(ix, iy, iz), data(ix, iy, iz), Ti);
   printf("LogLike of T%i = %Lf \n", Ti, sum);
   return sum;
 }
