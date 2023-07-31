@@ -9,7 +9,6 @@
 #include <map>
 #include <math.h>
 #include <string>
-#include <sys/time.h>
 #include <vector>
 
 using namespace std;
@@ -92,22 +91,6 @@ public:
       }
   }
 };
-
-/**\file Matrix.h
- * Collection of matrices (models of #CMatrix2D and #CMatrix3D).
- * Most of them also feature serialization and deserialization.
- *
- * #include "Matrix.h"
- *
- * @author Gerardo Tauriello
- * @date 7/19/10
- *
- * @see Matrix, CMatrix2D, CMatrix3D
- */
-
-
-// system includes
-#include <fstream>
 
 /**
  * Matrices all put into namespace Matrix (also includes some helpers).
@@ -919,26 +902,10 @@ void HGG_Likelihood::run() {
   _writeToFile(costFunction);
 }
 
-double my_gettime() {
-  struct timeval t;
-  gettimeofday(&t, NULL);
-  return (double)t.tv_sec + (double)t.tv_usec * 1.0E-6;
-}
-
 int main(int argc, const char **argv) {
-  printf("==========================================\n");
-  printf("          Computing likelihood            \n");
-  printf("==========================================\n");
-
   ArgumentParser parser(argc, argv);
-  double t_begin = my_gettime();
-
   HGG_Likelihood *l = new HGG_Likelihood(argc, (const char **)argv);
   l->run();
   delete l;
-
-  double t_end = my_gettime();
-  printf("Likelihood: elapsed time=%f (sec) \n", t_end - t_begin);
-
   return 0;
 };
