@@ -8,7 +8,6 @@
 
 #include "HGG_Likelihood.h"
 
-
 HGG_Likelihood::HGG_Likelihood(const int argc, const char **argv)
     : parser(argc, argv) {
   ifstream mydata("LikelihoodInput.txt");

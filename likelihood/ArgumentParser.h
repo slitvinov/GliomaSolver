@@ -12,12 +12,14 @@
 //
 //	Argument Parser
 //		this two classes (Value, ArgumentParser) are used to parse
-//parameters 			from command line 		usage from command line: 			after calling the
-//program list the argument as shown in the example below:
+// parameters 			from command line 		usage from command
+// line: 			after calling the program list the argument as
+// shown in the example below:
 //				"./program -parameter1 value1 -parameter2
-//value2" 		usage from within the program: 			(i)  ArgumentParser parser(argc, argv)
-//			(ii) parser("-ParameterName").asType(defaultValue)
-//				 where Type is Bool, Double, Int or String
+// value2" 		usage from within the program: 			(i)
+// ArgumentParser parser(argc, argv) 			(ii)
+//parser("-ParameterName").asType(defaultValue) 				 where Type is Bool, Double, Int
+//or String
 //
 //========================================================================================
 
