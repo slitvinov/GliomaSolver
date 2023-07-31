@@ -8,16 +8,6 @@
 #include <limits>
 #include <map>
 #include <math.h>
-#include <sys/time.h>
-#include <vector>
-using namespace std;
-
-#include <cassert>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <iostream>
-#include <map>
 #include <string>
 #include <sys/time.h>
 #include <vector>
@@ -140,7 +130,6 @@ public:
 namespace Matrix {
 // note: all global stuff must be inline or we get duplicate symbols!
 
-#pragma mark Type IDs
 
 /** Enumerator for supported data types. */
 enum TypeID { TID_DOUBLE = 0, TID_FLOAT = 1, TID_INT = 2, TID_INVALID = -1 };
@@ -153,8 +142,6 @@ template <typename T> inline int typeId() { return TID_INVALID; }
 template <> inline int typeId<double>() { return TID_DOUBLE; }
 template <> inline int typeId<float>() { return TID_FLOAT; }
 template <> inline int typeId<int>() { return TID_INT; }
-
-#pragma mark IO
 
 /**
  * Read header from data stream.
@@ -347,7 +334,6 @@ inline std::ostream &serialize(std::ostream &os, const T *data, int n_elem,
   }
 }
 
-#pragma mark Matrices
 /**
  * 2D matrix with dynamic allocation.
  * Loops over elements should always go first in y and then in x.
@@ -378,7 +364,6 @@ template <typename T> class D2D {
 public:
   typedef T ElementType;
 
-#pragma mark LIFECYCLE
 public:
   /**
    * Default constructor creating nx x ny matrix.
@@ -436,7 +421,6 @@ private:
     mData = new T[mNelements];
   }
 
-#pragma mark OPERATORS
 public:
   /**
    * Assignment operator.
@@ -466,7 +450,6 @@ public:
     return *this;
   }
 
-#pragma mark CMatrix2D
 public:
   /** Get size of matrix (X). */
   size_t getSizeX() const { return mNx; }
@@ -483,7 +466,6 @@ public:
     return mData[i + j * mNx];
   }
 
-#pragma mark IO
 public:
   /**
    * Dump matrix to file.
@@ -589,7 +571,6 @@ template <typename T> class D3D {
 public:
   typedef T ElementType;
 
-#pragma mark LIFECYCLE
 public:
   /**
    * Default constructor creating nx x ny x nz matrix.
@@ -648,7 +629,6 @@ private:
     mData = new T[mNelements];
   }
 
-#pragma mark OPERATORS
 public:
   /**
    * Assignment operator.
@@ -678,7 +658,6 @@ public:
     return *this;
   }
 
-#pragma mark CMatrix2D
 public:
   /** Get size of matrix (X). */
   size_t getSizeX() const { return mNx; }
@@ -697,7 +676,6 @@ public:
     return mData[i + (j + k * mNy) * mNx];
   }
 
-#pragma mark IO
 public:
   /**
    * Dump matrix to file.
