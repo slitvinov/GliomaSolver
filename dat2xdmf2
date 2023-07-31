@@ -30,7 +30,10 @@ try:
         nsx, nsy, nsz = nx // sx, ny // sy, nz // sz
         nsxp, nsyp, nszp = nsx + 1, nsy + 1, nsz + 1
         seek = file.tell()
+        size = file.seek(0, os.SEEK_END) - seek
         raw = os.path.basename(path)
+        type = "Float"
+        precision = size // nx // ny // nz
         sys.stdout.write("""\
 <Xdmf>
   <Domain>
@@ -47,11 +50,16 @@ try:
       <Attribute Name="u" Center="Cell">
         <DataItem ItemType="HyperSlab" Dimensions="{nsz} {nsy} {nsx}">
           <DataItem Dimensions="3 3">
-                     0  0  0
+                    0 0 0
                     {sz} {sy} {sx}
                     {nsz} {nsy} {nsx}
           </DataItem>
-          <DataItem Dimensions="{nz} {ny} {nx}" Format="Binary" Seek="{seek}">
+          <DataItem
+            Dimensions="{nz} {ny} {nx}"
+            Format="Binary"
+            NumberType="{type}"
+            Precision="{precision}"
+            Seek="{seek}">
                     {raw}
           </DataItem>
         </DataItem>
@@ -59,7 +67,7 @@ try:
     </Grid>
   </Domain>
 </Xdmf>
-        """.format(**locals()))
+""".format(**locals()))
 except FileNotFoundError:
     sys.stderr.write("dat2xdmf2: error: fail to open '%s'\n" % path)
     sys.exit(2)

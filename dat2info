@@ -2,6 +2,7 @@
 
 import sys
 import struct
+import os
 
 
 def unpack(string, file):
@@ -25,7 +26,9 @@ try:
             sys.stderr.write("dat2info: error: wrong dimension '%d'\n" % dim)
             sys.exit(1)
         nx, ny, nz = unpack('iii', file)
-        print(nx, ny, nz)
+        seek = file.tell()
+        size = file.seek(0, os.SEEK_END) - seek
+        print(nx, ny, nz, size // nx // ny // nz)
 except FileNotFoundError:
     sys.stderr.write("dat2info: error: fail to open '%s'\n" % path)
     sys.exit(2)
