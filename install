@@ -1,4 +1,4 @@
 #!/bin/sh
 
 (cd tbb40_20120613oss
-  make)
+  make CXXFLAGS=-std=c++11)
