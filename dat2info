@@ -3,9 +3,32 @@
 import sys
 import struct
 
+
 def unpack(string, file):
     buffer = file.read(struct.calcsize(string))
     return struct.unpack(string, buffer)
 
-with open(sys.argv[1], "rb") as file:
-    print(unpack('iiiii', file))
+
+try:
+    path = sys.argv[1]
+except IndexError:
+    sys.stderr.write("dat2info: error: needs an argument\n")
+    sys.exit(2)
+try:
+    with open(path, "rb") as file:
+        magic, = unpack('i', file)
+        if magic != 1234:
+            sys.stderr.write("dat2info: error: '%s' not a dat file\n" % path)
+            sys.exit(1)
+        dim, = unpack('i', file)
+        if dim != 3:
+            sys.stderr.write("dat2info: error: wrong dimension '%d'\n" % dim)
+            sys.exit(1)
+        nx, ny, nz = unpack('iii', file)
+        print(nx, ny, nz)
+except FileNotFoundError:
+    sys.stderr.write("dat2info: error: fail to open '%s'\n" % path)
+    sys.exit(2)
+except struct.error:
+    sys.stderr.write("dat2info: error: fail to read '%s'\n" % path)
+    sys.exit(2)
