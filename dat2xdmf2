@@ -1,0 +1,68 @@
+#!/usr/bin/python
+
+import sys
+import struct
+
+
+def unpack(string, file):
+    buffer = file.read(struct.calcsize(string))
+    return struct.unpack(string, buffer)
+
+
+sx, sy, sz = 1, 1, 1
+try:
+    path = sys.argv[1]
+except IndexError:
+    sys.stderr.write("dat2xdmf2: error: needs an argument\n")
+    sys.exit(2)
+try:
+    with open(path, "rb") as file:
+        magic, = unpack('i', file)
+        if magic != 1234:
+            sys.stderr.write("dat2xdmf2: error: '%s' not a dat file\n" % path)
+            sys.exit(1)
+        dim, = unpack('i', file)
+        if dim != 3:
+            sys.stderr.write("dat2xdmf2: error: wrong dimension '%d'\n" % dim)
+            sys.exit(1)
+        nx, ny, nz = unpack('iii', file)
+        nsx, nsy, nsz = nx // sx, ny // sy, nz // sz
+        nsxp, nsyp, nszp = nsx + 1, nsy + 1, nsz + 1
+        seek = file.tell()
+        type = "Float"
+        raw = path
+        sys.stdout.write("""\
+<Xdmf>
+  <Domain>
+    <Grid GridType="Uniform">
+      <Topology TopologyType="3DCORECTMesh" Dimensions="{nszp} {nsyp} {nsxp}"/>
+      <Geometry GeometryType="ORIGIN_DXDYDZ">
+        <DataItem Name="Origin" Dimensions="3" NumberType="Float" Precision="8" Format="XML">
+                 0 0 0
+        </DataItem>
+        <DataItem Name="Spacing" Dimensions="3" NumberType="Float" Precision="4" Format="XML">
+                {sz} {sy} {sx}
+        </DataItem>
+      </Geometry>
+      <Attribute Name="u" AttributeType="Scalar" Center="Cell">
+        <DataItem ItemType="HyperSlab" Dimensions="{nsz} {nsy} {nsx}" Type="HyperSlab">
+          <DataItem Dimensions="3 3" Format="XML">
+                     0  0  0
+                    {sz} {sy} {sx}
+                    {nsz} {nsy} {nsx}
+          </DataItem>
+          <DataItem Dimensions="{nz} {ny} {nx}" NumberType="{type}" Format="Binary" Seek="{seek}">
+                    {raw}
+          </DataItem>
+        </DataItem>
+      </Attribute>
+    </Grid>
+  </Domain>
+</Xdmf>
+        """.format(**locals()))
+except FileNotFoundError:
+    sys.stderr.write("dat2xdmf2: error: fail to open '%s'\n" % path)
+    sys.exit(2)
+except struct.error:
+    sys.stderr.write("dat2xdmf2: error: fail to read '%s'\n" % path)
+    sys.exit(2)
