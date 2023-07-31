@@ -1,0 +1,11 @@
+#!/bin/bash
+TROIAZZA=
+for FN in $(ls *.a)
+do
+echo processing $FN
+CULO=-l${FN#lib}
+CULO2=${CULO%.a}
+echo new word is $CULO2
+TROIAZZA="$TROIAZZA $CULO2"
+done
+echo TROIAZZA is $TROIAZZA

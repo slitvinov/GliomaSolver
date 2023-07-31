@@ -1,27 +1,5 @@
 #!/bin/sh
 
-InstallDir=$(pwd)
-SolverDir=$(dirname "${InstallDir}")
-
-cd "${SolverDir}"
-wget tdo.sk/~janka/GliomaSolverHome/libs/lib-linux-64-bit/lib.tgz
-tar -zxf lib.tgz
-rm lib.tgz
-cd lib
-
-LIB_BASE=$(pwd)
-tbb=tbb40_20120613oss
-vtk=myVTK
-hypre=hypre-2.10.0b
-
-tar -zxf ${tbb}.tgz
-tar -zxf ${vtk}.tgz
-tar -zxf ${hypre}.tgz
-
-rm ${tbb}.tgz
-rm ${vtk}.tgz
-rm ${hypre}.tgz
-
 cd ${tbb}
 make clean
 make
