@@ -27,7 +27,6 @@ VPATH = MRAG MRAG/MRAGcore
 
 OBJECTS = \
 main.o \
-ReactionDiffusion.o\
 MRAGBoundaryBlockInfo.o \
 MRAGProfiler.o \
 MRAGWavelets_StaticData.o \
