@@ -39,7 +39,7 @@ CXXFLAGS = \
 	-D _MAXLEVEL_=4\
 	-DNDEBUG\
 	-D_RESJUMP_=1\
-	-IMRAG/\
+	-IMRAG\
 	-O3\
 	-Wno-deprecated\
 	$(CXXFLAGS_VTK)\
