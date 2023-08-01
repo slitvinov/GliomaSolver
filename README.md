@@ -1,7 +1,7 @@
 ## Input for the solver
 
 <dl>
-  <dt>[CSF.dat](GSF.dat), [GM.dat](GM.dat), [WM.dat](WM.dat)</dt>
+  <dt>(GSF.dat)[CSF.dat], (GM.dat)[GM.dat], (WM.dat)[WM.dat]</dt>
   <dd>white matter, gray matter,  cerebrospinal fluid</dd>
 </dl>
 
@@ -19,6 +19,13 @@
 
 <dl>
   <dt>[[HGG_data.dat]]</dt>
+  <dd>???</dd>
+</dl>
+
+## Patient Data
+
+<dl>
+  <dt>tumFLAIR.dat, tumPET.dat, tumT1c.dat</dt>
   <dd>???</dd>
 </dl>
 
