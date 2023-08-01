@@ -1,15 +1,3 @@
-//
-//  TimeUpdateOperator
-//  GliomaXcode
-//
-//  Created by Lipkova on 21/05/15.
-//  Copyright (c) 2015 Lipkova. All rights reserved.
-//
-
-#pragma once
-#include "Glioma_Types.h"
-
-
 template<int nDim = 3>
 struct TimeUpdate
 {
