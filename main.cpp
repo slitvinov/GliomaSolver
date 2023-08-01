@@ -467,12 +467,6 @@ template <int nDim = 3> struct UpdateTumor {
 };
 
 using namespace MRAG;
-class Glioma {
-public:
-  virtual void run() = 0;
-  virtual ~Glioma() {}
-};
-
 struct Cell {
   /* tumor */
   Real phi;
@@ -756,7 +750,7 @@ typedef Matrix::D3D<double> MatrixD3D;
 
 static const int nThreads = 1;
 typedef Multithreading::BlockProcessing_SingleCPU<B> BlockProcessing;
-class Glioma_ReactionDiffusion : public Glioma {
+class Glioma_ReactionDiffusion {
 private:
   Grid<W, B> *grid;
   BlockProcessing blockProcessing;
