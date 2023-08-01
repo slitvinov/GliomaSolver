@@ -49,31 +49,13 @@ int main(int argc,const char ** argv)
     ArgumentParser parser(argc, argv);
     Environment::setup(max(1, parser("-nthreads").asInt()));
     Glioma * s = NULL;
-    
-    if(parser("-model").asString() == "RD")
-        s = new Glioma_ReactionDiffusion(argc, (const char **)argv);
-    else if(parser("-model").asString() == "UQprep")
-        s = new Glioma_UQ_DataPreprocessing(argc, (const char **)argv);
-    else if(parser("-model").asString() == "PFFCH")
-        s = new Glioma_ComputePFF_CahnHilliard(argc, (const char **)argv);
-#ifdef HYPRE
-    else if(parser("-model").asString() == "deform")
-        s = new Glioma_BrainDeformation(argc, (const char **)argv);
-    else if(parser("-model").asString() == "helmholtzTest")
-        s = new HelmholtzTest(argc, (const char **)argv);
-#endif
-    else if(parser("-model").asString() == "VP")
-        s = new dat2VP(argc, (const char **)argv);
-    else
-        s = new Test(argc, (const char **)argv);
-  
+    s = new Glioma_ReactionDiffusion(argc, (const char **)argv);
     tbb::tick_count t1,t0;
     {
         t0=tbb::tick_count::now();
         s->run();
         t1=tbb::tick_count::now();
     }
-   
 
 #ifdef HYPRE
     MPI_Finalize();
