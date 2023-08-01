@@ -21,8 +21,6 @@
 namespace Matrix {
     // note: all global stuff must be inline or we get duplicate symbols!
 
-#pragma mark Type IDs
-
 	/** Enumerator for supported data types. */
 	enum TypeID {
 		TID_DOUBLE = 0,
@@ -43,8 +41,6 @@ namespace Matrix {
 	inline int typeId<float>() { return TID_FLOAT; }
 	template <>
 	inline int typeId<int>() { return TID_INT; }
-
-#pragma mark IO
 
     /**
      * Read header from data stream.
@@ -225,7 +221,6 @@ namespace Matrix {
 		}
 	}
 
-#pragma mark Matrices
     /**
      * 2D matrix with dynamic allocation.
      * Loops over elements should always go first in y and then in x.
@@ -255,7 +250,6 @@ namespace Matrix {
 	public:
 		typedef T ElementType;
 
-#pragma mark LIFECYCLE
 	public:
 		/**
 		 * Default constructor creating nx x ny matrix.
@@ -320,7 +314,6 @@ namespace Matrix {
 			mData = new T[mNelements];
 		}
 
-#pragma mark OPERATORS
 	public:
 		/**
 		 * Assignment operator.
@@ -349,7 +342,6 @@ namespace Matrix {
 			return *this;
 		}
 
-#pragma mark CMatrix2D
 	public:
 		/** Get size of matrix (X). */
 		size_t getSizeX() const { return mNx; }
@@ -366,7 +358,6 @@ namespace Matrix {
 			return mData[i + j*mNx];
 		}
 
-#pragma mark IO
 	public:
 		/**
 		 * Dump matrix to file.
@@ -472,7 +463,6 @@ namespace Matrix {
 	public:
 		typedef T ElementType;
 
-#pragma mark LIFECYCLE
 	public:
 		/**
 		 * Default constructor creating nx x ny x nz matrix.
@@ -537,7 +527,6 @@ namespace Matrix {
 			mData = new T[mNelements];
 		}
 
-#pragma mark OPERATORS
 	public:
 		/**
 		 * Assignment operator.
@@ -566,7 +555,6 @@ namespace Matrix {
 			return *this;
 		}
 
-#pragma mark CMatrix2D
 	public:
 		/** Get size of matrix (X). */
 		size_t getSizeX() const { return mNx; }
@@ -585,7 +573,6 @@ namespace Matrix {
 			return mData[i + (j + k*mNy)*mNx];
 		}
 
-#pragma mark IO
 	public:
 		/**
 		 * Dump matrix to file.
@@ -1220,9 +1207,6 @@ inline Cell operator*(const Cell& p, Real v)
 	return c;
 }
 
-
-#pragma mark projectors
-
 template <typename T, int i>
 inline Real RD_projector_impl_vtk(const T&t)
 {
@@ -1393,7 +1377,6 @@ Glioma_ReactionDiffusion::~Glioma_ReactionDiffusion()
 }
 
 
-#pragma mark InitialCondition
 // 1) Read in anatomies - rescaled to [0,1]^3
 // 2) Initialize tumor
 // 3) Set the characteristic length L as the length of the data
@@ -1432,7 +1415,6 @@ void Glioma_ReactionDiffusion::_ic(Grid<W,B>& grid, string PatientFileName, Real
 
     vector<BlockInfo> vInfo = grid.getBlocksInfo();
 
-#pragma omp parallel for schedule(static)
     for(int i=0; i<vInfo.size(); i++)
     {
 	BlockInfo& info = vInfo[i];
@@ -1492,8 +1474,6 @@ void Glioma_ReactionDiffusion::_ic(Grid<W,B>& grid, string PatientFileName, Real
     }
 }
 
-
-#pragma mark ReactionDiffusion
 void Glioma_ReactionDiffusion::_reactionDiffusionStep(BoundaryInfo* boundaryInfo, const int nParallelGranularity, const Real Dw, const Real Dg, const Real rho, double dt)
 {
 
@@ -1508,7 +1488,6 @@ void Glioma_ReactionDiffusion::_reactionDiffusionStep(BoundaryInfo* boundaryInfo
 }
 
 
-#pragma mark DumpingOutput
 void Glioma_ReactionDiffusion:: _dump(int counter)
 {
     if(bVTK)
@@ -1535,7 +1514,6 @@ void Glioma_ReactionDiffusion::_dumpUQoutput()
     MatrixD3D tumor(gpd,gpd,gpd);
     vector<BlockInfo> vInfo = grid->getBlocksInfo();
 
-#pragma omp parallel for schedule(static)
     for(int i=0; i<vInfo.size(); i++)
     {
 	BlockInfo& info = vInfo[i];
@@ -1588,8 +1566,6 @@ void Glioma_ReactionDiffusion::_dumpUQoutput()
 }
 
 
-
-#pragma mark RUN
 void Glioma_ReactionDiffusion::run()
 {
     const int nParallelGranularity	= (grid->getBlocksInfo().size()<=8 ? 1 : 4);
