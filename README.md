@@ -11,7 +11,7 @@
   <dt>InputParameters.txt</dt>
   <dd> diffusivity in white matter [cm^2/day] (Dw) <br>
        proliferation rate [1/day] (rho) <br>
-       final simulation time [day]
+       final simulation time [day] (tend)
   </dd>
   
   <dt>TumorIC.txt</dt>
