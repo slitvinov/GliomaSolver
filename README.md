@@ -9,10 +9,10 @@
 
 <dl>
   <dt>InputParameters.txt</dt>
-  <dd>Dw, rho, tend</dd>
+  <dd>diffusivity in white matter [cm^2/day] (Dw), Proliferation rate [1/day] (rho), Final simulation time [day]</dd>
   
   <dt>TumorIC.txt</dt>
-  <dd>initial position of the tumor (x, y, z)</dd>
+  <dd>tumor initial location (icx, icy, icz)</dd>
 </dl>
 
 ## Output of the solver
