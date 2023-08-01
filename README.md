@@ -22,7 +22,7 @@
 
 <dl>
   <dt>HGG_data.dat</dt>
-  <dd>???</dd>
+  <dd>tumor cell density?</dd>
 </dl>
 
 ## Patient Data
