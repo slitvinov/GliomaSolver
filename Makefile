@@ -30,7 +30,7 @@ LIBS = \
 	-lvtkverdict\
 	-lvtkzlib\
 
-VPATH = Glioma MRAG MRAG/MRAGcore
+VPATH = MRAG MRAG/MRAGcore
 
 OBJECTS = \
 Glioma_main.o \
