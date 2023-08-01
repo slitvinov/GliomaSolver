@@ -7,6 +7,3 @@ int main(int argc,const char ** argv)
     Glioma_ReactionDiffusion s(argc, (const char **)argv);
     s.run();
 }
-
-
-
