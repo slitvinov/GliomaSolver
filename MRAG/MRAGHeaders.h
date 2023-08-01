@@ -70,6 +70,5 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <omp.h>
 #include <stdlib.h>     /* abs, rand */
 #include <math.h>       /* fabs */
