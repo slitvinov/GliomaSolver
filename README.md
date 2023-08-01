@@ -1,7 +1,7 @@
 ## Input for the solver
 
 <dl>
-  <dt>(GSF.dat)[CSF.dat], (GM.dat)[GM.dat], (WM.dat)[WM.dat]</dt>
+  <dt>[GSF.dat](CSF.dat), (GM.dat)[GM.dat], (WM.dat)[WM.dat]</dt>
   <dd>white matter, gray matter,  cerebrospinal fluid</dd>
 </dl>
 
