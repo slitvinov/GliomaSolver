@@ -1,12 +1,10 @@
-## Input for the solver
-
+Input for the solver
 <dl>
   <dt>CSF.dat, GM.dat, WM.dat</dt>
   <dd>white matter, gray matter,  cerebrospinal fluid</dd>
 </dl>
 
-## Model parameters
-
+Model parameters
 <dl>
   <dt>InputParameters.txt</dt>
   <dd>diffusivity in white matter [cm^2/day] (Dw), Proliferation rate [1/day] (rho), Final simulation time [day]</dd>
@@ -15,22 +13,19 @@
   <dd>tumor initial location (icx, icy, icz)</dd>
 </dl>
 
-## Output of the solver
-
+Output of the solver
 <dl>
   <dt>HGG_data.dat</dt>
   <dd>???</dd>
 </dl>
 
-## Patient Data
-
+Patient Data
 <dl>
   <dt>tumFLAIR.dat, tumPET.dat, tumT1c.dat</dt>
   <dd>FLAIR MRI scan, PET-FET scan, T1Gd MRI scan</dd>
 </dl>
 
-## Parameters of the likelihood
-
+Parameters of the likelihood
 <dl>
   <dt>LikelihoodInput.txt</dt>
   <dd>PETsigma2, PETscale, T1uc, T2uc, slope</dd>
