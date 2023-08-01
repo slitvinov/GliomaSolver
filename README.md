@@ -1,24 +1,24 @@
 ## Input for the solver
 
 <dl>
-  <dt>[GSF.dat](CSF.dat), (GM.dat)[GM.dat], (WM.dat)[WM.dat]</dt>
+  <dt>CSF.dat, GM.dat, WM.dat</dt>
   <dd>white matter, gray matter,  cerebrospinal fluid</dd>
 </dl>
 
-## Parameters
+## Model parameters
 
 <dl>
-  <dt>[[InputParameters.txt]]</dt>
+  <dt>InputParameters.txt</dt>
   <dd>Dw, rho, tend</dd>
   
-  <dt>[[TumorIC.txt]]</dt>
+  <dt>TumorIC.txt</dt>
   <dd>initial position of the tumor (x, y, z)</dd>
 </dl>
 
 ## Output of the solver
 
 <dl>
-  <dt>[[HGG_data.dat]]</dt>
+  <dt>HGG_data.dat</dt>
   <dd>???</dd>
 </dl>
 
@@ -26,7 +26,14 @@
 
 <dl>
   <dt>tumFLAIR.dat, tumPET.dat, tumT1c.dat</dt>
-  <dd>???</dd>
+  <dd>FLAIR MRI scan, PET-FET scan, T1Gd MRI scan</dd>
+</dl>
+
+## Parameters of the likelihood
+
+<dl>
+  <dt>LikelihoodInput.txt</dt>
+  <dd>PETsigma2, PETscale, T1uc, T2uc, slope</dd>
 </dl>
 
 # Refernces
