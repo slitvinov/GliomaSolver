@@ -307,10 +307,5 @@ typedef		_WAVELET_TYPE									W;
 typedef Matrix::D3D<double> MatrixD3D;
 typedef Matrix::D2D<double> MatrixD2D;
 
-#ifdef _MRAG_TBB
-static const int nThreads = _MRAG_TBB_NTHREADS_HINT ;
-typedef		Multithreading::BlockProcessing_Pipeline_TBB<B, BlockLab, nThreads+1>	BlockProcessing;
-#else
 static const int nThreads = 1 ;
 typedef		Multithreading::BlockProcessing_SingleCPU<B>							BlockProcessing;
-#endif

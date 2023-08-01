@@ -21,12 +21,7 @@
 using namespace std;
 
 #include "MRAGEnvironment.h"
-#ifdef _MRAG_TBB
-#include "tbb/tick_count.h"
-namespace tbb { class tick_count; }
-#else
 #include <time.h>
-#endif
 
 
 namespace MRAG
@@ -45,12 +40,7 @@ namespace MRAG
 	 */
 	class ProfileAgent
 	{
-#ifdef _MRAG_TBB
-		typedef tbb::tick_count ClockTime;
-#else
 		typedef clock_t ClockTime;
-#endif
-		
 		enum ProfileAgentState{ ProfileAgentState_Created, ProfileAgentState_Started, ProfileAgentState_Stopped};
 		
 		ClockTime m_tStart, m_tEnd;

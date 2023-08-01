@@ -2,18 +2,13 @@
 .SUFFIXES: .cpp
 .SUFFIXES: .o
 
-LIBS_TBB = `pkg-config --libs tbb`
-CXXFLAGS_TBB = `pkg-config --cflags tbb`
-
 CXXFLAGS_VTK = -IVTK/include/vtk-5.2
 LIBS_VTK = -LVTK/lib/vtk-5.2
 
 LIBS = \
-	$(LIBS_TBB)\
 	$(LIBS_VTK)\
 	-fopenmp\
 	-fpermissive\
-	-ltbbmalloc\
 	-lvtkCommon \
 	-lvtkDICOMParser\
 	-lvtkexpat \
@@ -54,7 +49,6 @@ CXXFLAGS = \
 	-O3\
 	-Wno-deprecated\
 	$(CXXFLAGS_VTK)\
-	$(CXXFLAGS_TBB)\
 
 brain: $(OBJECTS); $(CXX) $(OBJECTS) -o $@ $(LIBS)
 .cpp.o:; $(CXX) $(CXXFLAGS) -c $< -o $@
