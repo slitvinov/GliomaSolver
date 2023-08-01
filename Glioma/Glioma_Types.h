@@ -13,10 +13,7 @@
 #include "Matrix.h"
 
 #include "Operators/ReactionDiffusionOperator.h"
-#include "Operators/PressureOperator.h"
-#include "Operators/AdvectionConvectionOperator.h"
 #include "Operators/TimeUpdateOperator.h"
-#include "Operators/CahnHilliardOperator.h"
 
 struct Cell
 {

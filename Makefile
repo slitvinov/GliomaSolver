@@ -30,18 +30,14 @@ LIBS = \
 	-lvtkverdict\
 	-lvtkzlib\
 
-VPATH = Glioma MRAG MRAG/MRAGcore Glioma/Tests
+VPATH = Glioma MRAG MRAG/MRAGcore
 
 OBJECTS = \
-dat2VP.o \
-Glioma_ComputePFF_CahnHilliard.o\
 Glioma_main.o \
 Glioma_ReactionDiffusion.o\
-Glioma_UQ_DataPreprocessing.o\
 MRAGBoundaryBlockInfo.o \
 MRAGProfiler.o \
 MRAGWavelets_StaticData.o \
-Test.o\
 
 CXXFLAGS = \
 	-D_BLOCKSIZE_=16\

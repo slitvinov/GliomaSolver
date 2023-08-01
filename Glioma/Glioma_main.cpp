@@ -10,10 +10,7 @@
 
 #include <iostream>
 #include <xmmintrin.h>
-
-#include "Tests/Test.h"
 #include "Glioma_ReactionDiffusion.h"
-#include "dat2VP.h"
 
 using namespace std;
 using namespace MRAG;
