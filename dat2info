@@ -10,29 +10,31 @@ def unpack(string, file):
     return struct.unpack(string, buffer)
 
 
-try:
-    path = sys.argv[1]
-except IndexError:
+if len(sys.argv) < 1:
     sys.stderr.write("dat2info: error: needs an argument\n")
     sys.exit(2)
-try:
-    with open(path, "rb") as file:
-        magic, = unpack('i', file)
-        if magic != 1234:
-            sys.stderr.write("dat2info: error: '%s' not a dat file\n" % path)
-            sys.exit(1)
-        dim, = unpack('i', file)
-        if dim != 3:
-            sys.stderr.write("dat2info: error: wrong dimension '%d'\n" % dim)
-            sys.exit(1)
-        nx, ny, nz, type_id = unpack('iiii', file)
-        seek = file.tell()
-        size = file.seek(0, os.SEEK_END) - seek
-        itemsize = size // nx // ny // nz
-        print(nx, ny, nz, type_id, seek)
-except FileNotFoundError:
-    sys.stderr.write("dat2info: error: fail to open '%s'\n" % path)
-    sys.exit(2)
-except struct.error:
-    sys.stderr.write("dat2info: error: fail to read '%s'\n" % path)
-    sys.exit(2)
+for path in sys.argv[1:]:
+    try:
+        with open(path, "rb") as file:
+            magic, = unpack('i', file)
+            if magic != 1234:
+                sys.stderr.write("dat2info: error: '%s' not a dat file\n" %
+                                 path)
+                sys.exit(1)
+            dim, = unpack('i', file)
+            if dim != 3:
+                sys.stderr.write("dat2info: error: wrong dimension '%d'\n" %
+                                 dim)
+                sys.exit(1)
+            nx, ny, nz, type_id = unpack('iiii', file)
+            seek = file.tell()
+            size = file.seek(0, os.SEEK_END) - seek
+            itemsize = size // nx // ny // nz
+            type_name = {0: "double", 1: "float", 2: "int"}[type_id]
+            print(path, nx, ny, nz, type_name)
+    except FileNotFoundError:
+        sys.stderr.write("dat2info: error: fail to open '%s'\n" % path)
+        sys.exit(2)
+    except struct.error:
+        sys.stderr.write("dat2info: error: fail to read '%s'\n" % path)
+        sys.exit(2)
