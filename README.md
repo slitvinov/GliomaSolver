@@ -1,7 +1,7 @@
 ## Input for the solver
 
 <dl>
-  <dt>CSF.dat, GM.dat, WM.dat</dt>
+  <dt><CSF.dat, GM.dat, WM.dat</dt>
   <dd>white matter, gray matter,  cerebrospinal fluid</dd>
 </dl>
 
@@ -9,7 +9,10 @@
 
 <dl>
   <dt>InputParameters.txt</dt>
-  <dd>diffusivity in white matter [cm^2/day] (Dw), Proliferation rate [1/day] (rho), Final simulation time [day]</dd>
+  <dd> diffusivity in white matter [cm^2/day] (Dw) <br>
+       proliferation rate [1/day] (rho) <br>
+       final simulation time [day]
+  </dd>
   
   <dt>TumorIC.txt</dt>
   <dd>tumor initial location (icx, icy, icz)</dd>
