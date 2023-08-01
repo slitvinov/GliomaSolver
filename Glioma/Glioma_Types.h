@@ -12,8 +12,8 @@
 #include "Glioma.h"
 #include "Matrix.h"
 
-#include "Operators/ReactionDiffusionOperator.h"
-#include "Operators/TimeUpdateOperator.h"
+#include "ReactionDiffusionOperator.h"
+#include "TimeUpdateOperator.h"
 
 struct Cell
 {
