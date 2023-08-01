@@ -12,70 +12,6 @@
 #include <vector>
 
 using namespace std;
-
-class Value {
-private:
-  string content;
-
-public:
-  Value() : content("") {}
-
-  Value(string content_) : content(content_) {}
-
-
-  int asInt(int def = 0) const {
-    if (content == "")
-      return def;
-    return atoi(content.c_str());
-  }
-
-  string asString(string def = "") const {
-    if (content == "")
-      return def;
-
-    return content;
-  }
-};
-
-class ArgumentParser {
-private:
-  map<string, Value> mapArguments;
-
-  const int iArgC;
-  const char **vArgV;
-
-public:
-  Value operator()(const string arg) {
-    printf("%s is %s\n", arg.data(), mapArguments[arg].asString().data());
-    return mapArguments[arg];
-  }
-
-  ArgumentParser(const int argc, const char **argv)
-      : mapArguments(), iArgC(argc), vArgV(argv) {
-    for (int i = 1; i < argc; i++)
-      if (argv[i][0] == '-') {
-        string values = "";
-        int itemCount = 0;
-
-        for (int j = i + 1; j < argc; j++)
-          if (argv[j][0] == '-')
-            break;
-          else {
-            if (strcmp(values.c_str(), ""))
-              values += ' ';
-
-            values += argv[j];
-            itemCount++;
-          }
-
-        if (itemCount == 0)
-          values += '1';
-        mapArguments[argv[i]] = Value(values);
-        i += itemCount;
-      }
-  }
-};
-
 /**
  * Matrices all put into namespace Matrix (also includes some helpers).
  *
@@ -518,7 +454,6 @@ typedef Matrix::D3D<double> MatrixD3D;
 
 class HGG_Likelihood {
 private:
-  ArgumentParser parser;
   long double _computePETLogLikelihood(MatrixD3D model);
   long double _computeTiLogLikelihood(MatrixD3D model, int Ti);
   long double _computeLogBernoulli(double y, double u, int Ti);
@@ -537,8 +472,7 @@ public:
 };
 
 
-HGG_Likelihood::HGG_Likelihood(const int argc, const char **argv)
-    : parser(argc, argv) {
+HGG_Likelihood::HGG_Likelihood(const int argc, const char **argv) {
   ifstream mydata("LikelihoodInput.txt");
 
   if (mydata.is_open()) {
@@ -553,8 +487,8 @@ HGG_Likelihood::HGG_Likelihood(const int argc, const char **argv)
     abort();
   }
 
-  stepPET = parser("-stepPET").asInt(1);
-  stepTi = parser("-stepMRI").asInt(1);
+  stepPET = 1;
+  stepTi = 1;
 
   printf("PET: PETsigma2=%f, PETscale=%f \n", PETsigma2, PETscale);
   printf("MRI: T1uc=%f, T2uc =%f, slope=%f \n", T1uc, T2uc, slope);
@@ -682,7 +616,6 @@ void HGG_Likelihood::run() {
 }
 
 int main(int argc, const char **argv) {
-  ArgumentParser parser(argc, argv);
   HGG_Likelihood *l = new HGG_Likelihood(argc, (const char **)argv);
   l->run();
   delete l;
