@@ -7,8 +7,6 @@ LIBS_VTK = -LVTK/lib/vtk-5.2
 
 LIBS = \
 	$(LIBS_VTK)\
-	-fopenmp\
-	-fpermissive\
 	-lvtkCommon \
 	-lvtkDICOMParser\
 	-lvtkexpat \
@@ -42,9 +40,6 @@ CXXFLAGS = \
 	-D _MAXLEVEL_=4\
 	-DNDEBUG\
 	-D_RESJUMP_=1\
-	-IGlioma/\
-	-IGlioma/Operators/\
-	-IGlioma/Tests/\
 	-IMRAG/\
 	-O3\
 	-Wno-deprecated\
