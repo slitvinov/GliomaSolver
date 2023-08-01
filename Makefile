@@ -26,8 +26,8 @@ LIBS = \
 VPATH = MRAG MRAG/MRAGcore
 
 OBJECTS = \
-Glioma_main.o \
-Glioma_ReactionDiffusion.o\
+main.o \
+ReactionDiffusion.o\
 MRAGBoundaryBlockInfo.o \
 MRAGProfiler.o \
 MRAGWavelets_StaticData.o \
