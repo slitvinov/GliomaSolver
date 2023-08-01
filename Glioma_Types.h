@@ -9,42 +9,49 @@
 
 
 #pragma once
-#include "Glioma.h"
+#include "../MRAG/MRAGHeaders.h"
 #include "Matrix.h"
-
 #include "ReactionDiffusionOperator.h"
 #include "TimeUpdateOperator.h"
+using namespace MRAG;
+class Glioma
+{
+public:
+
+	virtual void run() = 0;
+	virtual ~Glioma(){}
+};
 
 struct Cell
 {
     /* tumor */
     Real phi;
     Real dphidt;
-    
+
     /* tissue percentage per voxel*/
 	Real p_g, p_w, p_csf;
-    
+
     /* tissue concentration */
     Real wm, gm, csf;  //
     Real dwmdt, dgmdt, dcsfdt;
-    
+
     // velocity field + helper fields for WENO
     Real ux,uy,uz;
     Real omega, domegadt;
-    
+
     // pressure + auxiliary functions for pressure source, phase filed funtion, charact. function
     Real p, dpdt;
     Real f;
     Real chi;           // domain char. funciton
     Real pff, dpffdt;   // pahse field function of whole anatomy, of tissue
-    
+
     // other helper fields
 	Real exact;
 	Real tmp;
-    
+
     // Volume Perception
     Real vp;
-    
+
     // Cahn-Hilliard
     Real mob, mu;  // mobility and chemical potetnial mu
 
@@ -55,24 +62,24 @@ struct Cell
 		p_g		 = 0.0;
 		p_w		 = 0.0;
 		p_csf    = 0.0;
-        wm = gm = csf = 0.0;
-        dwmdt = dgmdt = dcsfdt = 0.0;
+	wm = gm = csf = 0.0;
+	dwmdt = dgmdt = dcsfdt = 0.0;
 		ux = uy = uz  = 0.0;
 		p        = 0.0;
-        dpdt     = 0.0;
+	dpdt     = 0.0;
 		omega	 = 0.0;
 		domegadt = 0.0;
 		exact    = 0.0;
 		tmp      = 0.0;
 		f        = 0.0;
-        chi      = 0.0;
+	chi      = 0.0;
 		pff		 = 0.0;
-        dpffdt   = 0.0;
-        vp       = 0.0;
-        mob      = 0.0;
-        mu       = 0.0;
+	dpffdt   = 0.0;
+	vp       = 0.0;
+	mob      = 0.0;
+	mu       = 0.0;
     }
-	
+
     Cell(Real phi_, Real dphidt_, Real p_g_, Real p_w_, Real p_csf_, Real wm_, Real gm_, Real csf_, Real dwmdt_, Real dgmdt_, Real dcsfdt_, Real ux_, Real uy_, Real uz_, Real p_, Real dpdt_, Real omega_, Real domegadt_, Real exact_, Real tmp_ , Real f_, Real chi_, Real pff_, Real dpffdt_, Real vp_, Real mob_, Real mu_)
 	{
 		phi		 = phi_	    ;
@@ -80,30 +87,30 @@ struct Cell
 		p_g		 = p_g_	    ;
 		p_w		 = p_w_	    ;
 		p_csf	 = p_csf_   ;
-        wm       = wm_      ;
-        gm       = gm_      ;
-        csf      = csf_     ;
-        dwmdt    = dwmdt_   ;
-        dgmdt    = dgmdt_   ;
-        dcsfdt   = dcsfdt_  ;
+	wm       = wm_      ;
+	gm       = gm_      ;
+	csf      = csf_     ;
+	dwmdt    = dwmdt_   ;
+	dgmdt    = dgmdt_   ;
+	dcsfdt   = dcsfdt_  ;
 		ux		 = ux_	    ;
 		uy		 = uy_	    ;
 		uz		 = uz_	    ;
 		p		 = p_       ;
-        dpdt     = dpdt_    ;
+	dpdt     = dpdt_    ;
 		omega    = omega_   ;
 		domegadt = domegadt_;
 		exact    = exact_   ;
 		tmp      = tmp_     ;
 		f        = f_       ;
-        chi      = chi_     ;
+	chi      = chi_     ;
 		pff		 = pff_	    ;
-        dpffdt   = dpffdt_  ;
-        vp       = vp_      ;
-        mob      = mob_     ;
-        mu       = mu_      ;
+	dpffdt   = dpffdt_  ;
+	vp       = vp_      ;
+	mob      = mob_     ;
+	mu       = mu_      ;
     }
-	
+
 	void operator += (Cell t)
 	{
 		phi		 += t.phi	  ;
@@ -111,90 +118,90 @@ struct Cell
 		p_g		 += t.p_g	  ;
 		p_w		 += t.p_w	  ;
 		p_csf    += t.p_csf   ;
-        wm       += t.wm      ;
-        gm       += t.gm      ;
-        csf      += t.csf     ;
-        dwmdt    += t.dwmdt   ;
-        dgmdt    += t.dgmdt   ;
-        dcsfdt   += t.dcsfdt  ;
+	wm       += t.wm      ;
+	gm       += t.gm      ;
+	csf      += t.csf     ;
+	dwmdt    += t.dwmdt   ;
+	dgmdt    += t.dgmdt   ;
+	dcsfdt   += t.dcsfdt  ;
 		ux		 += t.ux	  ;
 		uy		 += t.uy	  ;
 		uz		 += t.uz	  ;
-		p		 += t.p 	  ;
-        dpdt     += t.dpdt    ;
+		p		 += t.p		  ;
+	dpdt     += t.dpdt    ;
 		omega    += t.omega	  ;
 		domegadt += t.domegadt;
 		exact    += t.exact   ;
 		tmp      += t.tmp	  ;
 		f        += t.f		  ;
-        chi      += t.chi     ;
+	chi      += t.chi     ;
 		pff		 += t.pff     ;
-        dpffdt   += t.dpffdt     ;
-        vp       += t.vp      ;
-        mob      += t.mob     ;
-        mu       += t.mu      ;
+	dpffdt   += t.dpffdt     ;
+	vp       += t.vp      ;
+	mob      += t.mob     ;
+	mu       += t.mu      ;
 	}
-	
-	
-	
-	operator Real() 
+
+
+
+	operator Real()
 	{
 		return (Real)phi;
 	}
-	
+
 	void integrate(float dt)
 	{
 		phi		+= dt*dphidt;
 		dphidt	= 0.0;
 	}
-	
+
 	template<int i>
 	Real evaluate_concentration(double dt)
 	{
 		return  phi+dt*dphidt;
 	}
-	
-	
+
+
 	Real giveMe(int i, Real h=0)
 	{
-        
+
 #ifdef _TESTS
-        switch(i)
-        {
-            case 0: return p; //vp
-            case 1: return exact;
-            case 2: return pff;
-            case 3: return chi;
-            case 4: return f;
-        }        
+	switch(i)
+	{
+	    case 0: return p; //vp
+	    case 1: return exact;
+	    case 2: return pff;
+	    case 3: return chi;
+	    case 4: return f;
+	}
 #else
 		switch(i)
 		{
-            case 0:  return phi;
-            case 1:  return phi + 0.1 * p_g + 0.2 * p_w;
-            case 2:  return p_w;
-            case 3:  return p_g;
-            case 4:  return p_csf;
-            case 5:  return wm;
-            case 6:  return gm;
-            case 7:  return csf;
-            case 8:  return ux;
-            case 9:  return uy;
-            case 10: return uz;
-            case 11: return p ;
-            case 12: return chi;
-            case 13: return f;
-            case 14: return pff;
+	    case 0:  return phi;
+	    case 1:  return phi + 0.1 * p_g + 0.2 * p_w;
+	    case 2:  return p_w;
+	    case 3:  return p_g;
+	    case 4:  return p_csf;
+	    case 5:  return wm;
+	    case 6:  return gm;
+	    case 7:  return csf;
+	    case 8:  return ux;
+	    case 9:  return uy;
+	    case 10: return uz;
+	    case 11: return p ;
+	    case 12: return chi;
+	    case 13: return f;
+	    case 14: return pff;
 
 
 			default: abort(); return 0;
 		}
-        
+
 #endif
-        
+
 	}
-				
-	
+
+
 };
 
 inline Cell operator*(const Cell& p, Real v)
@@ -227,21 +234,21 @@ inline Cell operator*(const Cell& p, Real v)
     c.vp        = p.vp       *v;
     c.mob       = p.mob      *v;
     c.mu        = p.mu       *v;
-   
+
 	return c;
 }
 
 
 #pragma mark projectors
 
-template <typename T, int i> 
+template <typename T, int i>
 inline Real RD_projector_impl_vtk(const T&t)
 {
-	//	return (Real)(0.2*t.p_w + 0.1*t.p_g );	
+	//	return (Real)(0.2*t.p_w + 0.1*t.p_g );
 	return (Real)(0.1 * t.p_g + 0.2 * t.p_w + t.p_csf + t.phi );
 }
 
-template <typename T, int i> 
+template <typename T, int i>
 inline Real RD_projector_impl_wav(const T&t)
 {
 	//return i==0 ? (Real)(t.phi) : (Real)(t.p_w);  // for refinment w.r.t 2 channels
