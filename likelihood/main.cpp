@@ -195,7 +195,6 @@ private:
   double PETsigma2, PETscale;
   double slope;
   double T1uc, T2uc;
-  int stepPET, stepTi;
 
 public:
   HGG_Likelihood(const int argc, const char **argv);
@@ -215,11 +214,8 @@ HGG_Likelihood::HGG_Likelihood(const int argc, const char **argv) {
     printf("Aborting: missing input file LikelihoodInput.txt \n");
     abort();
   }
-  stepPET = 1;
-  stepTi = 1;
   printf("PET: PETsigma2=%f, PETscale=%f \n", PETsigma2, PETscale);
   printf("MRI: T1uc=%f, T2uc =%f, slope=%f \n", T1uc, T2uc, slope);
-  printf("stepPET=%d, stepTi =%d \n", stepPET, stepTi);
 }
 long double HGG_Likelihood::_computePETLogLikelihood(MatrixD3D model) {
   char filename[256];
@@ -233,18 +229,15 @@ long double HGG_Likelihood::_computePETLogLikelihood(MatrixD3D model) {
   for (int iz = 0; iz < dataZ; iz++)
     for (int iy = 0; iy < dataY; iy++)
       for (int ix = 0; ix < dataX; ix++) {
-        if ((ix % stepPET == 0) && (iy % stepPET == 0) && (iz % stepPET == 0)) {
           if (PETdata(ix, iy, iz) > 0.) {
             sum += (model(ix, iy, iz) - PETscale * PETdata(ix, iy, iz)) *
                    (model(ix, iy, iz) - PETscale * PETdata(ix, iy, iz));
             N++;
           }
-        }
       }
   long double p1 = -0.5 * N * log(2. * M_PI * PETsigma2);
   long double p2 = -0.5 * (1. / PETsigma2) * sum;
-  printf("Points=%i, stepPET=%i \n", N, stepPET);
-  return (p1 + p2);
+  return p1 + p2;
 }
 long double HGG_Likelihood::_computeTiLogLikelihood(MatrixD3D model, int Ti) {
   char filename[256];
