@@ -456,13 +456,7 @@ public:
 		for(int i=0; i<n; i++)
 			body.vOutput[i] = new FWTReport<nChannels>(nReportSizeX, nReportSizeY, nReportSizeZ);
 		
-#ifdef _MRAG_TBB
-		//printf("(BlockFWT::multichannel_fwt: TBB)\n");
-		const int nThreads = _MRAG_TBB_NTHREADS_HINT;
-		tbb::parallel_for(tbb::blocked_range<size_t>(0, n,std::max(1,n/nThreads)), body);
-#else
 		body(SimpleInterval(0, n));
-#endif
 		vector<FWTReport<nChannels> > vResult;
 		
 		for(int i=0; i<n; i++)

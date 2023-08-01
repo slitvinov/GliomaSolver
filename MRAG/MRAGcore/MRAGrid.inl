@@ -6,11 +6,6 @@
 #include "MRAG_BBInfoCreator.h"
 #include "MRAGRefiner.h"
 
-#ifdef _MRAG_TBB
-#include "tbb/blocked_range.h"
-#include "tbb/parallel_for.h"
-#endif
-
 namespace MRAG
 {
 	
@@ -687,15 +682,7 @@ namespace MRAG
 		
 		const int n = vNodesToCompute.size();
 		Body_CreateBoundaryInfo<WaveletType, BlockType> body(m_neighborhood, binfo, requested_stencil_start, requested_stencil_end, vNodesToCompute);
-
-#ifdef _MRAG_TBB
-		//printf("(Grid::_computeBoundaryInfo: TBB)\n");
-		const int nThreads = _MRAG_TBB_NTHREADS_HINT;
-		tbb::parallel_for(tbb::blocked_range<size_t>(0, n,std::max(1,n/nThreads)), body);
-#else
 		body(SimpleInterval(0, n));
-#endif
-		
 		body.collect();
 	}
 
