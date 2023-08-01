@@ -1,4 +1,4 @@
-## Input for the solver
+## Input for the Reaction-Diffusion model
 
 <dl>
   <dt><CSF.dat, GM.dat, WM.dat</dt>
