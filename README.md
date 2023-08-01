@@ -1,8 +1,6 @@
 ## Input for the Reaction-Diffusion model
-
-<br>
 <dl>
-  <dt><CSF.dat, GM.dat, WM.dat</dt>
+  <dt>CSF.dat, GM.dat, WM.dat</dt>
   <dd>white matter, gray matter,  cerebrospinal fluid</dd>
 </dl>
 
