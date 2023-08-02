@@ -142,29 +142,6 @@ private:
     mNelements = nx * ny * nz;
     mData = new T[mNelements];
   }
-
-public:
-  D3D &operator=(const D3D &from) {
-    // handle self-assignment
-    if (this == &from)
-      return *this;
-
-    // resize needed?
-    if (from.mNx != mNx || from.mNy != mNy || from.mNz != mNz) {
-      delete mData;
-      init(from.mNx, from.mNy, from.mNz);
-      assert(mNelements == from.mNelements);
-    }
-
-    // copy from data
-    for (int i = 0; i < mNelements; ++i) {
-      mData[i] = from.mData[i];
-    }
-
-    // don't forget to return
-    return *this;
-  }
-
 public:
   size_t getSizeX() const { return mNx; }
   size_t getSizeY() const { return mNy; }
