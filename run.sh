@@ -2,8 +2,7 @@
 
 : ${brain=./brain}
 
-N=4
-OMP_NUM_THREADS=$N LD_LIBRARY_PATH=VTK/lib/vtk-5.2 "$brain" \
+"$brain" \
     -adaptive 1 \
     -dumpfreq 50 \
     -model RD \
