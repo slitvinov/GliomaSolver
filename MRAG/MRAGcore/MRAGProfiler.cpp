@@ -8,7 +8,6 @@
  */
 
 
-#include "MRAGEnvironment.h"
 #include "MRAGProfiler.h"
 	#include <time.h>
 	void MRAG::ProfileAgent::_getTime(clock_t& time)

@@ -16,7 +16,6 @@
 #include <set>
 using namespace std;
 
-#include "MRAGEnvironment.h"
 #include "MRAGGridNode.h"
 #include "MRAGCompressor.h"
 #include "MRAGRefinementPlan.h"

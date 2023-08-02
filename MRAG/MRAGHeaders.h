@@ -9,7 +9,6 @@
  */
 
 #include "MRAGcore/MRAGCommon.h"
-#include "MRAGcore/MRAGEnvironment.h"
 
 #define _WAVELET_TYPE Wavelets_Interp2ndOrder
 #undef _MRAG_GLUT_VIZ

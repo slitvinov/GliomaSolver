@@ -15,7 +15,6 @@
 #include "MRAGBlockCollection.h"
 #include "MRAGMatrix3D.h"
 #include "MRAGBlockLab.h"
-#include "MRAGEnvironment.h"
 #undef max
 #undef min
 

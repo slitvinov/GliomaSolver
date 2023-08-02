@@ -11,8 +11,6 @@
 #include "MRAGrid.h"
 #include "MRAGBlockCollection.h"
 
-#include "MRAGEnvironment.h"
-
 #ifdef _MRAG_BLOCKLAB_ALLOCATOR_HEADER
 #include _MRAG_BLOCKLAB_ALLOCATOR_HEADER
 #endif

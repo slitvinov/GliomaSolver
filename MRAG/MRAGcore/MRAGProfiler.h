@@ -20,7 +20,6 @@
 
 using namespace std;
 
-#include "MRAGEnvironment.h"
 #include <time.h>
 
 
