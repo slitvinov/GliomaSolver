@@ -23,17 +23,6 @@ inline std::istream &deserializeHeader(std::istream &is, size_t dim,
   is.read((char *)size, dim * sizeof(int));
   return is;
 }
-inline void deserializeHeader(const char *filename, size_t dim, int *size) {
-  std::ifstream fin(filename, std::ios::binary);
-  if (!fin.is_open()) {
-    std::cout << "ERROR while opening " << filename << std::endl;
-    return;
-  }
-  if (!deserializeHeader(fin, dim, size)) {
-    std::cout << "ERROR while reading " << filename << std::endl;
-  }
-  fin.close();
-}
 template <typename T2, typename T>
 inline std::istream &deserializeConvert(std::istream &is, T *data, int n_elem) {
   T2 *tmp = new T2[n_elem];
