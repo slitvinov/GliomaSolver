@@ -617,7 +617,6 @@ private:
   bool bAdaptivity;
   bool bVerbose;
   bool bVTK;
-  bool bUQ;
   bool bDumpIC;
   string PatientFileName;
   Real L;
@@ -643,7 +642,6 @@ Glioma_ReactionDiffusion::Glioma_ReactionDiffusion(int argc, const char **argv)
     : parser(argc, argv) {
   bVerbose = parser("-verbose").asBool(1);
   bVTK = parser("-vtk").asBool(1);
-  bUQ = parser("-UQ").asBool(0);
   bDumpIC = parser("-bDumpIC").asBool(1);
   bAdaptivity = parser("-adaptive").asBool(1);
   PatientFileName = parser("-PatFileName").asString();
@@ -662,7 +660,6 @@ Glioma_ReactionDiffusion::Glioma_ReactionDiffusion(int argc, const char **argv)
 
   L = 1;
 
-  if (bUQ) {
     ifstream mydata("TumorIC.txt");
 
     if (mydata.is_open()) {
@@ -674,11 +671,6 @@ Glioma_ReactionDiffusion::Glioma_ReactionDiffusion(int argc, const char **argv)
       printf("Aborting: missing input file TumorIC.txt \n");
       abort();
     }
-  } else {
-    tumor_ic[0] = parser("-icx").asDouble(0.28);
-    tumor_ic[1] = parser("-icy").asDouble(0.67);
-    tumor_ic[2] = parser("-icz").asDouble(0.35);
-  }
 
   _ic(*grid, PatientFileName, L, tumor_ic);
 
@@ -885,7 +877,6 @@ void Glioma_ReactionDiffusion::run() {
   /* Tumor growth parameters*/
   Real Dw, Dg, rho, tend;
 
-  if (bUQ) {
     ifstream mydata("InputParameters.txt");
     if (mydata.is_open()) {
       mydata >> Dw;
@@ -896,11 +887,6 @@ void Glioma_ReactionDiffusion::run() {
       printf("Aborting: missing input file InputParameters.txt \n");
       abort();
     }
-  } else {
-    Dw = (Real)parser("-Dw").asDouble(0.0013);
-    rho = (Real)parser("-rho").asDouble(0.025);
-    tend = (Real)parser("-Tend").asDouble(300);
-  }
 
   /*rescale for correct space dimension*/
   Dw = Dw / (L * L);
@@ -938,20 +924,11 @@ void Glioma_ReactionDiffusion::run() {
         printf("Dumping data at time t=%f\n", t);
     }
   }
-
-  // Refine + save the last one
   if (bAdaptivity)
     Science::AutomaticRefinement<0, 0>(*grid, blockfwt, refinement_tolerance,
                                        maxLevel, 1, &profiler);
-
   _dump(iCounter);
-  if (bUQ)
-    _dumpUQoutput();
-
-  if (bVerbose)
-    printf("**** Dumping done\n");
-  if (bVerbose)
-    printf("\n\n Run Finished \n\n");
+  _dumpUQoutput();
 }
 
 using namespace MRAG;
