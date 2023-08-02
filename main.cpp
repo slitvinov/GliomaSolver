@@ -169,10 +169,8 @@ public:
     fout.close();
   }
   std::ostream &dump(std::ostream &os, TypeID tid = (TypeID)typeId<T>()) const {
-    // HEADER
     int header[5] = {1234, 3, mNx, mNy, mNz};
     os.write((char *)header, 5 * sizeof(int));
-    // DATA
     return serialize(os, mData, mNelements, tid);
   }
   void load(const char *filename) {
@@ -540,10 +538,6 @@ inline Cell operator*(const Cell &p, Real v) {
   return c;
 }
 
-template <typename T, int i> inline Real RD_projector_impl_vtk(const T &t) {
-  //	return (Real)(0.2*t.p_w + 0.1*t.p_g );
-  return (Real)(0.1 * t.p_g + 0.2 * t.p_w + t.p_csf + t.phi);
-}
 
 template <typename T, int i> inline Real RD_projector_impl_wav(const T &t) {
   // return i==0 ? (Real)(t.phi) : (Real)(t.p_w);  // for refinment w.r.t 2
@@ -552,8 +546,7 @@ template <typename T, int i> inline Real RD_projector_impl_wav(const T &t) {
   //    return (Real)(t.pff) ;
 }
 
-make_projector(RD_Projector_VTK, RD_projector_impl_vtk)
-    make_projector(RD_Projector_Wavelets, RD_projector_impl_wav)
+make_projector(RD_Projector_Wavelets, RD_projector_impl_wav)
 
 #ifndef _BLOCKSIZE_
 #define _BLOCKSIZE_ 16
@@ -608,7 +601,6 @@ private:
   SpaceTimeSorter stSorter;
   Profiler profiler;
   ArgumentParser parser;
-  IO_VTK<W, B, RD_Projector_VTK> vtk;
   BlockLab<B> lab;
   int numberOfIterations;
   double whenToWrite;
@@ -616,7 +608,6 @@ private:
   bool isDone;
   bool bAdaptivity;
   bool bVerbose;
-  bool bVTK;
   bool bDumpIC;
   string PatientFileName;
   Real L;
@@ -627,7 +618,6 @@ private:
   void _reactionDiffusionStep(BoundaryInfo *boundaryInfo,
                               const int nParallelGranularity, const Real Dw,
                               const Real Dg, const Real rho, double dt);
-  void _dump(int counter);
   void _dumpUQoutput();
 
 public:
@@ -641,7 +631,6 @@ static int maxStencil[2][3] = {-1, -1, -1, +2, +2, +2};
 Glioma_ReactionDiffusion::Glioma_ReactionDiffusion(int argc, const char **argv)
     : parser(argc, argv) {
   bVerbose = parser("-verbose").asBool(1);
-  bVTK = parser("-vtk").asBool(1);
   bDumpIC = parser("-bDumpIC").asBool(1);
   bAdaptivity = parser("-adaptive").asBool(1);
   PatientFileName = parser("-PatFileName").asString();
@@ -673,9 +662,6 @@ Glioma_ReactionDiffusion::Glioma_ReactionDiffusion(int argc, const char **argv)
     }
 
   _ic(*grid, PatientFileName, L, tumor_ic);
-
-  if (bDumpIC)
-    _dump(0);
 
   isDone = false;
   whenToWriteOffset = parser("-dumpfreq").asDouble();
@@ -806,15 +792,6 @@ void Glioma_ReactionDiffusion::_reactionDiffusionStep(
   BlockProcessing::process(vInfo, collecton, updateTumor, nParallelGranularity);
 }
 
-void Glioma_ReactionDiffusion::_dump(int counter) {
-  if (bVTK) {
-    char filename[256];
-    sprintf(filename, "Data_%04d", counter);
-
-    IO_VTKNative3D<W, B, 5, 0> vtkdumper2;
-    vtkdumper2.Write(*grid, grid->getBoundaryInfo(), filename);
-  }
-}
 
 /* Dump output for UQ likelihood. Requirements:
  - dump at the uniform finest resolution
@@ -917,17 +894,12 @@ void Glioma_ReactionDiffusion::run() {
         // Science::AutomaticCompression	<0,0>(*grid, blockfwt,
         // compression_tolerance, -1, &profiler);
       }
-
-      _dump(iCounter++);
       whenToWrite = whenToWrite + whenToWriteOffset;
-      if ((bVerbose) && (bVTK))
-        printf("Dumping data at time t=%f\n", t);
     }
   }
   if (bAdaptivity)
     Science::AutomaticRefinement<0, 0>(*grid, blockfwt, refinement_tolerance,
                                        maxLevel, 1, &profiler);
-  _dump(iCounter);
   _dumpUQoutput();
 }
 
