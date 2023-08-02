@@ -1,5 +1,12 @@
-#include "../MRAG/MRAGHeaders.h"
+#include "MRAGcore/MRAGCommon.h"
+#include "MRAGHeaders.h"
+#include "MRAGcore/MRAGrid.h"
+#include "MRAGcore/MRAGBlock.h"
+#include "MRAGcore/MRAGGridNode.h"
+#include "MRAGcore/MRAGBlockCollection.h"
+#include "MRAGio/MRAG_IO_BaseClass.h"
 #include <fstream>
+using namespace MRAG;
 namespace Matrix {
 enum TypeID { TID_DOUBLE = 0, TID_FLOAT = 1, TID_INT = 2, TID_INVALID = -1 };
 template <typename T> inline int typeId() { return TID_INVALID; }
@@ -903,7 +910,6 @@ void Glioma_ReactionDiffusion::run() {
   _dumpUQoutput();
 }
 
-using namespace MRAG;
 int main(int argc, const char **argv) {
   ArgumentParser parser(argc, argv);
   Environment::setup(max(1, parser("-nthreads").asInt()));

@@ -159,10 +159,6 @@ struct WTDataType
 	operator float() { return scaling; }
 };
 
-#pragma mark struct BlockInfo
-/**
- * Helper structure to pass info of a block (like ID, position, level and a reference to the actual block).
- */
 struct BlockInfo
 {
 	int blockID;

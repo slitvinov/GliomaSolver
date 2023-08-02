@@ -54,10 +54,7 @@
 #include "MRAGscience/MRAGRefiner_SpaceExtension.h"
 #include "MRAGscience/MRAGWeno.h"
 #include "MRAGmultithreading/MRAGBlockProcessing_SingleCPU.h"
-
 #include "MRAGio/MRAG_IO_ArgumentParser.h"
-#include "MRAGio/MRAG_IO_VTK.h"
-#include "MRAGio/MRAG_IO_VTU3D.h"
 
 #include <cstdlib>
 #include <cstdio>
