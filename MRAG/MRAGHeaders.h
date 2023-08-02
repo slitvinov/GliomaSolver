@@ -2,8 +2,8 @@
  *  MRAGHeaders.h
  *  GliomaCode
  *
- *  Created by Diego Rossinelli on 7/15/10, 
- *	modified by Jana Lipkova 
+ *  Created by Diego Rossinelli on 7/15/10,
+ *	modified by Jana Lipkova
  *  Copyright 2010 ETH Zurich. All rights reserved.
  *
  */
@@ -42,11 +42,6 @@
 #include "MRAGcore/MRAGBlockLab.h"
 #include "MRAGcore/MRAGBlockFWT.h"
 #include "MRAGcore/MRAGProfiler.h"
-
-#ifdef _MRAG_GLUT_VIZ
-    #include "MRAGvisual/GridViewer.h"
-#endif
-
 #include "MRAGscience/MRAGScienceCore.h"
 #include "MRAGscience/MRAGAutomaticRefiner.h"
 #include "MRAGscience/MRAGSimpleLevelsetBlock.h"
@@ -63,5 +58,5 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <stdlib.h>     /* abs, rand */
-#include <math.h>       /* fabs */
+#include <stdlib.h>
+#include <math.h>

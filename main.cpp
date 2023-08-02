@@ -4,7 +4,6 @@
 #include "MRAGcore/MRAGBlock.h"
 #include "MRAGcore/MRAGGridNode.h"
 #include "MRAGcore/MRAGBlockCollection.h"
-#include "MRAGio/MRAG_IO_BaseClass.h"
 #include <fstream>
 using namespace MRAG;
 namespace Matrix {
