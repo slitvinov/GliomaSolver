@@ -425,40 +425,6 @@ struct Cell {
     mu = 0.0;
   }
 
-  Cell(Real phi_, Real dphidt_, Real p_g_, Real p_w_, Real p_csf_, Real wm_,
-       Real gm_, Real csf_, Real dwmdt_, Real dgmdt_, Real dcsfdt_, Real ux_,
-       Real uy_, Real uz_, Real p_, Real dpdt_, Real omega_, Real domegadt_,
-       Real exact_, Real tmp_, Real f_, Real chi_, Real pff_, Real dpffdt_,
-       Real vp_, Real mob_, Real mu_) {
-    phi = phi_;
-    dphidt = dphidt_;
-    p_g = p_g_;
-    p_w = p_w_;
-    p_csf = p_csf_;
-    wm = wm_;
-    gm = gm_;
-    csf = csf_;
-    dwmdt = dwmdt_;
-    dgmdt = dgmdt_;
-    dcsfdt = dcsfdt_;
-    ux = ux_;
-    uy = uy_;
-    uz = uz_;
-    p = p_;
-    dpdt = dpdt_;
-    omega = omega_;
-    domegadt = domegadt_;
-    exact = exact_;
-    tmp = tmp_;
-    f = f_;
-    chi = chi_;
-    pff = pff_;
-    dpffdt = dpffdt_;
-    vp = vp_;
-    mob = mob_;
-    mu = mu_;
-  }
-
   void operator+=(Cell t) {
     phi += t.phi;
     dphidt += t.dphidt;
