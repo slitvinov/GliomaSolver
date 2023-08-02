@@ -215,7 +215,7 @@ private:
  //     D - diffusivity
  //  ------------------------------------
  */
-template <int nDim = 3> struct ReactionDiffusionOperator {
+struct ReactionDiffusionOperator {
   int stencil_start[3];
   int stencil_end[3];
 
@@ -225,16 +225,16 @@ template <int nDim = 3> struct ReactionDiffusionOperator {
       : Dw(Dw_), Dg(Dg_), rho(rho_) {
     stencil_start[0] = stencil_start[1] = -1;
     stencil_end[0] = stencil_end[1] = +2;
-    stencil_start[2] = nDim == 3 ? -1 : 0;
-    stencil_end[2] = nDim == 3 ? +2 : +1;
+    stencil_start[2] = -1;
+    stencil_end[2] = +2;
   }
 
   ReactionDiffusionOperator(const ReactionDiffusionOperator &copy)
       : Dw(copy.Dw), Dg(copy.Dg), rho(copy.rho) {
     stencil_start[0] = stencil_start[1] = -1;
     stencil_end[0] = stencil_end[1] = +2;
-    stencil_start[2] = nDim == 3 ? -1 : 0;
-    stencil_end[2] = nDim == 3 ? +2 : +1;
+    stencil_start[2] = -1;
+    stencil_end[2] = +2;
   }
 
   template <typename LabType, typename BlockType>
@@ -248,50 +248,6 @@ template <int nDim = 3> struct ReactionDiffusionOperator {
     Real df_loc; // diffusion at the current point (local)
     Real chf_loc; // diffusion at the current point (local)
 
-    if (nDim == 2) {
-      for (int iy = 0; iy < BlockType::sizeY; iy++)
-        for (int ix = 0; ix < BlockType::sizeX; ix++) {
-          // check if we are in the brain domain = wm+gm + tumor
-          // need to include tumor for case of brain deformations, to deal with
-          // case where there is 100% tumor -> no healthy brain tissue but we
-          // are still in the brain
-          if (lab(ix, iy).p_w + lab(ix, iy).p_g + lab(ix, iy).phi > 0.) {
-            df_loc = lab(ix, iy).p_w * Dw + lab(ix, iy).p_g * Dg;
-            df[0] = lab(ix - 1, iy).p_w * Dw + lab(ix - 1, iy).p_g * Dg;
-            df[1] = lab(ix + 1, iy).p_w * Dw + lab(ix + 1, iy).p_g * Dg;
-            df[2] = lab(ix, iy - 1).p_w * Dw + lab(ix, iy - 1).p_g * Dg;
-            df[3] = lab(ix, iy + 1).p_w * Dw + lab(ix, iy + 1).p_g * Dg;
-
-            _harmonic_mean(df, df_loc);
-
-            chf[0] =
-                lab(ix - 1, iy).phi + lab(ix - 1, iy).p_w + lab(ix - 1, iy).p_g;
-            chf[1] =
-                lab(ix + 1, iy).phi + lab(ix + 1, iy).p_w + lab(ix + 1, iy).p_g;
-            chf[2] =
-                lab(ix, iy - 1).phi + lab(ix, iy - 1).p_w + lab(ix, iy - 1).p_g;
-            chf[3] =
-                lab(ix, iy + 1).phi + lab(ix, iy + 1).p_w + lab(ix, iy + 1).p_g;
-
-            _applyNoFluxBC(df, chf);
-
-            // diffusion fluxes
-            double diffusionFluxIn =
-                ih2 *
-                (df[0] * lab(ix - 1, iy).phi + df[1] * lab(ix + 1, iy).phi +
-                 df[2] * lab(ix, iy - 1).phi + df[3] * lab(ix, iy + 1).phi);
-
-            double diffusionFluxOut =
-                -((df[0] + df[1] + df[2] + df[3]) * lab(ix, iy).phi * ih2);
-            double reactionFlux =
-                rho * lab(ix, iy).phi * (1. - lab(ix, iy).phi);
-
-            o(ix, iy).dphidt =
-                diffusionFluxOut + diffusionFluxIn + reactionFlux;
-          } else
-            o(ix, iy).dphidt = 0.;
-        }
-    } else {
       for (int iz = 0; iz < BlockType::sizeZ; iz++)
         for (int iy = 0; iy < BlockType::sizeY; iy++)
           for (int ix = 0; ix < BlockType::sizeX; ix++) {
@@ -349,7 +305,6 @@ template <int nDim = 3> struct ReactionDiffusionOperator {
             } else
               o(ix, iy, iz).dphidt = 0.;
           }
-    }
   }
 
   // Di,j = 2 * (Di * Dj / (Di + Dj)
@@ -366,12 +321,10 @@ template <int nDim = 3> struct ReactionDiffusionOperator {
     df[3] =
         (df[3] + df_loc < eps) ? 0. : 2. * df[3] * df_loc / (df[3] + df_loc);
 
-    if (nDim > 2) {
       df[4] =
           (df[4] + df_loc < eps) ? 0. : 2. * df[4] * df_loc / (df[4] + df_loc);
       df[5] =
           (df[5] + df_loc < eps) ? 0. : 2. * df[5] * df_loc / (df[5] + df_loc);
-    }
   }
 
   inline void _applyNoFluxBC(Real (&df)[6], Real n[6]) const {
@@ -392,18 +345,16 @@ template <int nDim = 3> struct ReactionDiffusionOperator {
       df[2] *= 2.0;
     }
 
-    if (nDim > 2) {
       if (n[4] < eps) {
         df[5] *= 2.0;
       }
       if (n[5] < eps) {
         df[4] *= 2.0;
       }
-    }
   }
 };
 
-template <int nDim = 3> struct UpdateTumor {
+struct UpdateTumor {
   double dt;
 
   UpdateTumor(double dt_) : dt(dt_) {}
@@ -412,15 +363,6 @@ template <int nDim = 3> struct UpdateTumor {
 
   template <typename BlockType>
   inline void operator()(const BlockInfo &info, BlockType &o) const {
-    if (nDim == 2) {
-      for (int iy = 0; iy < BlockType::sizeY; iy++)
-        for (int ix = 0; ix < BlockType::sizeX; ix++) {
-          o(ix, iy).phi += dt * o(ix, iy).dphidt;
-          o(ix, iy).phi = max((Real)0., o(ix, iy).phi);
-          o(ix, iy).phi = min((Real)1., o(ix, iy).phi);
-        }
-
-    } else {
       for (int iz = 0; iz < BlockType::sizeZ; iz++)
         for (int iy = 0; iy < BlockType::sizeY; iy++)
           for (int ix = 0; ix < BlockType::sizeX; ix++) {
@@ -428,7 +370,6 @@ template <int nDim = 3> struct UpdateTumor {
             o(ix, iy, iz).phi = max((Real)0., o(ix, iy, iz).phi);
             o(ix, iy, iz).phi = min((Real)1., o(ix, iy, iz).phi);
           }
-    }
   }
 };
 
@@ -669,10 +610,6 @@ template <typename T, int i> inline Real RD_projector_impl_wav(const T &t) {
 
 make_projector(RD_Projector_VTK, RD_projector_impl_vtk)
     make_projector(RD_Projector_Wavelets, RD_projector_impl_wav)
-
-#ifndef _DIM
-#define _DIM 3
-#endif
 
 #ifndef _BLOCKSIZE_
 #define _BLOCKSIZE_ 16
@@ -936,8 +873,8 @@ void Glioma_ReactionDiffusion::_reactionDiffusionStep(
   vector<BlockInfo> vInfo = grid->getBlocksInfo();
   const BlockCollection<B> &collecton = grid->getBlockCollection();
 
-  ReactionDiffusionOperator<_DIM> rhs(Dw, Dg, rho);
-  UpdateTumor<_DIM> updateTumor(dt);
+  ReactionDiffusionOperator rhs(Dw, Dg, rho);
+  UpdateTumor updateTumor(dt);
 
   blockProcessing.pipeline_process(vInfo, collecton, *boundaryInfo, rhs);
   BlockProcessing::process(vInfo, collecton, updateTumor, nParallelGranularity);
@@ -1037,7 +974,7 @@ void Glioma_ReactionDiffusion::run() {
 
   Real t = 0.0;
   Real h = 1. / (blockSize * blocksPerDimension);
-  Real dt = 0.99 * h * h / (2. * _DIM * max(Dw, Dg));
+  Real dt = 0.99 * h * h / (2. * 3 * max(Dw, Dg));
   int iCounter = 1;
   if (bVerbose)
     printf("Dg=%e, Dw=%e, dt= %f, rho=%f , h=%f\n", Dg, Dw, dt, rho, h);
