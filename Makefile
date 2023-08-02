@@ -39,7 +39,7 @@ MRAGBoundaryBlockInfo.o \
 MRAGProfiler.o \
 MRAGWavelets_StaticData.o \
 
-brain: $(OBJECTS); $(CXX) $(OBJECTS) -o $@ $(LIBS)
+brain: $(OBJECTS); $(CXX) $(OBJECTS) -o $@ $(LIBS) $(LDFLAGS)
 .cpp.o:
 	$(CXX) $< -o $@ -c $(DEFS) -Wno-deprecated $(CXXFLAGS_VTK) -IMRAG $(CXXFLAGS)
 clean:; rm -rf $(OBJECTS) brain
