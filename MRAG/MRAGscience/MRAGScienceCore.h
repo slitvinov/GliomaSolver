@@ -9,7 +9,6 @@
 #include "MRAGcore/MRAGCommon.h"
 #include "MRAGcore/MRAGProfiler.h"
 #include "MRAGcore/MRAGBlockFWT.h"
-#include "MRAGSimpleLevelsetBlock.h"
 
 #include <vector>
 #include <set>

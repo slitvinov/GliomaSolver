@@ -44,10 +44,8 @@
 #include "MRAGcore/MRAGProfiler.h"
 #include "MRAGscience/MRAGScienceCore.h"
 #include "MRAGscience/MRAGAutomaticRefiner.h"
-#include "MRAGscience/MRAGSimpleLevelsetBlock.h"
 #include "MRAGscience/MRAGSpaceTimeSorter.h"
 #include "MRAGscience/MRAGRefiner_SpaceExtension.h"
-#include "MRAGscience/MRAGWeno.h"
 #include "MRAGmultithreading/MRAGBlockProcessing_SingleCPU.h"
 #include "MRAGio/MRAG_IO_ArgumentParser.h"
 
