@@ -6,7 +6,7 @@ CXXFLAGS = -O3
 CXXFLAGS_VTK = -IVTK/include/vtk-5.2
 LIBS_VTK = -LVTK/lib/vtk-5.2
 DEFS = -D_BLOCKSIZE_=16\
-	-D_BPD_=16\
+	-D_BPD_=8\
 	-D_DIM=3\
 	-D_FMMSILENT\
 	-D_MAXLEVEL_=4\
