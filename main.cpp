@@ -605,7 +605,6 @@ private:
   BlockFWT<W, B, RD_Projector_Wavelets>
       blockfwt; // refinment based on single channel
   SpaceTimeSorter stSorter;
-  Profiler profiler;
   ArgumentParser parser;
   BlockLab<B> lab;
   int numberOfIterations;
@@ -884,9 +883,9 @@ void Glioma_ReactionDiffusion::run() {
 
   // Initial compression, later just refinment since tumor just grow
   Science::AutomaticRefinement<0, 0>(*grid, blockfwt, refinement_tolerance,
-                                     maxLevel, 1, &profiler);
+                                     maxLevel, 1);
   Science::AutomaticCompression<0, 0>(*grid, blockfwt, compression_tolerance,
-                                      -1, &profiler);
+                                      -1);
 
   while (t <= tend) {
     _reactionDiffusionStep(boundaryInfo, nParallelGranularity, Dw, Dg, rho, dt);
@@ -896,7 +895,7 @@ void Glioma_ReactionDiffusion::run() {
     if (t >= ((double)(whenToWrite))) {
       if (bAdaptivity) {
         Science::AutomaticRefinement<0, 0>(
-            *grid, blockfwt, refinement_tolerance, maxLevel, 1, &profiler);
+            *grid, blockfwt, refinement_tolerance, maxLevel, 1);
         // Science::AutomaticCompression	<0,0>(*grid, blockfwt,
         // compression_tolerance, -1, &profiler);
       }
@@ -905,7 +904,7 @@ void Glioma_ReactionDiffusion::run() {
   }
   if (bAdaptivity)
     Science::AutomaticRefinement<0, 0>(*grid, blockfwt, refinement_tolerance,
-                                       maxLevel, 1, &profiler);
+                                       maxLevel, 1);
   _dumpUQoutput();
 }
 

@@ -15,7 +15,6 @@ VPATH = MRAG MRAG/MRAGcore
 OBJECTS =\
 main.o\
 MRAGBoundaryBlockInfo.o\
-MRAGProfiler.o\
 MRAGWavelets_StaticData.o\
 
 brain: $(OBJECTS); $(CXX) $(OBJECTS) -o $@ $(LDFLAGS)

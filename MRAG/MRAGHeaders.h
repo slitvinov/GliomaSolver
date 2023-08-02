@@ -40,7 +40,6 @@
 #include "MRAGcore/MRAGCompressor.h"
 #include "MRAGcore/MRAGBlockLab.h"
 #include "MRAGcore/MRAGBlockFWT.h"
-#include "MRAGcore/MRAGProfiler.h"
 #include "MRAGscience/MRAGScienceCore.h"
 #include "MRAGscience/MRAGAutomaticRefiner.h"
 #include "MRAGscience/MRAGSpaceTimeSorter.h"

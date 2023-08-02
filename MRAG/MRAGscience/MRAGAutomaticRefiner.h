@@ -9,7 +9,6 @@
 
 #include "../MRAGcore/MRAGCommon.h"
 #include "../MRAGcore/MRAGRefiner.h"
-#include "../MRAGcore/MRAGProfiler.h"
 #include "../MRAGcore/MRAGBlockFWT.h"
 
 namespace MRAG
@@ -23,7 +22,6 @@ namespace MRAG
 		double m_dMaxMemorySizeMB;
 		int m_nMaxPasses;
 		
-		Profiler* m_refProfiler;
 		Refiner * m_refRefiner;
 		
 		Grid& m_grid;
@@ -43,9 +41,9 @@ namespace MRAG
 		
 	public:
 		
-		AutomaticRefiner(Grid& grid, BlockFWT& fwt, Refiner * refiner, double dMaxMemorySizeMB = 1000.0, Profiler* profiler = NULL):
+		AutomaticRefiner(Grid& grid, BlockFWT& fwt, Refiner * refiner, double dMaxMemorySizeMB = 1000.0):
 		Refiner(refiner->getMaxLevelJump()), 
-		m_grid(grid), m_fwt(fwt), m_refRefiner(refiner), m_refProfiler(profiler),
+		m_grid(grid), m_fwt(fwt), m_refRefiner(refiner),
 		m_dMaxMemorySizeMB(dMaxMemorySizeMB)
 		{
 			m_grid.setRefiner(this);
@@ -86,7 +84,7 @@ namespace MRAG
 			double maxDetailLeft;
 			if (bVerbose)
 				printf("FIRST ATTEMPT ========================================================\n");
-			RefinementResult refinement_result = Science::AutomaticRefinementForLevelsets(m_grid, m_fwt, tolerance, -1, true, -1, m_refProfiler, &maxDetailLeft, fillGrid);
+			RefinementResult refinement_result = Science::AutomaticRefinementForLevelsets(m_grid, m_fwt, tolerance, -1, true, -1, &maxDetailLeft, fillGrid);
 			
 			if (!refinement_result.hasFailed())
 			{
@@ -113,7 +111,7 @@ namespace MRAG
 				const double candidate_tol = tol + delta*0.75;
 				if (bVerbose)
 					printf("LOOP ATTEMPT START candidate_tol=%e ========================================================\n", candidate_tol);
-				RefinementResult refinement_result = Science::AutomaticRefinementForLevelsets(m_grid, m_fwt, candidate_tol, -1, true, -1, m_refProfiler, &maxDetailLeft, fillGrid);
+				RefinementResult refinement_result = Science::AutomaticRefinementForLevelsets(m_grid, m_fwt, candidate_tol, -1, true, -1, &maxDetailLeft, fillGrid);
 				if (bVerbose)
 					printf("LOOP ATTEMPT END candidate_tol=%e maxDetailLeft=%e ========================================================\n", candidate_tol, maxDetailLeft);
 				if(maxDetailLeft != maxTolerance && maxDetailLeft<candidate_tol)

@@ -7,7 +7,6 @@
  *
  */
 #include "MRAGcore/MRAGCommon.h"
-#include "MRAGcore/MRAGProfiler.h"
 #include "MRAGcore/MRAGBlockFWT.h"
 
 #include <vector>
@@ -29,7 +28,6 @@ namespace MRAG
          * @param iMaxLevel             Maximal level of refinement.
          * @param iMaxLoops             Maximal number of refinement-iterations to be done.
          *                              (each block may be refined once per loop)
-         * @param profiler              Optional profiler to monitor performance.
          * @param fillGrid(Grid&)       Optional function to fill the refined grid.
          *                              (otherwise wavelets used to interpolate values)
          * 
@@ -41,7 +39,7 @@ namespace MRAG
 		template < int iFirstChannel, int iLastChannel, typename Grid, typename BlockFWT>
 		int AutomaticRefinement(Grid& g, BlockFWT& fwt, const double dAbsoluteTolerance, 
 								 const int iMaxLevel = -1, const int iMaxLoops=-1, 
-								 MRAG::Profiler* profiler=NULL, void (*fillGrid)(Grid& g)=NULL)
+								 void (*fillGrid)(Grid& g)=NULL)
 		{
 			int loopCounter = 0;
 			
@@ -65,11 +63,8 @@ namespace MRAG
 				if(bVerbose) printf("Blocks to FWT (levelset): %d\n", vBlocksToFWT.size());
 				if (vBlocksToFWT.size() == 0) break;
 				
-				if (profiler !=NULL) profiler->getAgent("AutoRef::FWT").start();
 				vector<FWTReport<iLastChannel - iFirstChannel+1> > vReports = 
 					BlockFWT::template multichannel_fwt<iFirstChannel, iLastChannel>(vBlocksToFWT, g.getBlockCollection(), g.getBoundaryInfo());
-				if (profiler !=NULL) profiler->getAgent("AutoRef::FWT").stop(vBlocksToFWT.size());
-				
 				set<int> shouldBeRefined;
 				for(int i=0; i<vBlocksToFWT.size(); i++)
 				{
@@ -82,16 +77,10 @@ namespace MRAG
 				}
 				if (shouldBeRefined.size() == 0) break;
 				
-				if (profiler !=NULL) profiler->getAgent("AutoRef::refine").start();
-				
 				RefinementResult result = g.refine(shouldBeRefined);
 				nRefinedBlocks += result.nCollapsedParentBlocks;
 
-				if (profiler !=NULL) profiler->getAgent("AutoRef::refine").stop(shouldBeRefined.size());
-				
-				if (profiler !=NULL) profiler->getAgent("boundaries").start();
 				g.getBoundaryInfo();
-				if (profiler !=NULL) profiler->getAgent("boundaries").stop();
 				
 				if (fillGrid != NULL) fillGrid(g);
 				
@@ -116,7 +105,7 @@ namespace MRAG
 		template <int iFirstChannel, int iLastChannel, typename BlockFWT, typename Grid>
 		int AutomaticCompression(Grid& g, BlockFWT& fwt, const double dAbsoluteTolerance, 
 								 const int iMaxLoops=-1,
-								 MRAG::Profiler* profiler=NULL, void (*fillGrid)(Grid& g)=NULL)
+								 void (*fillGrid)(Grid& g)=NULL)
 		{
 			if(bVerbose) printf("AutomaticCompression\n");
 			
@@ -132,10 +121,8 @@ namespace MRAG
 					else
 						nSkippedBlocks++;
 				
-				if (profiler !=NULL) profiler->getAgent("AutoCompr::FWT").start();
 				vector<FWTReport<iLastChannel - iFirstChannel+1> > vReports = 
 				BlockFWT::template multichannel_fwt<iFirstChannel, iLastChannel>(vBlocksToFWT, g.getBlockCollection(), g.getBoundaryInfo());
-				if (profiler !=NULL) profiler->getAgent("AutoCompr::FWT").stop(vBlocksToFWT.size());
 				
 				set<int> shouldBeCompressed;
 				
@@ -148,15 +135,10 @@ namespace MRAG
 	
 				if (shouldBeCompressed.size() == 0) break;
 				
-				if (profiler !=NULL) profiler->getAgent("AutoCompr::compress").start();
 				int nCollapsed;
 				g.compress(shouldBeCompressed, nCollapsed);
 				
-				if (profiler !=NULL) profiler->getAgent("AutoCompr::compress").stop(nCollapsed);
-				
-				if (profiler !=NULL) profiler->getAgent("boundaries").start();
 				g.getBoundaryInfo();
-				if (profiler !=NULL) profiler->getAgent("boundaries").stop();
 				
 				if (fillGrid != NULL) fillGrid(g);
 				
@@ -177,7 +159,7 @@ namespace MRAG
 
 		
       template <typename BlockFWT, typename Grid>
-		int AutomaticCompressionForLevelsets(Grid& g, BlockFWT& fwt, const double dAbsoluteTolerance, const bool bKeepHUpdated = true,  int iMaxLoops=-1, MRAG::Profiler* profiler=NULL)
+		int AutomaticCompressionForLevelsets(Grid& g, BlockFWT& fwt, const double dAbsoluteTolerance, const bool bKeepHUpdated = true,  int iMaxLoops=-1)
 		{
 			if(bVerbose) printf("AutomaticCompressionForLevelsets\n");
 			
@@ -195,7 +177,6 @@ namespace MRAG
 					else
 						nSkippedBlocks++;
 				
-				if (profiler !=NULL) profiler->getAgent("AutoCompr::FWT").start();
 
 				set<int> shouldBeCompressed;
 				for(vector<BlockInfo>::iterator it = vBlocksToFWT.begin(); it != vBlocksToFWT.end(); it++)
@@ -211,20 +192,11 @@ namespace MRAG
 
 					g.getBlockCollection().release(it->blockID);
 				}
-				if (profiler !=NULL) profiler->getAgent("AutoCompr::FWT").stop(vBlocksToFWT.size());
-							
 				if (shouldBeCompressed.size() == 0) break;
 				
-				if (profiler !=NULL) profiler->getAgent("AutoCompr::compress").start();
 				int nCollapsed;
 				g.compress(shouldBeCompressed, nCollapsed);
-				if (profiler !=NULL) profiler->getAgent("AutoCompr::compress").stop(nCollapsed);
-				
-				if (profiler !=NULL) profiler->getAgent("boundaries").start();
 				g.getBoundaryInfo();
-				if (profiler !=NULL) profiler->getAgent("boundaries").stop();
-				
-				
 				if (nCollapsed == 0) break;
 				
 				if(bVerbose) printf("AutomaticCompression:: Compressed %d, FWT skipped blocks:%d\n", nCollapsed, nSkippedBlocks);
@@ -265,7 +237,7 @@ namespace MRAG
 
 		template <typename BlockFWT, typename Grid>
 		RefinementResult AutomaticRefinementForLevelsets(Grid& g, BlockFWT& fwt, const double dAbsoluteTolerance,  const int iMaxLevel = -1, const bool bKeepHUpdated = true, const int iMaxLoops=-1,
-		MRAG::Profiler* profiler=NULL, double * dMaxDetailAlive= NULL, void (*fillGrid)(Grid& g)=NULL)
+		double * dMaxDetailAlive= NULL, void (*fillGrid)(Grid& g)=NULL)
 		{
 		  RefinementResult refinement_result;
 		  
@@ -294,9 +266,6 @@ namespace MRAG
 				}
 				
 				if (vBlocksToFWT.size() == 0) break;
-				
-				if (profiler !=NULL) profiler->getAgent("AutoRef::FWT").start();
-
 				set<int> shouldBeRefined;
 				//printf("Blocks to FWT (levelset): %d\n", vBlocksToFWT.size());
 				for(vector<BlockInfo>::iterator it = vBlocksToFWT.begin(); it != vBlocksToFWT.end(); it++)
@@ -312,20 +281,10 @@ namespace MRAG
 
 					g.getBlockCollection().release(it->blockID);
 				}
-				if (profiler !=NULL) profiler->getAgent("AutoRef::FWT").stop(vBlocksToFWT.size());
-				
-				
 				if (shouldBeRefined.size() == 0) break;
-				
-				if (profiler !=NULL) profiler->getAgent("AutoRef::refine").start();
 				refinement_result  += g.refine(shouldBeRefined);
-				if (profiler !=NULL) profiler->getAgent("AutoRef::refine").stop(shouldBeRefined.size());
 				if (refinement_result.hasFailed()) break;
-				
-				if (profiler !=NULL) profiler->getAgent("boundaries").start();
 				g.getBoundaryInfo();
-				if (profiler !=NULL) profiler->getAgent("boundaries").stop();
-				
 				if (fillGrid != NULL) fillGrid(g);
 				
 				if(bVerbose) printf("AutomaticRefinement:: Refined %d, FWT skipped blocks:%d\n", shouldBeRefined.size(), nSkippedBlocks);
