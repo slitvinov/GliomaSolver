@@ -703,16 +703,6 @@ Glioma_ReactionDiffusion::Glioma_ReactionDiffusion(int argc, const char **argv)
   bDumpIC = parser("-bDumpIC").asBool(1);
   bAdaptivity = parser("-adaptive").asBool(1);
   PatientFileName = parser("-PatFileName").asString();
-
-  if (bVerbose)
-    printf("///////////////////////////////////////////////////////////////////"
-           "/////////////\n");
-  if (bVerbose)
-    printf("//////////////////          Glioma Reaction Diffusion           "
-           "////////////////\n");
-  if (bVerbose)
-    printf("///////////////////////////////////////////////////////////////////"
-           "/////////////\n");
   if (bVerbose)
     printf("Set up: blockSize=%d Wavelets=w%s (blocksPerDimension=%d, "
            "maxLevel=%d)\n",
