@@ -19,7 +19,7 @@
 ## Output of the solver
 <dl>
   <dt>HGG_data.dat</dt>
-  <dd>tumor cell density?</dd>
+  <dd>tumor cell density</dd>
 </dl>
 
 ## Patient Data
