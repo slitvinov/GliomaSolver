@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 
+static  double PETsigma2, PETscale, slope, T1uc, T2uc;
 static int sgn(double d) {
   double eps = 0.0;
   if (d < -eps) {
@@ -198,10 +199,6 @@ private:
   long double _computeTiLogLikelihood(MatrixD3D model, int Ti);
   long double _computeLogBernoulli(double y, double u, int Ti);
   void _writeToFile(long double output);
-  double PETsigma2, PETscale;
-  double slope;
-  double T1uc, T2uc;
-
 public:
   HGG_Likelihood(const int argc, const char **argv);
   ~HGG_Likelihood(){};
