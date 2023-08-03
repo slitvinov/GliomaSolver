@@ -10,6 +10,16 @@
 #include <math.h>
 #include <string>
 #include <vector>
+
+static int sgn(double d) {
+  double eps = 0.0;
+  if (d < -eps) {
+    return -1;
+  } else {
+    return d > eps;
+  }
+}
+
 using namespace std;
 namespace Matrix {
 enum TypeID { TID_DOUBLE = 0, TID_FLOAT = 1, TID_INVALID = -1 };
@@ -188,7 +198,6 @@ private:
   long double _computeTiLogLikelihood(MatrixD3D model, int Ti);
   long double _computeLogBernoulli(double y, double u, int Ti);
   void _writeToFile(long double output);
-  int sgn(double d);
   double PETsigma2, PETscale;
   double slope;
   double T1uc, T2uc;
@@ -270,14 +279,6 @@ long double HGG_Likelihood::_computeLogBernoulli(double u, double y, int Ti) {
   long double alpha = 0.5 + 0.5 * sgn(diff) * (1. - exp(-omega2 * is2));
   return (y == 1) ? log(alpha) : log(1. - alpha);
 }
-int HGG_Likelihood::sgn(double d) {
-  double eps = 0.0;
-  if (d < -eps) {
-    return -1;
-  } else {
-    return d > eps;
-  }
-}
 void HGG_Likelihood::_writeToFile(long double output) {
   long double MinusLogLikelihood = -output;
   FILE *myfile = fopen("Likelihood.txt", "w");
@@ -297,6 +298,7 @@ void HGG_Likelihood::run() {
   printf("LogLike = %Lf \n", costFunction);
   _writeToFile(costFunction);
 }
+
 int main(int argc, const char **argv) {
   HGG_Likelihood l(argc, (const char **)argv);
   l.run();
