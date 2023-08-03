@@ -226,11 +226,11 @@ long double HGG_Likelihood::_computePETLogLikelihood(MatrixD3D model) {
   for (int iz = 0; iz < dataZ; iz++)
     for (int iy = 0; iy < dataY; iy++)
       for (int ix = 0; ix < dataX; ix++) {
-          if (PETdata(ix, iy, iz) > 0.) {
-            sum += (model(ix, iy, iz) - PETscale * PETdata(ix, iy, iz)) *
-                   (model(ix, iy, iz) - PETscale * PETdata(ix, iy, iz));
-            N++;
-          }
+        if (PETdata(ix, iy, iz) > 0.) {
+          sum += (model(ix, iy, iz) - PETscale * PETdata(ix, iy, iz)) *
+                 (model(ix, iy, iz) - PETscale * PETdata(ix, iy, iz));
+          N++;
+        }
       }
   long double p1 = -0.5 * N * log(2. * M_PI * PETsigma2);
   long double p2 = -0.5 * (1. / PETsigma2) * sum;
