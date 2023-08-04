@@ -686,9 +686,13 @@ void Glioma_ReactionDiffusion::_reactionDiffusionStep(
 }
 
 void Glioma_ReactionDiffusion::_dumpUQoutput() {
+  float *d;
+  FILE *file;
   int gpd = blocksPerDimension * blockSize;
   double hf = 1. / gpd;
   double eps = hf * 0.5;
+
+  d = (float*)malloc(gpd * gpd * gpd * sizeof *d);
 
   MatrixD3D tumor(gpd, gpd, gpd);
   vector<BlockInfo> vInfo = grid->getBlocksInfo();
@@ -709,8 +713,10 @@ void Glioma_ReactionDiffusion::_dumpUQoutput() {
           int my = (int)floor((x[1]) / hf);
           int mz = (int)floor((x[2]) / hf);
 
-          if (h < hf + eps)
+          if (h < hf + eps) {
             tumor(mx, my, mz) = block(ix, iy, iz).phi;
+	    d[ix + (iy + iz * gpd) * gpd] = block(ix, iy, iz).phi;
+	  }
           else if (h < 2. * hf + eps) {
             for (int cz = 0; cz < 2; cz++)
               for (int cy = 0; cy < 2; cy++)
@@ -730,6 +736,12 @@ void Glioma_ReactionDiffusion::_dumpUQoutput() {
         }
   }
   tumor.dump("HGG_data.dat");
+  file = fopen("HGG_data0.dat", "w");
+  int header[6] = {1234, 3, gpd, gpd, gpd, 1};
+  fwrite(header, sizeof header, 1, file);
+  fwrite(d, gpd * gpd * gpd, sizeof *d, file);
+  fclose(file);
+  free(d);
 }
 
 void Glioma_ReactionDiffusion::run() {

@@ -34,7 +34,7 @@ for path in sys.argv[1:]:
             seek = file.tell()
             size = file.seek(0, os.SEEK_END) - seek
             raw = os.path.basename(path)
-            type = "Float"
+            type_name = {0: "Float", 1: "Float", 2: "Int"}[type_id]
             precision = size // nx // ny // nz
             nsx, nsy, nsz = nx // sx, ny // sy, nz // sz
             nsxp, nsyp, nszp = nsx + 1, nsy + 1, nsz + 1
@@ -46,17 +46,28 @@ for path in sys.argv[1:]:
 <Xdmf>
   <Domain>
     <Grid>
-      <Topology TopologyType="3DCORECTMesh" Dimensions="{nszp} {nsyp} {nsxp}"/>
-      <Geometry GeometryType="ORIGIN_DXDYDZ">
-        <DataItem Name="Origin" Dimensions="3">
+      <Topology
+        TopologyType="3DCORECTMesh"
+        Dimensions="{nszp} {nsyp} {nsxp}"/>
+      <Geometry
+        GeometryType="ORIGIN_DXDYDZ">
+        <DataItem
+          Name="Origin"
+          Dimensions="3">
                  0 0 0
         </DataItem>
-        <DataItem Name="Spacing" Dimensions="3">
+        <DataItem
+          Name="Spacing"
+          Dimensions="3">
                 {sz} {sy} {sx}
         </DataItem>
       </Geometry>
-      <Attribute Name="u" Center="Cell">
-        <DataItem ItemType="HyperSlab" Dimensions="{nsz} {nsy} {nsx}">
+      <Attribute
+        Name="u"
+        Center="Cell">
+        <DataItem
+          ItemType="HyperSlab"
+          Dimensions="{nsz} {nsy} {nsx}">
           <DataItem Dimensions="3 3">
                     0 0 0
                     {sz} {sy} {sx}
@@ -65,7 +76,7 @@ for path in sys.argv[1:]:
           <DataItem
             Dimensions="{nz} {ny} {nx}"
             Format="Binary"
-            NumberType="{type}"
+            NumberType="{type_name}"
             Precision="{precision}"
             Seek="{seek}">
                     {raw}
