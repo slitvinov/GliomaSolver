@@ -1,0 +1,70 @@
+#!/usr/bin/python
+
+import sys
+import struct
+import os
+import mmap
+import numpy as np
+
+
+def unpack(string, file):
+    buffer = file.read(struct.calcsize(string))
+    return struct.unpack(string, buffer)
+
+
+def pgm(path, a):
+    nx, ny = a.shape
+    dtype = np.dtype(">u2")
+    M = np.iinfo(dtype).max
+    with open(path, "wb+") as f:
+        f.write(b"P5\n%d %d\n%d\n" % (nx, ny, M))
+        offset = f.tell()
+        f.seek(nx * ny * dtype.itemsize - 1, 1)
+        f.write(b'\0')
+        f.seek(0, 0)
+        buffer = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_WRITE)
+    b = np.ndarray((nx, ny), dtype, buffer, offset=offset, order='F')
+    lo, hi = np.percentile(a, (1, 99))
+    np.clip(a, lo, hi, b)
+    if hi - lo > 0:
+        b[:] = (b - lo) / (hi - lo) * M
+
+
+if len(sys.argv) < 1:
+    sys.stderr.write("dat2slice: error: needs an argument\n")
+    sys.exit(1)
+for path in sys.argv[1:]:
+    try:
+        with open(path, "rb") as inp:
+            magic, = unpack('i', inp)
+            if magic != 1234:
+                sys.stderr.write("dat2slice: error: '%s' not a dat file\n" %
+                                 path)
+                sys.exit(1)
+            dim, = unpack('i', inp)
+            if dim != 3:
+                sys.stderr.write("dat2slice: error: wrong dimension '%d'\n" %
+                                 dim)
+                sys.exit(1)
+            nx, ny, nz, type_id = unpack('iiii', inp)
+            seek = inp.tell()
+            size = inp.seek(0, os.SEEK_END) - seek
+            itemsize = size // nx // ny // nz
+            if itemsize * nx * ny * nz != size:
+                sys.stderr.write("dat2slice: error: wrong size '%s'\n" % path)
+                sys.exit(1)
+            type_name = {0: "<d", 1: "<f", 2: "<i"}[type_id]
+        with open(path, "rb+") as inp:
+            z = nz // 2
+            mm = mmap.mmap(inp.fileno(), 0)
+            dtype = np.dtype(type_name)
+            offset = seek + dtype.itemsize * nx * ny * z
+            a = np.ndarray((nx, ny), dtype, mm, offset, order='F')
+        pgm("a.pgm", a)
+
+    except FileNotFoundError:
+        sys.stderr.write("dat2slice: error: fail to open '%s'\n" % path)
+        sys.exit(1)
+    except struct.error:
+        sys.stderr.write("dat2slice: error: fail to read '%s'\n" % path)
+        sys.exit(1)
