@@ -32,24 +32,8 @@ float* D3D(const char *path) {
     return mData;
 }
 
-long double PETLogLikelihood(float *model) {
-  float *PETdata;
-  PETdata = D3D("tumPET.dat");
-  int N = 0;
-  long double sum = 0.;
-  for (int i = 0; i < mNelements; i++) {
-    if (PETdata[i] > 0.) {
-      sum += (model[i] - PETscale * PETdata[i]) *
-             (model[i] - PETscale * PETdata[i]);
-      N++;
-    }
-  }
-  long double p1 = -0.5 * N * log(2. * PI * PETsigma2);
-  long double p2 = -0.5 * (1. / PETsigma2) * sum;
-  return p1 + p2;
-}
 long double LogBernoulli(double u, double y, int Ti) {
-  double uc, is2;
+  double uc;
   if (Ti == 1) {
     uc = T1uc;
   } else {
@@ -61,7 +45,6 @@ long double LogBernoulli(double u, double y, int Ti) {
   return (y == 1) ? log(alpha) : log(1. - alpha);
 }
 long double TiLogLikelihood(float *model, int Ti) {
-  char filename[256];
   float *data;
   if (Ti == 1)
     data = D3D("tumT1c.dat");
@@ -73,14 +56,28 @@ long double TiLogLikelihood(float *model, int Ti) {
   return sum;
 }
 int main(int argc, const char **argv) {
-  float *model;
+  float *model, *PETdata;
+  int N, i;
+  long double sum;
+  
   PETsigma2 = 0.000361;
   PETscale = 0.85;
   T1uc = 0.7;
   T2uc = 0.25;
   slope = 2;
   model = D3D("HGG_data.dat");
-  long double Lpet = PETLogLikelihood(model);
+  PETdata = D3D("tumPET.dat");
+  N = 0;
+  sum = 0.;
+  for (i = 0; i < mNelements; i++)
+    if (PETdata[i] > 0.) {
+      sum += (model[i] - PETscale * PETdata[i]) *
+             (model[i] - PETscale * PETdata[i]);
+      N++;
+    }
+  long double p1 = -0.5 * N * log(2. * PI * PETsigma2);
+  long double p2 = -0.5 * (1. / PETsigma2) * sum;
+  long double Lpet = p1 + p2;
   long double Lt1 = TiLogLikelihood(model, 1);
   long double Lt2 = TiLogLikelihood(model, 2);
   printf("%.16Le\n", -(Lpet + Lt1 + Lt2));
