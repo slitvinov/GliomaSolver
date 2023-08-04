@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-static  double PETsigma2, PETscale, slope, T1uc, T2uc;
+static double PETsigma2, PETscale, slope, T1uc, T2uc;
 static int sgn(double d) {
   double eps = 0.0;
   if (d < -eps) {
@@ -146,22 +146,6 @@ public:
   }
 
 public:
-  void dump(const char *filename, TypeID tid = (TypeID)typeId<T>()) const {
-    std::ofstream fout(filename, std::ios::binary);
-    if (!fout.is_open()) {
-      std::cout << "ERROR while opening " << filename << std::endl;
-      return;
-    }
-    if (!dump(fout, tid)) {
-      std::cout << "ERROR while writing to " << filename << std::endl;
-    }
-    fout.close();
-  }
-  std::ostream &dump(std::ostream &os, TypeID tid = (TypeID)typeId<T>()) const {
-    int header[5] = {1234, 3, mNx, mNy, mNz};
-    os.write((char *)header, 5 * sizeof(int));
-    return serialize(os, mData, mNelements, tid);
-  }
   void load(const char *filename) {
     std::ifstream fin(filename, std::ios::binary);
     if (!fin.is_open()) {
@@ -191,34 +175,7 @@ private:
   T *mData;
 };
 typedef D3D<double> MatrixD3D;
-class HGG_Likelihood {
-private:
-  long double _computePETLogLikelihood(MatrixD3D model);
-  long double _computeTiLogLikelihood(MatrixD3D model, int Ti);
-  long double _computeLogBernoulli(double y, double u, int Ti);
-  void _writeToFile(long double output);
-public:
-  HGG_Likelihood(const int argc, const char **argv);
-  ~HGG_Likelihood(){};
-  void run();
-};
-HGG_Likelihood::HGG_Likelihood(const int argc, const char **argv) {
-  ifstream mydata("LikelihoodInput.txt");
-  if (mydata.is_open()) {
-    mydata >> PETsigma2;
-    mydata >> PETscale;
-    mydata >> T1uc;
-    mydata >> T2uc;
-    mydata >> slope;
-    mydata.close();
-  } else {
-    printf("Aborting: missing input file LikelihoodInput.txt \n");
-    abort();
-  }
-  printf("PET: PETsigma2=%f, PETscale=%f \n", PETsigma2, PETscale);
-  printf("MRI: T1uc=%f, T2uc =%f, slope=%f \n", T1uc, T2uc, slope);
-}
-long double HGG_Likelihood::_computePETLogLikelihood(MatrixD3D model) {
+long double _computePETLogLikelihood(MatrixD3D model) {
   char filename[256];
   sprintf(filename, "tumPET.dat");
   MatrixD3D PETdata(filename);
@@ -240,7 +197,21 @@ long double HGG_Likelihood::_computePETLogLikelihood(MatrixD3D model) {
   long double p2 = -0.5 * (1. / PETsigma2) * sum;
   return p1 + p2;
 }
-long double HGG_Likelihood::_computeTiLogLikelihood(MatrixD3D model, int Ti) {
+long double _computeLogBernoulli(double u, double y, int Ti) {
+  double uc, is2;
+  if (Ti == 1) {
+    uc = T1uc;
+    is2 = 1. / slope;
+  } else {
+    uc = T2uc;
+    is2 = 1. / slope;
+  }
+  double diff = u - uc;
+  long double omega2 = (diff > 0.) ? 1. : diff * diff;
+  long double alpha = 0.5 + 0.5 * sgn(diff) * (1. - exp(-omega2 * is2));
+  return (y == 1) ? log(alpha) : log(1. - alpha);
+}
+long double _computeTiLogLikelihood(MatrixD3D model, int Ti) {
   char filename[256];
   if (Ti == 1)
     sprintf(filename, "tumT1c.dat");
@@ -260,28 +231,21 @@ long double HGG_Likelihood::_computeTiLogLikelihood(MatrixD3D model, int Ti) {
   printf("LogLike of T%i = %Lf \n", Ti, sum);
   return sum;
 }
-long double HGG_Likelihood::_computeLogBernoulli(double u, double y, int Ti) {
-  double uc, is2;
-  if (Ti == 1) {
-    uc = T1uc;
-    is2 = 1. / slope;
+int main(int argc, const char **argv) {
+  ifstream mydata("LikelihoodInput.txt");
+  if (mydata.is_open()) {
+    mydata >> PETsigma2;
+    mydata >> PETscale;
+    mydata >> T1uc;
+    mydata >> T2uc;
+    mydata >> slope;
+    mydata.close();
   } else {
-    uc = T2uc;
-    is2 = 1. / slope;
+    printf("Aborting: missing input file LikelihoodInput.txt \n");
+    abort();
   }
-  double diff = u - uc;
-  long double omega2 = (diff > 0.) ? 1. : diff * diff;
-  long double alpha = 0.5 + 0.5 * sgn(diff) * (1. - exp(-omega2 * is2));
-  return (y == 1) ? log(alpha) : log(1. - alpha);
-}
-void HGG_Likelihood::_writeToFile(long double output) {
-  long double MinusLogLikelihood = -output;
-  FILE *myfile = fopen("Likelihood.txt", "w");
-  if (myfile != NULL)
-    fprintf(myfile, "%Lf \n", MinusLogLikelihood);
-  fclose(myfile);
-}
-void HGG_Likelihood::run() {
+  printf("PET: PETsigma2=%f, PETscale=%f \n", PETsigma2, PETscale);
+  printf("MRI: T1uc=%f, T2uc =%f, slope=%f \n", T1uc, T2uc, slope);
   char filename[256];
   sprintf(filename, "HGG_data.dat");
   MatrixD3D model(filename);
@@ -291,11 +255,9 @@ void HGG_Likelihood::run() {
   long double costFunction = Lpet + Lt1 + Lt2;
   printf("L_Pet=%Lf, L_T1=%Lf, L_T2 = %Lf \n", Lpet, Lt1, Lt2);
   printf("LogLike = %Lf \n", costFunction);
-  _writeToFile(costFunction);
-}
-
-int main(int argc, const char **argv) {
-  HGG_Likelihood l(argc, (const char **)argv);
-  l.run();
-  return 0;
+  long double MinusLogLikelihood = -costFunction;
+  FILE *myfile = fopen("Likelihood.txt", "w");
+  if (myfile != NULL)
+    fprintf(myfile, "%Lf \n", MinusLogLikelihood);
+  fclose(myfile);
 };
