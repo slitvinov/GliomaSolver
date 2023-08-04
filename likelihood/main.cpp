@@ -51,12 +51,6 @@ inline std::istream &deserialize(std::istream &is, T *data, int n_elem) {
 }
 class D3D {
 public:
-  D3D(const D3D &from) {
-    init(from.mNx, from.mNy, from.mNz);
-    for (int i = 0; i < mNelements; ++i) {
-      mData[i] = from.mData[i];
-    }
-  }
   D3D(const char *filename) : mNx(0), mData(NULL) { load(filename); }
   ~D3D() { delete mData; }
 
@@ -105,7 +99,7 @@ private:
   size_t mNelements;
   float *mData;
 };
-long double PETLogLikelihood(D3D model) {
+long double PETLogLikelihood(D3D &model) {
   char filename[256];
   sprintf(filename, "tumPET.dat");
   D3D PETdata(filename);
@@ -141,7 +135,7 @@ long double LogBernoulli(double u, double y, int Ti) {
   long double alpha = 0.5 + 0.5 * sgn(diff) * (1. - exp(-omega2 * is2));
   return (y == 1) ? log(alpha) : log(1. - alpha);
 }
-long double TiLogLikelihood(D3D model, int Ti) {
+long double TiLogLikelihood(D3D &model, int Ti) {
   char filename[256];
   if (Ti == 1)
     sprintf(filename, "tumT1c.dat");
