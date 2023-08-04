@@ -1,9 +1,9 @@
-#include "MRAGcore/MRAGCommon.h"
 #include "MRAGHeaders.h"
-#include "MRAGcore/MRAGrid.h"
 #include "MRAGcore/MRAGBlock.h"
-#include "MRAGcore/MRAGGridNode.h"
 #include "MRAGcore/MRAGBlockCollection.h"
+#include "MRAGcore/MRAGCommon.h"
+#include "MRAGcore/MRAGGridNode.h"
+#include "MRAGcore/MRAGrid.h"
 #include <fstream>
 using namespace MRAG;
 enum TypeID { TID_DOUBLE = 0, TID_FLOAT = 1, TID_INT = 2, TID_INVALID = -1 };
@@ -28,45 +28,12 @@ inline std::istream &deserializeHeader(std::istream &is, size_t dim,
   is.read((char *)size, dim * sizeof(int));
   return is;
 }
-template <typename T2, typename T>
-inline std::istream &deserializeConvert(std::istream &is, T *data, int n_elem) {
-  T2 *tmp = new T2[n_elem];
-  is.read((char *)tmp, sizeof(T2) * n_elem);
-  for (int i = 0; i < n_elem; ++i) {
-    data[i] = (T)tmp[i];
-  }
-  delete tmp;
-  return is;
-}
 template <typename T>
 inline std::istream &deserialize(std::istream &is, T *data, int n_elem) {
-  // read type of data
+
   int data_type;
   is.read((char *)&data_type, sizeof(int));
-  if (!is || TypeID(data_type) == TID_INVALID) {
-    // FAIL
-    is.clear(std::ios::badbit);
-    return is;
-  }
-  // compare with given type
-  if (data_type == typeId<T>()) {
-    // fast version
-    return is.read((char *)data, sizeof(T) * n_elem);
-  } else {
-    // must convert
-    switch (TypeID(data_type)) {
-    case TID_DOUBLE:
-      return deserializeConvert<double>(is, data, n_elem);
-    case TID_FLOAT:
-      return deserializeConvert<float>(is, data, n_elem);
-    case TID_INT:
-      return deserializeConvert<int>(is, data, n_elem);
-    default:
-      // FAIL
-      is.clear(std::ios::badbit);
-      return is;
-    }
-  }
+  return is.read((char *)data, sizeof(T) * n_elem);
 }
 template <typename T2, typename T>
 inline std::ostream &serializeConvert(std::ostream &os, const T *data,
@@ -82,23 +49,15 @@ inline std::ostream &serializeConvert(std::ostream &os, const T *data,
 template <typename T>
 inline std::ostream &serialize(std::ostream &os, const T *data, int n_elem,
                                TypeID tid = (TypeID)typeId<T>()) {
-  // type id check
   if (tid == TID_INVALID) {
-    // FAIL
     os.clear(std::ios::badbit);
     return os;
   }
-
-  // write type of data
   int data_type = tid;
   os.write((char *)&data_type, sizeof(int));
-
-  // compare with given type
   if (tid == typeId<T>()) {
-    // fast version
     return os.write((char *)data, sizeof(T) * n_elem);
   } else {
-    // must convert
     switch (TypeID(data_type)) {
     case TID_DOUBLE:
       return serializeConvert<double>(os, data, n_elem);
@@ -107,14 +66,12 @@ inline std::ostream &serialize(std::ostream &os, const T *data, int n_elem,
     case TID_INT:
       return serializeConvert<int>(os, data, n_elem);
     default:
-      // FAIL
       os.clear(std::ios::badbit);
       return os;
     }
   }
 }
 template <typename T> class D3D {
-  // TYPEDEFS
 public:
   typedef T ElementType;
 
@@ -122,14 +79,12 @@ public:
   D3D(const size_t nx, const size_t ny, const size_t nz) { init(nx, ny, nz); }
   D3D(const size_t nx, const size_t ny, const size_t nz, T *data) {
     init(nx, ny, nz);
-    // copy from data
     for (int i = 0; i < mNelements; ++i) {
       mData[i] = data[i];
     }
   }
   D3D(const D3D &from) {
     init(from.mNx, from.mNy, from.mNz);
-    // copy from data
     for (int i = 0; i < mNelements; ++i) {
       mData[i] = from.mData[i];
     }
@@ -140,7 +95,6 @@ public:
 
 private:
   void init(const size_t nx, const size_t ny, const size_t nz) {
-    // use this only for primitive types (rest should be in init. list)
     mNx = nx;
     mNy = ny;
     mNz = nz;
@@ -530,7 +484,6 @@ inline Cell operator*(const Cell &p, Real v) {
   return c;
 }
 
-
 template <typename T, int i> inline Real RD_projector_impl_wav(const T &t) {
   // return i==0 ? (Real)(t.phi) : (Real)(t.p_w);  // for refinment w.r.t 2
   // channels
@@ -560,7 +513,7 @@ make_projector(RD_Projector_Wavelets, RD_projector_impl_wav)
 #define _RESJUMP_ 1
 #endif
 
-        static const int blockSize = _BLOCKSIZE_;
+    static const int blockSize = _BLOCKSIZE_;
 static const int blockSizeZ = _BLOCKSIZE_Z_;
 static const int blocksPerDimension = _BPD_;
 static const bool bIsCellCentered = true;
@@ -631,17 +584,17 @@ Glioma_ReactionDiffusion::Glioma_ReactionDiffusion(int argc, const char **argv)
 
   L = 1;
 
-    ifstream mydata("TumorIC.txt");
+  ifstream mydata("TumorIC.txt");
 
-    if (mydata.is_open()) {
-      mydata >> tumor_ic[0];
-      mydata >> tumor_ic[1];
-      mydata >> tumor_ic[2];
-      mydata.close();
-    } else {
-      printf("Aborting: missing input file TumorIC.txt \n");
-      abort();
-    }
+  if (mydata.is_open()) {
+    mydata >> tumor_ic[0];
+    mydata >> tumor_ic[1];
+    mydata >> tumor_ic[2];
+    mydata.close();
+  } else {
+    printf("Aborting: missing input file TumorIC.txt \n");
+    abort();
+  }
 
   _ic(*grid, PatientFileName, L, tumor_ic);
 
@@ -717,9 +670,7 @@ void Glioma_ReactionDiffusion::_ic(Grid<W, B> &grid, string PatientFileName,
             block(ix, iy, iz).p_csf = pCSF;
             const Real p[3] = {x[0] - tumor_ic[0], x[1] - tumor_ic[1],
                                x[2] - tumor_ic[2]};
-            const Real dist =
-                sqrt(p[0] * p[0] + p[1] * p[1] +
-                     p[2] * p[2]);
+            const Real dist = sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
             const Real psi = (dist - tumorRadius) * iw;
             if ((psi < -1) && (pGM + pWM > 0.001))
               block(ix, iy, iz).phi = 1.0;
@@ -754,7 +705,7 @@ void Glioma_ReactionDiffusion::_dumpUQoutput() {
   double hf = 1. / gpd;
   double eps = hf * 0.5;
 
-  MatrixD3D  tumor(gpd, gpd, gpd);
+  MatrixD3D tumor(gpd, gpd, gpd);
   vector<BlockInfo> vInfo = grid->getBlocksInfo();
 
   for (int i = 0; i < vInfo.size(); i++) {
@@ -804,16 +755,16 @@ void Glioma_ReactionDiffusion::run() {
   BoundaryInfo *boundaryInfo = &grid->getBoundaryInfo();
   Real Dw, Dg, rho, tend;
 
-    ifstream mydata("InputParameters.txt");
-    if (mydata.is_open()) {
-      mydata >> Dw;
-      mydata >> rho;
-      mydata >> tend;
-      mydata.close();
-    } else {
-      printf("Aborting: missing input file InputParameters.txt \n");
-      abort();
-    }
+  ifstream mydata("InputParameters.txt");
+  if (mydata.is_open()) {
+    mydata >> Dw;
+    mydata >> rho;
+    mydata >> tend;
+    mydata.close();
+  } else {
+    printf("Aborting: missing input file InputParameters.txt \n");
+    abort();
+  }
   Dw = Dw / (L * L);
   Dg = 0.1 * Dw;
 
@@ -835,8 +786,8 @@ void Glioma_ReactionDiffusion::run() {
 
     if (t >= ((double)(whenToWrite))) {
       if (bAdaptivity) {
-        Science::AutomaticRefinement<0, 0>(
-            *grid, blockfwt, refinement_tolerance, maxLevel, 1);
+        Science::AutomaticRefinement<0, 0>(*grid, blockfwt,
+                                           refinement_tolerance, maxLevel, 1);
         // Science::AutomaticCompression	<0,0>(*grid, blockfwt,
         // compression_tolerance, -1, &profiler);
       }
