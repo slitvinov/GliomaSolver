@@ -557,7 +557,6 @@ private:
 
 public:
   Glioma_ReactionDiffusion(int argc, const char **argv);
-  ~Glioma_ReactionDiffusion();
   void run();
 };
 
@@ -603,21 +602,11 @@ Glioma_ReactionDiffusion::Glioma_ReactionDiffusion(int argc, const char **argv)
   whenToWrite = whenToWriteOffset;
   numberOfIterations = 0;
 }
-
-Glioma_ReactionDiffusion::~Glioma_ReactionDiffusion() {
-  std::cout << "------Adios muchachos------" << std::endl;
-}
 void Glioma_ReactionDiffusion::_ic(Grid<W, B> &grid, string PatientFileName,
                                    Real &L, Real tumor_ic[3]) {
-  printf("Reading data from file: %s \n", PatientFileName.c_str());
-
-  char anatomy[200];
-  sprintf(anatomy, "%sGM.dat", PatientFileName.c_str());
-  MatrixD3D GM(anatomy);
-  sprintf(anatomy, "%sWM.dat", PatientFileName.c_str());
-  MatrixD3D WM(anatomy);
-  sprintf(anatomy, "%sCSF.dat", PatientFileName.c_str());
-  MatrixD3D CSF(anatomy);
+  MatrixD3D GM("GM.dat");
+  MatrixD3D WM("WM.dat");
+  MatrixD3D CSF("CSF.dat");
 
   int brainSizeX = (int)GM.getSizeX();
   int brainSizeY = (int)GM.getSizeY();
@@ -633,14 +622,10 @@ void Glioma_ReactionDiffusion::_ic(Grid<W, B> &grid, string PatientFileName,
   double brainHz = 1.0 / ((double)(brainSizeMax));
   const Real tumorRadius = 0.005;
   const Real smooth_sup = 2.;
-  const Real h =
-      1. / 128; // use fixed h, for same IC smoothening at all resolutions
-  const Real iw = 1. / (smooth_sup * h); // widht of smoothening
-
+  const Real h = 1. / 128;
+  const Real iw = 1. / (smooth_sup * h);
   Real pGM, pWM, pCSF;
-
   vector<BlockInfo> vInfo = grid.getBlocksInfo();
-
   for (int i = 0; i < vInfo.size(); i++) {
     BlockInfo &info = vInfo[i];
     B &block = grid.getBlockCollection()[info.blockID];
@@ -744,10 +729,7 @@ void Glioma_ReactionDiffusion::_dumpUQoutput() {
           }
         }
   }
-
-  char filename2[256];
-  sprintf(filename2, "HGG_data.dat");
-  tumor.dump(filename2);
+  tumor.dump("HGG_data.dat");
 }
 
 void Glioma_ReactionDiffusion::run() {
