@@ -50,6 +50,9 @@ public:
     assert(i < mNx && j < mNy && k < mNz);
     return mData[i + (j + k * mNy) * mNx];
   }
+  float operator()(size_t i) const {
+    return mData[i];
+  }
 private:
   float *mData;
 };
@@ -92,10 +95,8 @@ long double TiLogLikelihood(D3D &model, int Ti) {
     sprintf(filename, "tumFLAIR.dat");
   D3D data(filename);
   long double sum = 0.;
-  for (int iz = 0; iz < mNz; iz++)
-    for (int iy = 0; iy < mNy; iy++)
-      for (int ix = 0; ix < mNx; ix++)
-        sum += LogBernoulli(model(ix, iy, iz), data(ix, iy, iz), Ti);
+  for (int i = 0; i < mNelements; i++)
+        sum += LogBernoulli(model(i), data(i), Ti);
   return sum;
 }
 int main(int argc, const char **argv) {
