@@ -153,7 +153,7 @@ private:
   size_t mNelements;
   double *mData;
 };
-long double _computePETLogLikelihood(D3D model) {
+long double PETLogLikelihood(D3D model) {
   char filename[256];
   sprintf(filename, "tumPET.dat");
   D3D PETdata(filename);
@@ -175,7 +175,7 @@ long double _computePETLogLikelihood(D3D model) {
   long double p2 = -0.5 * (1. / PETsigma2) * sum;
   return p1 + p2;
 }
-long double _computeLogBernoulli(double u, double y, int Ti) {
+long double LogBernoulli(double u, double y, int Ti) {
   double uc, is2;
   if (Ti == 1) {
     uc = T1uc;
@@ -189,7 +189,7 @@ long double _computeLogBernoulli(double u, double y, int Ti) {
   long double alpha = 0.5 + 0.5 * sgn(diff) * (1. - exp(-omega2 * is2));
   return (y == 1) ? log(alpha) : log(1. - alpha);
 }
-long double _computeTiLogLikelihood(D3D model, int Ti) {
+long double TiLogLikelihood(D3D model, int Ti) {
   char filename[256];
   if (Ti == 1)
     sprintf(filename, "tumT1c.dat");
@@ -205,7 +205,7 @@ long double _computeTiLogLikelihood(D3D model, int Ti) {
   for (int iz = 0; iz < dataZ; iz++)
     for (int iy = 0; iy < dataY; iy++)
       for (int ix = 0; ix < dataX; ix++)
-        sum += _computeLogBernoulli(model(ix, iy, iz), data(ix, iy, iz), Ti);
+        sum += LogBernoulli(model(ix, iy, iz), data(ix, iy, iz), Ti);
   return sum;
 }
 int main(int argc, const char **argv) {
@@ -224,9 +224,9 @@ int main(int argc, const char **argv) {
   char filename[256];
   sprintf(filename, "HGG_data.dat");
   D3D model(filename);
-  long double Lpet = _computePETLogLikelihood(model);
-  long double Lt1 = _computeTiLogLikelihood(model, 1);
-  long double Lt2 = _computeTiLogLikelihood(model, 2);
+  long double Lpet = PETLogLikelihood(model);
+  long double Lt1 = TiLogLikelihood(model, 1);
+  long double Lt2 = TiLogLikelihood(model, 2);
   long double costFunction = Lpet + Lt1 + Lt2;
   long double MinusLogLikelihood = -costFunction;
   FILE *myfile = fopen("Likelihood.txt", "w");

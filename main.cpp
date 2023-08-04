@@ -592,7 +592,7 @@ const double compression_tolerance = 1e-5;
 typedef Block<Cell, blockSize, blockSize, blockSizeZ> B;
 typedef _WAVELET_TYPE W;
 
-typedef Matrix::D3D<double> MatrixD3D;
+typedef Matrix::D3D<float> MatrixD3D;
 
 static const int nThreads = 1;
 typedef Multithreading::BlockProcessing_SingleCPU<B> BlockProcessing;
@@ -807,7 +807,7 @@ void Glioma_ReactionDiffusion::_dumpUQoutput() {
   double hf = 1. / gpd;
   double eps = hf * 0.5;
 
-  MatrixD3D tumor(gpd, gpd, gpd);
+  MatrixD3D  tumor(gpd, gpd, gpd);
   vector<BlockInfo> vInfo = grid->getBlocksInfo();
 
   for (int i = 0; i < vInfo.size(); i++) {
