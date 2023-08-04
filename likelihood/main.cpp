@@ -1,15 +1,6 @@
-#include <cassert>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <ctime>
-#include <fstream>
-#include <iostream>
-#include <limits>
-#include <map>
+#include <assert.h>
+#include <stdio.h>
 #include <math.h>
-#include <string>
-#include <vector>
 
 static double PETsigma2, PETscale, slope, T1uc, T2uc;
 static size_t mNelements;
@@ -23,39 +14,31 @@ static int sgn(double d) {
   }
 }
 
-using namespace std;
-class D3D {
-public:
-  D3D(const char *filename) {
-    std::ifstream fin(filename, std::ios::binary);
-    int size[3];
-    int header[2];
-    fin.read((char *)header, 2 * sizeof(int));
-    fin.read((char *)size, 3 * sizeof(int));
-    mNelements = size[0] * size[1] * size[2];
-    mData = new float[mNelements];
+float* D3D(const char *path) {
+    FILE *file;
+    int header[6];
+    float *mData;
+    file = fopen(path, "r");
+    fread(header, sizeof header, 1, file);
+    assert(header[0] == 1234);
+    assert(header[1] == 3);
+    assert(header[5] == 1);
+    mNelements = header[2] * header[3] * header[4];
+    mData = (float*)malloc(mNelements * sizeof *mData);
+    fread(mData, mNelements, sizeof *mData, file);
+    fclose(file);
+    return mData;
+}
 
-    int data_type;
-    fin.read((char *)&data_type, sizeof(int));
-    fin.read((char *)mData, sizeof(float) * mNelements);
-    fin.close();
-  }
-  ~D3D() { delete mData; }
-
-public:
-  float operator()(size_t i) const { return mData[i]; }
-
-private:
-  float *mData;
-};
-long double PETLogLikelihood(D3D &model) {
-  D3D PETdata("tumPET.dat");
+long double PETLogLikelihood(float *model) {
+  float *PETdata;
+  PETdata = D3D("tumPET.dat");
   int N = 0;
   long double sum = 0.;
   for (int i = 0; i < mNelements; i++) {
-    if (PETdata(i) > 0.) {
-      sum += (model(i) - PETscale * PETdata(i)) *
-             (model(i) - PETscale * PETdata(i));
+    if (PETdata[i] > 0.) {
+      sum += (model[i] - PETscale * PETdata[i]) *
+             (model[i] - PETscale * PETdata[i]);
       N++;
     }
   }
@@ -75,32 +58,26 @@ long double LogBernoulli(double u, double y, int Ti) {
   long double alpha = 0.5 + 0.5 * sgn(diff) * (1. - exp(-omega2 / slope));
   return (y == 1) ? log(alpha) : log(1. - alpha);
 }
-long double TiLogLikelihood(D3D &model, int Ti) {
+long double TiLogLikelihood(float *model, int Ti) {
   char filename[256];
+  float *data;
   if (Ti == 1)
-    sprintf(filename, "tumT1c.dat");
+    data = D3D("tumT1c.dat");
   else
-    sprintf(filename, "tumFLAIR.dat");
-  D3D data(filename);
+    data = D3D("tumFLAIR.dat");
   long double sum = 0.;
   for (int i = 0; i < mNelements; i++)
-    sum += LogBernoulli(model(i), data(i), Ti);
+    sum += LogBernoulli(model[i], data[i], Ti);
   return sum;
 }
 int main(int argc, const char **argv) {
-  ifstream mydata("LikelihoodInput.txt");
-  if (mydata.is_open()) {
-    mydata >> PETsigma2;
-    mydata >> PETscale;
-    mydata >> T1uc;
-    mydata >> T2uc;
-    mydata >> slope;
-    mydata.close();
-  } else {
-    printf("Aborting: missing input file LikelihoodInput.txt \n");
-    abort();
-  }
-  D3D model("HGG_data.dat");
+  float *model;
+  PETsigma2 = 0.000361;
+  PETscale = 0.85;
+  T1uc = 0.7;
+  T2uc = 0.25;
+  slope = 2;
+  model = D3D("HGG_data.dat");
   long double Lpet = PETLogLikelihood(model);
   long double Lt1 = TiLogLikelihood(model, 1);
   long double Lt2 = TiLogLikelihood(model, 2);
