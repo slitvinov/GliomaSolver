@@ -24,30 +24,23 @@ static int sgn(double d) {
 }
 
 using namespace std;
-inline std::istream &deserializeHeader(std::istream &is,
-                                       int *size) {
-  int header[2];
-  is.read((char *)header, 2 * sizeof(int));
-  is.read((char *)size, 3 * sizeof(int));
-  return is;
-}
-inline std::istream &deserialize(std::istream &is, float *data, int n_elem) {
-  int data_type;
-  is.read((char *)&data_type, sizeof(int));
-  return is.read((char *)data, sizeof(float) * n_elem);
-}
 class D3D {
 public:
   D3D(const char *filename) {
     std::ifstream fin(filename, std::ios::binary);
     int size[3];
-    deserializeHeader(fin, size);
+  int header[2];
+  fin.read((char *)header, 2 * sizeof(int));
+  fin.read((char *)size, 3 * sizeof(int));
     mNx = size[0];
     mNy = size[1];
     mNz = size[2];
     mNelements = mNx * mNy * mNz;
     mData = new float[mNelements];
-    deserialize(fin, mData, mNelements);
+
+  int data_type;
+  fin.read((char *)&data_type, sizeof(int));
+  fin.read((char *)mData, sizeof(float) * mNelements);
     fin.close();
   }
   ~D3D() { delete mData; }
