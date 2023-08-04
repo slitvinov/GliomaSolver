@@ -34,7 +34,7 @@ for path in sys.argv[1:]:
                 sys.stderr.write("dat2info: error: wrong size '%s'\n" % path)
                 sys.exit(1)
             type_name = {0: "double", 1: "float", 2: "int"}[type_id]
-            print(path, nx, ny, nz, type_name)
+            print(path, nx, ny, nz, type_name, seek)
     except FileNotFoundError:
         sys.stderr.write("dat2info: error: fail to open '%s'\n" % path)
         sys.exit(1)

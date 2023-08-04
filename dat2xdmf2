@@ -3,6 +3,7 @@
 import sys
 import struct
 import os
+import re
 
 
 def unpack(string, file):
@@ -16,25 +17,32 @@ try:
 except IndexError:
     sys.stderr.write("dat2xdmf2: error: needs an argument\n")
     sys.exit(1)
-try:
-    with open(path, "rb") as file:
-        magic, = unpack('i', file)
-        if magic != 1234:
-            sys.stderr.write("dat2xdmf2: error: '%s' not a dat file\n" % path)
-            sys.exit(1)
-        dim, = unpack('i', file)
-        if dim != 3:
-            sys.stderr.write("dat2xdmf2: error: wrong dimension '%d'\n" % dim)
-            sys.exit(1)
-        nx, ny, nz, type_id = unpack('iiii', file)
-        seek = file.tell()
-        size = file.seek(0, os.SEEK_END) - seek
-        raw = os.path.basename(path)
-        type = "Float"
-        precision = size // nx // ny // nz
-        nsx, nsy, nsz = nx // sx, ny // sy, nz // sz
-        nsxp, nsyp, nszp = nsx + 1, nsy + 1, nsz + 1
-        sys.stdout.write("""\
+for path in sys.argv[1:]:
+    try:
+        with open(path, "rb") as file:
+            magic, = unpack('i', file)
+            if magic != 1234:
+                sys.stderr.write("dat2xdmf2: error: '%s' not a dat file\n" %
+                                 path)
+                sys.exit(1)
+            dim, = unpack('i', file)
+            if dim != 3:
+                sys.stderr.write("dat2xdmf2: error: wrong dimension '%d'\n" %
+                                 dim)
+                sys.exit(1)
+            nx, ny, nz, type_id = unpack('iiii', file)
+            seek = file.tell()
+            size = file.seek(0, os.SEEK_END) - seek
+            raw = os.path.basename(path)
+            type = "Float"
+            precision = size // nx // ny // nz
+            nsx, nsy, nsz = nx // sx, ny // sy, nz // sz
+            nsxp, nsyp, nszp = nsx + 1, nsy + 1, nsz + 1
+            prefix = re.sub("\.[^\.]*$", "", path)
+            xdmf_path = "%s.xdmf2" % prefix
+            sys.stderr.write("%s\n" % xdmf_path)
+            with open(xdmf_path, "w") as xdmf:
+                xdmf.write("""\
 <Xdmf>
   <Domain>
     <Grid>
@@ -68,9 +76,9 @@ try:
   </Domain>
 </Xdmf>
 """.format(**locals()))
-except FileNotFoundError:
-    sys.stderr.write("dat2xdmf2: error: fail to open '%s'\n" % path)
-    sys.exit(1)
-except struct.error:
-    sys.stderr.write("dat2xdmf2: error: fail to read '%s'\n" % path)
-    sys.exit(1)
+    except FileNotFoundError:
+        sys.stderr.write("dat2xdmf2: error: fail to open '%s'\n" % path)
+        sys.exit(1)
+    except struct.error:
+        sys.stderr.write("dat2xdmf2: error: fail to read '%s'\n" % path)
+        sys.exit(1)
