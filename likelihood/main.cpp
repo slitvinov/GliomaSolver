@@ -43,37 +43,11 @@ inline std::istream &deserializeHeader(std::istream &is, size_t dim,
   is.read((char *)size, dim * sizeof(int));
   return is;
 }
-template <typename T2, typename T>
-inline std::istream &deserializeConvert(std::istream &is, T *data, int n_elem) {
-  T2 *tmp = new T2[n_elem];
-  is.read((char *)tmp, sizeof(T2) * n_elem);
-  for (int i = 0; i < n_elem; ++i) {
-    data[i] = (T)tmp[i];
-  }
-  delete tmp;
-  return is;
-}
 template <typename T>
 inline std::istream &deserialize(std::istream &is, T *data, int n_elem) {
   int data_type;
   is.read((char *)&data_type, sizeof(int));
-  if (!is || TypeID(data_type) == TID_INVALID) {
-    is.clear(std::ios::badbit);
-    return is;
-  }
-  if (data_type == typeId<T>()) {
-    return is.read((char *)data, sizeof(T) * n_elem);
-  } else {
-    switch (TypeID(data_type)) {
-    case TID_DOUBLE:
-      return deserializeConvert<double>(is, data, n_elem);
-    case TID_FLOAT:
-      return deserializeConvert<float>(is, data, n_elem);
-    default:
-      is.clear(std::ios::badbit);
-      return is;
-    }
-  }
+  return is.read((char *)data, sizeof(T) * n_elem);
 }
 class D3D {
 public:
