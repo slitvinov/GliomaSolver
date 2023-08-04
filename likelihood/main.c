@@ -1,9 +1,11 @@
 #include <assert.h>
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h>
 
 static double PETsigma2, PETscale, slope, T1uc, T2uc;
 static size_t mNelements;
+#define PI (3.141592653589793)
 
 static int sgn(double d) {
   double eps = 0.0;
@@ -42,7 +44,7 @@ long double PETLogLikelihood(float *model) {
       N++;
     }
   }
-  long double p1 = -0.5 * N * log(2. * M_PI * PETsigma2);
+  long double p1 = -0.5 * N * log(2. * PI * PETsigma2);
   long double p2 = -0.5 * (1. / PETsigma2) * sum;
   return p1 + p2;
 }

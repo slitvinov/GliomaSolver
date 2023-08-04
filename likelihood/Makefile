@@ -1,7 +1,7 @@
 .POSIX:
 .SUFFIXES:
-CXXFLAGS = -O2 -g
-S = main.cpp
+CFLAGS = -O2 -g
+S = main.c
 likelihood: $S
-	$(CXX) $S -o $@ $(CXXFLAGS) $(LDFLAGS)
+	$(CC) $S -o $@ $(CFLAGS) -lm $(LDFLAGS)
 clean:; rm -f likelihood
