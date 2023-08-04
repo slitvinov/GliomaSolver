@@ -1,0 +1,55 @@
+#!/usr/bin/python
+
+import sys
+import struct
+import os
+import re
+
+
+def unpack(string, file):
+    buffer = file.read(struct.calcsize(string))
+    return struct.unpack(string, buffer)
+
+
+def symlink(t, l):
+    try:
+        os.symlink(t, l)
+    except FileExistsError:
+        os.remove(l)
+        os.symlink(t, l)
+
+
+if len(sys.argv) < 1:
+    sys.stderr.write("dat2raw: error: needs an argument\n")
+    sys.exit(1)
+for path in sys.argv[1:]:
+    try:
+        with open(path, "rb") as file:
+            magic, = unpack('i', file)
+            if magic != 1234:
+                sys.stderr.write("dat2raw: error: '%s' not a dat file\n" %
+                                 path)
+                sys.exit(1)
+            dim, = unpack('i', file)
+            if dim != 3:
+                sys.stderr.write("dat2raw: error: wrong dimension '%d'\n" %
+                                 dim)
+                sys.exit(1)
+            nx, ny, nz, type_id = unpack('iiii', file)
+            seek = file.tell()
+            size = file.seek(0, os.SEEK_END) - seek
+            itemsize = size // nx // ny // nz
+            if itemsize * nx * ny * nz != size:
+                sys.stderr.write("dat2raw: error: wrong size '%s'\n" % path)
+                sys.exit(1)
+            type_name = {0: "double", 1: "float", 2: "int"}[type_id]
+            prefix = re.sub("\.[^\.]*$", "", path)
+            raw = "%dx%dx%dle.%s.raw" % (nx, ny, nz, prefix)
+            symlink(path, raw)
+            sys.stderr.write("%s\n" % raw)
+    except FileNotFoundError:
+        sys.stderr.write("dat2symlink: error: fail to open '%s'\n" % path)
+        sys.exit(1)
+    except struct.error:
+        sys.stderr.write("dat2symlink: error: fail to read '%s'\n" % path)
+        sys.exit(1)
