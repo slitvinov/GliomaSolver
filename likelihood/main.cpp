@@ -162,16 +162,9 @@ int main(int argc, const char **argv) {
     printf("Aborting: missing input file LikelihoodInput.txt \n");
     abort();
   }
-  char filename[256];
-  sprintf(filename, "HGG_data.dat");
-  D3D model(filename);
+  D3D model("HGG_data.dat");
   long double Lpet = PETLogLikelihood(model);
   long double Lt1 = TiLogLikelihood(model, 1);
   long double Lt2 = TiLogLikelihood(model, 2);
-  long double costFunction = Lpet + Lt1 + Lt2;
-  long double MinusLogLikelihood = -costFunction;
-  FILE *myfile = fopen("Likelihood.txt", "w");
-  if (myfile != NULL)
-    fprintf(myfile, "%Lf \n", MinusLogLikelihood);
-  fclose(myfile);
+  printf("%.16Le\n", -(Lpet + Lt1 + Lt2));
 };
