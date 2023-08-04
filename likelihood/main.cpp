@@ -75,13 +75,10 @@ inline std::istream &deserialize(std::istream &is, T *data, int n_elem) {
     }
   }
 }
-template <typename T> class D3D {
-public:
-  typedef T ElementType;
-
+class D3D {
 public:
   D3D(const size_t nx, const size_t ny, const size_t nz) { init(nx, ny, nz); }
-  D3D(const size_t nx, const size_t ny, const size_t nz, T *data) {
+  D3D(const size_t nx, const size_t ny, const size_t nz, double *data) {
     init(nx, ny, nz);
     for (int i = 0; i < mNelements; ++i) {
       mData[i] = data[i];
@@ -103,7 +100,7 @@ private:
     mNy = ny;
     mNz = nz;
     mNelements = nx * ny * nz;
-    mData = new T[mNelements];
+    mData = new double[mNelements];
   }
 
 public:
@@ -125,11 +122,11 @@ public:
   size_t getSizeX() const { return mNx; }
   size_t getSizeY() const { return mNy; }
   size_t getSizeZ() const { return mNz; }
-  T operator()(size_t i, size_t j, size_t k) const {
+  double operator()(size_t i, size_t j, size_t k) const {
     assert(i < mNx && j < mNy && k < mNz);
     return mData[i + (j + k * mNy) * mNx];
   }
-  T &operator()(size_t i, size_t j, size_t k) {
+  double &operator()(size_t i, size_t j, size_t k) {
     assert(i < mNx && j < mNy && k < mNz);
     return mData[i + (j + k * mNy) * mNx];
   }
@@ -161,13 +158,12 @@ private:
   size_t mNy;
   size_t mNz;
   size_t mNelements;
-  T *mData;
+  double *mData;
 };
-typedef D3D<double> MatrixD3D;
-long double _computePETLogLikelihood(MatrixD3D model) {
+long double _computePETLogLikelihood(D3D model) {
   char filename[256];
   sprintf(filename, "tumPET.dat");
-  MatrixD3D PETdata(filename);
+  D3D PETdata(filename);
   int dataX = PETdata.getSizeX();
   int dataY = PETdata.getSizeY();
   int dataZ = PETdata.getSizeZ();
@@ -200,13 +196,13 @@ long double _computeLogBernoulli(double u, double y, int Ti) {
   long double alpha = 0.5 + 0.5 * sgn(diff) * (1. - exp(-omega2 * is2));
   return (y == 1) ? log(alpha) : log(1. - alpha);
 }
-long double _computeTiLogLikelihood(MatrixD3D model, int Ti) {
+long double _computeTiLogLikelihood(D3D model, int Ti) {
   char filename[256];
   if (Ti == 1)
     sprintf(filename, "tumT1c.dat");
   else
     sprintf(filename, "tumFLAIR.dat");
-  MatrixD3D data(filename);
+  D3D data(filename);
   int dataX = data.getSizeX();
   int dataY = data.getSizeY();
   int dataZ = data.getSizeZ();
@@ -234,7 +230,7 @@ int main(int argc, const char **argv) {
   }
   char filename[256];
   sprintf(filename, "HGG_data.dat");
-  MatrixD3D model(filename);
+  D3D model(filename);
   long double Lpet = _computePETLogLikelihood(model);
   long double Lt1 = _computeTiLogLikelihood(model, 1);
   long double Lt2 = _computeTiLogLikelihood(model, 2);
