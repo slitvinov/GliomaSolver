@@ -93,7 +93,7 @@ private:
     mNy = ny;
     mNz = nz;
     mNelements = nx * ny * nz;
-    mData = new double[mNelements];
+    mData = new float[mNelements];
   }
 
 public:
@@ -115,11 +115,11 @@ public:
   size_t getSizeX() const { return mNx; }
   size_t getSizeY() const { return mNy; }
   size_t getSizeZ() const { return mNz; }
-  double operator()(size_t i, size_t j, size_t k) const {
+  float operator()(size_t i, size_t j, size_t k) const {
     assert(i < mNx && j < mNy && k < mNz);
     return mData[i + (j + k * mNy) * mNx];
   }
-  double &operator()(size_t i, size_t j, size_t k) {
+  float &operator()(size_t i, size_t j, size_t k) {
     assert(i < mNx && j < mNy && k < mNz);
     return mData[i + (j + k * mNy) * mNx];
   }
@@ -151,7 +151,7 @@ private:
   size_t mNy;
   size_t mNz;
   size_t mNelements;
-  double *mData;
+  float *mData;
 };
 long double PETLogLikelihood(D3D model) {
   char filename[256];
