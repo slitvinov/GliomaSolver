@@ -12,7 +12,7 @@
 #include <vector>
 
 static double PETsigma2, PETscale, slope, T1uc, T2uc;
-static size_t mNx, mNy, mNz, mNelements;
+static size_t mNelements;
 
 static int sgn(double d) {
   double eps = 0.0;
@@ -32,10 +32,7 @@ public:
   int header[2];
   fin.read((char *)header, 2 * sizeof(int));
   fin.read((char *)size, 3 * sizeof(int));
-    mNx = size[0];
-    mNy = size[1];
-    mNz = size[2];
-    mNelements = mNx * mNy * mNz;
+    mNelements = size[0] * size[1] * size[2];
     mData = new float[mNelements];
 
   int data_type;
@@ -46,10 +43,6 @@ public:
   ~D3D() { delete mData; }
 
 public:
-  float operator()(size_t i, size_t j, size_t k) const {
-    assert(i < mNx && j < mNy && k < mNz);
-    return mData[i + (j + k * mNy) * mNx];
-  }
   float operator()(size_t i) const {
     return mData[i];
   }
@@ -60,12 +53,10 @@ long double PETLogLikelihood(D3D &model) {
   D3D PETdata("tumPET.dat");
   int N = 0;
   long double sum = 0.;
-  for (int iz = 0; iz < mNz; iz++)
-    for (int iy = 0; iy < mNy; iy++)
-      for (int ix = 0; ix < mNx; ix++) {
-        if (PETdata(ix, iy, iz) > 0.) {
-          sum += (model(ix, iy, iz) - PETscale * PETdata(ix, iy, iz)) *
-                 (model(ix, iy, iz) - PETscale * PETdata(ix, iy, iz));
+  for (int i = 0; i < mNelements; i++) {
+        if (PETdata(i) > 0.) {
+          sum += (model(i) - PETscale * PETdata(i)) *
+                 (model(i) - PETscale * PETdata(i));
           N++;
         }
       }
