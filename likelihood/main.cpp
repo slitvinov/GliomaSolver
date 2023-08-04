@@ -68,22 +68,6 @@ private:
     mNelements = nx * ny * nz;
     mData = new float[mNelements];
   }
-
-public:
-  D3D &operator=(const D3D &from) {
-    if (this == &from)
-      return *this;
-    if (from.mNx != mNx || from.mNy != mNy || from.mNz != mNz) {
-      delete mData;
-      init(from.mNx, from.mNy, from.mNz);
-      assert(mNelements == from.mNelements);
-    }
-    for (int i = 0; i < mNelements; ++i) {
-      mData[i] = from.mData[i];
-    }
-    return *this;
-  }
-
 public:
   size_t getSizeX() const { return mNx; }
   size_t getSizeY() const { return mNy; }
@@ -92,11 +76,6 @@ public:
     assert(i < mNx && j < mNy && k < mNz);
     return mData[i + (j + k * mNy) * mNx];
   }
-  float &operator()(size_t i, size_t j, size_t k) {
-    assert(i < mNx && j < mNy && k < mNz);
-    return mData[i + (j + k * mNy) * mNx];
-  }
-
 public:
   void load(const char *filename) {
     std::ifstream fin(filename, std::ios::binary);
