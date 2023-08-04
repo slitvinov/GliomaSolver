@@ -32,31 +32,20 @@ float *D3D(const char *path) {
   return mData;
 }
 
-long double LogBernoulli(double u, double y, int Ti) {
-  double uc;
-  if (Ti == 1) {
-    uc = T1uc;
-  } else {
-    uc = T2uc;
-  }
+long double LogBernoulli(double u, double y, double uc) {
   double diff = u - uc;
   long double omega2 = (diff > 0.) ? 1. : diff * diff;
   long double alpha = 0.5 + 0.5 * sgn(diff) * (1. - exp(-omega2 / slope));
   return (y == 1) ? log(alpha) : log(1. - alpha);
 }
-long double TiLogLikelihood(float *model, int Ti) {
-  float *data;
-  if (Ti == 1)
-    data = D3D("tumT1c.dat");
-  else
-    data = D3D("tumFLAIR.dat");
+long double TiLogLikelihood(float *model, float *data, double uc) {
   long double sum = 0.;
   for (int i = 0; i < mNelements; i++)
-    sum += LogBernoulli(model[i], data[i], Ti);
+    sum += LogBernoulli(model[i], data[i], uc);
   return sum;
 }
 int main(int argc, const char **argv) {
-  float *model, *PETdata;
+  float *model, *PETdata, *tumT1c, *tumFLAIR;
   int N, i;
   long double sum;
 
@@ -67,6 +56,8 @@ int main(int argc, const char **argv) {
   slope = 2;
   model = D3D("HGG_data.dat");
   PETdata = D3D("tumPET.dat");
+  tumT1c = D3D("tumT1c.dat");
+  tumFLAIR = D3D("tumFLAIR.dat");
   N = 0;
   sum = 0.;
   for (i = 0; i < mNelements; i++)
@@ -78,7 +69,7 @@ int main(int argc, const char **argv) {
   long double p1 = -0.5 * N * log(2. * PI * PETsigma2);
   long double p2 = -0.5 * (1. / PETsigma2) * sum;
   long double Lpet = p1 + p2;
-  long double Lt1 = TiLogLikelihood(model, 1);
-  long double Lt2 = TiLogLikelihood(model, 2);
+  long double Lt1 = TiLogLikelihood(model, tumT1c, T1uc);
+  long double Lt2 = TiLogLikelihood(model, tumFLAIR, T2uc);
   printf("%.16Le\n", -(Lpet + Lt1 + Lt2));
 };
