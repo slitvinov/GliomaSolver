@@ -22,7 +22,6 @@ static int sgn(double d) {
 }
 
 using namespace std;
-namespace Matrix {
 enum TypeID { TID_DOUBLE = 0, TID_FLOAT = 1, TID_INVALID = -1 };
 template <typename T> inline int typeId() { return TID_INVALID; }
 template <> inline int typeId<double>() { return TID_DOUBLE; }
@@ -191,8 +190,7 @@ private:
   size_t mNelements;
   T *mData;
 };
-} // namespace Matrix
-typedef Matrix::D3D<double> MatrixD3D;
+typedef D3D<double> MatrixD3D;
 class HGG_Likelihood {
 private:
   long double _computePETLogLikelihood(MatrixD3D model);
