@@ -39,11 +39,10 @@ inline std::istream &deserializeHeader(std::istream &is, size_t dim,
   is.read((char *)size, dim * sizeof(int));
   return is;
 }
-template <typename T>
-inline std::istream &deserialize(std::istream &is, T *data, int n_elem) {
+inline std::istream &deserialize(std::istream &is, float *data, int n_elem) {
   int data_type;
   is.read((char *)&data_type, sizeof(int));
-  return is.read((char *)data, sizeof(T) * n_elem);
+  return is.read((char *)data, sizeof(float) * n_elem);
 }
 class D3D {
 public:
