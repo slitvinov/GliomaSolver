@@ -6,7 +6,6 @@
 #include "MRAGcore/MRAGBlockCollection.h"
 #include <fstream>
 using namespace MRAG;
-namespace Matrix {
 enum TypeID { TID_DOUBLE = 0, TID_FLOAT = 1, TID_INT = 2, TID_INVALID = -1 };
 template <typename T> inline int typeId() { return TID_INVALID; }
 template <> inline int typeId<double>() { return TID_DOUBLE; }
@@ -207,19 +206,6 @@ private:
   size_t mNelements;
   T *mData;
 };
-
-} // namespace Matrix
-/*
- Computes rhs of the reaction-diffusio equation for tumor:
- //  ------------------------------------
- //    ∂φ / ∂t = ∇( D∇φ) + ρ * φ(1-φ)
- //     + no flux BC
- //
- //     φ - tumor density
- //     ρ - tumor proliferation rate
- //     D - diffusivity
- //  ------------------------------------
- */
 struct ReactionDiffusionOperator {
   int stencil_start[3];
   int stencil_end[3];
@@ -592,7 +578,7 @@ const double compression_tolerance = 1e-5;
 typedef Block<Cell, blockSize, blockSize, blockSizeZ> B;
 typedef _WAVELET_TYPE W;
 
-typedef Matrix::D3D<float> MatrixD3D;
+typedef D3D<float> MatrixD3D;
 
 static const int nThreads = 1;
 typedef Multithreading::BlockProcessing_SingleCPU<B> BlockProcessing;
