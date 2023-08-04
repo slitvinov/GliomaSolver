@@ -43,17 +43,6 @@ inline std::istream &deserializeHeader(std::istream &is, size_t dim,
   is.read((char *)size, dim * sizeof(int));
   return is;
 }
-inline void deserializeHeader(const char *filename, size_t dim, int *size) {
-  std::ifstream fin(filename, std::ios::binary);
-  if (!fin.is_open()) {
-    std::cout << "ERROR while opening " << filename << std::endl;
-    return;
-  }
-  if (!deserializeHeader(fin, dim, size)) {
-    std::cout << "ERROR while reading " << filename << std::endl;
-  }
-  fin.close();
-}
 template <typename T2, typename T>
 inline std::istream &deserializeConvert(std::istream &is, T *data, int n_elem) {
   T2 *tmp = new T2[n_elem];
@@ -228,7 +217,6 @@ long double _computeTiLogLikelihood(MatrixD3D model, int Ti) {
     for (int iy = 0; iy < dataY; iy++)
       for (int ix = 0; ix < dataX; ix++)
         sum += _computeLogBernoulli(model(ix, iy, iz), data(ix, iy, iz), Ti);
-  printf("LogLike of T%i = %Lf \n", Ti, sum);
   return sum;
 }
 int main(int argc, const char **argv) {
@@ -244,8 +232,6 @@ int main(int argc, const char **argv) {
     printf("Aborting: missing input file LikelihoodInput.txt \n");
     abort();
   }
-  printf("PET: PETsigma2=%f, PETscale=%f \n", PETsigma2, PETscale);
-  printf("MRI: T1uc=%f, T2uc =%f, slope=%f \n", T1uc, T2uc, slope);
   char filename[256];
   sprintf(filename, "HGG_data.dat");
   MatrixD3D model(filename);
@@ -253,8 +239,6 @@ int main(int argc, const char **argv) {
   long double Lt1 = _computeTiLogLikelihood(model, 1);
   long double Lt2 = _computeTiLogLikelihood(model, 2);
   long double costFunction = Lpet + Lt1 + Lt2;
-  printf("L_Pet=%Lf, L_T1=%Lf, L_T2 = %Lf \n", Lpet, Lt1, Lt2);
-  printf("LogLike = %Lf \n", costFunction);
   long double MinusLogLikelihood = -costFunction;
   FILE *myfile = fopen("Likelihood.txt", "w");
   if (myfile != NULL)
