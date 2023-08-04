@@ -36,4 +36,11 @@
 
 # Refernces
 
-<http://tdo.sk/~janka/GliomaWebsite//index.html>
+1. <http://tdo.sk/~janka/GliomaWebsite/index.html>
+
+2. Lipková, J., Angelikopoulos, P., Wu, S., Alberts, E., Wiestler, B.,
+   Diehl, C., ... & Menze, B. (2019). Personalized radiotherapy design
+   for glioblastoma: Integrating mathematical tumor models, multimodal
+   scans, and bayesian inference. IEEE transactions on medical
+   imaging, 38(8), 1875-1884.
+  [10.1109/TMI.2019.2902044](https://doi.org/10.1109/TMI.2019.2902044)
