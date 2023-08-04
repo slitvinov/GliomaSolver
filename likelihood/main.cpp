@@ -12,6 +12,8 @@
 #include <vector>
 
 static double PETsigma2, PETscale, slope, T1uc, T2uc;
+static size_t mNx, mNy, mNz, mNelements;
+
 static int sgn(double d) {
   double eps = 0.0;
   if (d < -eps) {
@@ -46,17 +48,20 @@ inline std::istream &deserialize(std::istream &is, float *data, int n_elem) {
 }
 class D3D {
 public:
-  D3D(const char *filename) : mNx(0), mData(NULL) { load(filename); }
+  D3D(const char *filename) {
+    std::ifstream fin(filename, std::ios::binary);
+    int size[3];
+    deserializeHeader(fin, 3, size);
+    mNx = size[0];
+    mNy = size[1];
+    mNz = size[2];
+    mNelements = mNx * mNy * mNz;
+    mData = new float[mNelements];
+    deserialize(fin, mData, mNelements);
+    fin.close();
+  }
   ~D3D() { delete mData; }
 
-private:
-  void init(const size_t nx, const size_t ny, const size_t nz) {
-    mNx = nx;
-    mNy = ny;
-    mNz = nz;
-    mNelements = nx * ny * nz;
-    mData = new float[mNelements];
-  }
 public:
   size_t getSizeX() const { return mNx; }
   size_t getSizeY() const { return mNy; }
@@ -65,33 +70,7 @@ public:
     assert(i < mNx && j < mNy && k < mNz);
     return mData[i + (j + k * mNy) * mNx];
   }
-public:
-  void load(const char *filename) {
-    std::ifstream fin(filename, std::ios::binary);
-    if (!fin.is_open()) {
-      std::cout << "ERROR while opening " << filename << std::endl;
-      return;
-    }
-    if (!load(fin)) {
-      std::cout << "ERROR while reading " << filename << std::endl;
-    }
-    fin.close();
-  }
-  std::istream &load(std::istream &is) {
-    int size[3];
-    deserializeHeader(is, 3, size);
-    if (size[0] != mNx || size[1] != mNy || size[2] != mNz) {
-      delete mData;
-      init(size[0], size[1], size[2]);
-    }
-    return deserialize(is, mData, mNelements);
-  }
-
 private:
-  size_t mNx;
-  size_t mNy;
-  size_t mNz;
-  size_t mNelements;
   float *mData;
 };
 long double PETLogLikelihood(D3D &model) {
