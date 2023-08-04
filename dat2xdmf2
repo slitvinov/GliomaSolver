@@ -15,7 +15,7 @@ try:
     path = sys.argv[1]
 except IndexError:
     sys.stderr.write("dat2xdmf2: error: needs an argument\n")
-    sys.exit(2)
+    sys.exit(1)
 try:
     with open(path, "rb") as file:
         magic, = unpack('i', file)
@@ -70,7 +70,7 @@ try:
 """.format(**locals()))
 except FileNotFoundError:
     sys.stderr.write("dat2xdmf2: error: fail to open '%s'\n" % path)
-    sys.exit(2)
+    sys.exit(1)
 except struct.error:
     sys.stderr.write("dat2xdmf2: error: fail to read '%s'\n" % path)
-    sys.exit(2)
+    sys.exit(1)

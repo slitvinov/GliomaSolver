@@ -12,7 +12,7 @@ def unpack(string, file):
 
 if len(sys.argv) < 1:
     sys.stderr.write("dat2info: error: needs an argument\n")
-    sys.exit(2)
+    sys.exit(1)
 for path in sys.argv[1:]:
     try:
         with open(path, "rb") as file:
@@ -34,7 +34,7 @@ for path in sys.argv[1:]:
             print(path, nx, ny, nz, type_name)
     except FileNotFoundError:
         sys.stderr.write("dat2info: error: fail to open '%s'\n" % path)
-        sys.exit(2)
+        sys.exit(1)
     except struct.error:
         sys.stderr.write("dat2info: error: fail to read '%s'\n" % path)
-        sys.exit(2)
+        sys.exit()
