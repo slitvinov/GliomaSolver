@@ -24,21 +24,11 @@ static int sgn(double d) {
 }
 
 using namespace std;
-inline std::istream &deserializeHeader(std::istream &is, size_t dim,
+inline std::istream &deserializeHeader(std::istream &is,
                                        int *size) {
   int header[2];
   is.read((char *)header, 2 * sizeof(int));
-  if (header[0] != 1234) {
-    std::cout << "Magic number did not match. Aborting\n";
-    is.clear(std::ios::badbit);
-    return is;
-  }
-  if (header[1] != dim) {
-    std::cout << "Dimensions of matrix do not match. Aborting\n";
-    is.clear(std::ios::badbit);
-    return is;
-  }
-  is.read((char *)size, dim * sizeof(int));
+  is.read((char *)size, 3 * sizeof(int));
   return is;
 }
 inline std::istream &deserialize(std::istream &is, float *data, int n_elem) {
@@ -51,7 +41,7 @@ public:
   D3D(const char *filename) {
     std::ifstream fin(filename, std::ios::binary);
     int size[3];
-    deserializeHeader(fin, 3, size);
+    deserializeHeader(fin, size);
     mNx = size[0];
     mNy = size[1];
     mNz = size[2];
@@ -63,9 +53,6 @@ public:
   ~D3D() { delete mData; }
 
 public:
-  size_t getSizeX() const { return mNx; }
-  size_t getSizeY() const { return mNy; }
-  size_t getSizeZ() const { return mNz; }
   float operator()(size_t i, size_t j, size_t k) const {
     assert(i < mNx && j < mNy && k < mNz);
     return mData[i + (j + k * mNy) * mNx];
@@ -74,17 +61,12 @@ private:
   float *mData;
 };
 long double PETLogLikelihood(D3D &model) {
-  char filename[256];
-  sprintf(filename, "tumPET.dat");
-  D3D PETdata(filename);
-  int dataX = PETdata.getSizeX();
-  int dataY = PETdata.getSizeY();
-  int dataZ = PETdata.getSizeZ();
+  D3D PETdata("tumPET.dat");
   int N = 0;
   long double sum = 0.;
-  for (int iz = 0; iz < dataZ; iz++)
-    for (int iy = 0; iy < dataY; iy++)
-      for (int ix = 0; ix < dataX; ix++) {
+  for (int iz = 0; iz < mNz; iz++)
+    for (int iy = 0; iy < mNy; iy++)
+      for (int ix = 0; ix < mNx; ix++) {
         if (PETdata(ix, iy, iz) > 0.) {
           sum += (model(ix, iy, iz) - PETscale * PETdata(ix, iy, iz)) *
                  (model(ix, iy, iz) - PETscale * PETdata(ix, iy, iz));
@@ -116,15 +98,10 @@ long double TiLogLikelihood(D3D &model, int Ti) {
   else
     sprintf(filename, "tumFLAIR.dat");
   D3D data(filename);
-  int dataX = data.getSizeX();
-  int dataY = data.getSizeY();
-  int dataZ = data.getSizeZ();
-  long int N = dataX * dataY * dataZ;
-  assert(N == model.getSizeX() * model.getSizeY() * model.getSizeZ());
   long double sum = 0.;
-  for (int iz = 0; iz < dataZ; iz++)
-    for (int iy = 0; iy < dataY; iy++)
-      for (int ix = 0; ix < dataX; ix++)
+  for (int iz = 0; iz < mNz; iz++)
+    for (int iy = 0; iy < mNy; iy++)
+      for (int ix = 0; ix < mNx; ix++)
         sum += LogBernoulli(model(ix, iy, iz), data(ix, iy, iz), Ti);
   return sum;
 }
