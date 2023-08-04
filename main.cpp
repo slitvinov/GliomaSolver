@@ -563,23 +563,15 @@ make_projector(RD_Projector_Wavelets, RD_projector_impl_wav)
         static const int blockSize = _BLOCKSIZE_;
 static const int blockSizeZ = _BLOCKSIZE_Z_;
 static const int blocksPerDimension = _BPD_;
-
-// Structural parameters
 static const bool bIsCellCentered = true;
 static const bool bVerbose = true;
-
-// Multiresolution parameters
-static const int maxLevel = _MAXLEVEL_; // 8bpd has maxLevel 3 since 2^3
-static const int resJump =
-    _RESJUMP_; // modulo(maxLevel,resJum) = 0, !!! and reJump < maxLevel
+static const int maxLevel = _MAXLEVEL_;
+static const int resJump = _RESJUMP_;
 const double refinement_tolerance = 1e-4;
 const double compression_tolerance = 1e-5;
-
 typedef Block<Cell, blockSize, blockSize, blockSizeZ> B;
 typedef _WAVELET_TYPE W;
-
 typedef D3D<float> MatrixD3D;
-
 static const int nThreads = 1;
 typedef Multithreading::BlockProcessing_SingleCPU<B> BlockProcessing;
 class Glioma_ReactionDiffusion {
@@ -588,8 +580,7 @@ private:
   BlockProcessing blockProcessing;
   Refiner_SpaceExtension *refiner;
   Compressor *compressor;
-  BlockFWT<W, B, RD_Projector_Wavelets>
-      blockfwt; // refinment based on single channel
+  BlockFWT<W, B, RD_Projector_Wavelets> blockfwt;
   SpaceTimeSorter stSorter;
   ArgumentParser parser;
   BlockLab<B> lab;
@@ -663,10 +654,6 @@ Glioma_ReactionDiffusion::Glioma_ReactionDiffusion(int argc, const char **argv)
 Glioma_ReactionDiffusion::~Glioma_ReactionDiffusion() {
   std::cout << "------Adios muchachos------" << std::endl;
 }
-
-// 1) Read in anatomies - rescaled to [0,1]^3
-// 2) Initialize tumor
-// 3) Set the characteristic length L as the length of the data
 void Glioma_ReactionDiffusion::_ic(Grid<W, B> &grid, string PatientFileName,
                                    Real &L, Real tumor_ic[3]) {
   printf("Reading data from file: %s \n", PatientFileName.c_str());
@@ -686,20 +673,13 @@ void Glioma_ReactionDiffusion::_ic(Grid<W, B> &grid, string PatientFileName,
          brainSizeY, brainSizeZ);
 
   int brainSizeMax = max(brainSizeX, max(brainSizeY, brainSizeZ));
-  L = brainSizeMax *
-      0.1; // voxel spacing 1mm, convert from mm to cm  // L = 25.6 cm
+  L = brainSizeMax * 0.1;
   printf("Characteristic Lenght L=%f \n", L);
-
-  double brainHx = 1.0 / ((double)(brainSizeMax)); //  w.r.t. longest dimension
-                                                   //  for correct aspect ratio
-  double brainHy = 1.0 / ((double)(brainSizeMax)); //  w.r.t. longest dimension
-                                                   //  for correct aspect ratio
-  double brainHz = 1.0 / ((double)(brainSizeMax)); //  w.r.t. longest dimension
-                                                   //  for correct aspect ratio
-
-  // Tumor set up
+  double brainHx = 1.0 / ((double)(brainSizeMax));
+  double brainHy = 1.0 / ((double)(brainSizeMax));
+  double brainHz = 1.0 / ((double)(brainSizeMax));
   const Real tumorRadius = 0.005;
-  const Real smooth_sup = 2.; // suppor of smoothening
+  const Real smooth_sup = 2.;
   const Real h =
       1. / 128; // use fixed h, for same IC smoothening at all resolutions
   const Real iw = 1. / (smooth_sup * h); // widht of smoothening
@@ -721,41 +701,27 @@ void Glioma_ReactionDiffusion::_ic(Grid<W, B> &grid, string PatientFileName,
           int mappedBrainX = (int)floor(x[0] / brainHx);
           int mappedBrainY = (int)floor(x[1] / brainHy);
           int mappedBrainZ = (int)floor(x[2] / brainHz);
-
-          //                    // aspect ratio correction
-          //                    mappedBrainX -= (int) ( (brainSizeMax -
-          //                    brainSizeX) * 0.5); mappedBrainY -= (int) (
-          //                    (brainSizeMax - brainSizeY) * 0.5); mappedBrainZ
-          //                    -= (int) ( (brainSizeMax - brainSizeZ) * 0.5);
-
           if ((mappedBrainX >= 0 && mappedBrainX < brainSizeX) &
                   (mappedBrainY >= 0 && mappedBrainY < brainSizeY) &&
               (mappedBrainZ >= 0 && mappedBrainZ < brainSizeZ)) {
-            // anatomy
             pGM = GM(mappedBrainX, mappedBrainY, mappedBrainZ);
             pWM = WM(mappedBrainX, mappedBrainY, mappedBrainZ);
             pCSF = CSF(mappedBrainX, mappedBrainY, mappedBrainZ);
-
-            // separat tissue and fluid based on majority voting
             double tissue = pWM + pGM;
             pCSF = (pCSF > tissue) ? 1. : 0.;
             pWM = (pCSF > tissue) ? 0. : pWM;
             pGM = (pCSF > tissue) ? 0. : pGM;
-
             tissue = pWM + pGM;
             block(ix, iy, iz).p_w = (tissue > 0.) ? (pWM / tissue) : 0.;
             block(ix, iy, iz).p_g = (tissue > 0.) ? (pGM / tissue) : 0.;
             block(ix, iy, iz).p_csf = pCSF;
-
-            // tumor
             const Real p[3] = {x[0] - tumor_ic[0], x[1] - tumor_ic[1],
                                x[2] - tumor_ic[2]};
             const Real dist =
                 sqrt(p[0] * p[0] + p[1] * p[1] +
-                     p[2] * p[2]); // distance of curent voxel from tumor center
+                     p[2] * p[2]);
             const Real psi = (dist - tumorRadius) * iw;
-
-            if ((psi < -1) && (pGM + pWM > 0.001)) // we are in tumor
+            if ((psi < -1) && (pGM + pWM > 0.001))
               block(ix, iy, iz).phi = 1.0;
             else if (((-1 <= psi) && (psi <= 1)) && (pGM + pWM > 0))
               block(ix, iy, iz).phi =
@@ -783,11 +749,6 @@ void Glioma_ReactionDiffusion::_reactionDiffusionStep(
   BlockProcessing::process(vInfo, collecton, updateTumor, nParallelGranularity);
 }
 
-
-/* Dump output for UQ likelihood. Requirements:
- - dump at the uniform finest resolution
- - use 3D Matrix structure to dump data in binary format
- - assume 3D simulation */
 void Glioma_ReactionDiffusion::_dumpUQoutput() {
   int gpd = blocksPerDimension * blockSize;
   double hf = 1. / gpd;
@@ -841,8 +802,6 @@ void Glioma_ReactionDiffusion::_dumpUQoutput() {
 void Glioma_ReactionDiffusion::run() {
   const int nParallelGranularity = (grid->getBlocksInfo().size() <= 8 ? 1 : 4);
   BoundaryInfo *boundaryInfo = &grid->getBoundaryInfo();
-
-  /* Tumor growth parameters*/
   Real Dw, Dg, rho, tend;
 
     ifstream mydata("InputParameters.txt");
@@ -855,8 +814,6 @@ void Glioma_ReactionDiffusion::run() {
       printf("Aborting: missing input file InputParameters.txt \n");
       abort();
     }
-
-  /*rescale for correct space dimension*/
   Dw = Dw / (L * L);
   Dg = 0.1 * Dw;
 
@@ -866,8 +823,6 @@ void Glioma_ReactionDiffusion::run() {
   int iCounter = 1;
   if (bVerbose)
     printf("Dg=%e, Dw=%e, dt= %f, rho=%f , h=%f\n", Dg, Dw, dt, rho, h);
-
-  // Initial compression, later just refinment since tumor just grow
   Science::AutomaticRefinement<0, 0>(*grid, blockfwt, refinement_tolerance,
                                      maxLevel, 1);
   Science::AutomaticCompression<0, 0>(*grid, blockfwt, compression_tolerance,
