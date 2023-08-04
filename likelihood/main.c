@@ -1,6 +1,6 @@
 #include <assert.h>
-#include <stdio.h>
 #include <math.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 static double PETsigma2, PETscale, slope, T1uc, T2uc;
@@ -16,20 +16,20 @@ static int sgn(double d) {
   }
 }
 
-float* D3D(const char *path) {
-    FILE *file;
-    int header[6];
-    float *mData;
-    file = fopen(path, "r");
-    fread(header, sizeof header, 1, file);
-    assert(header[0] == 1234);
-    assert(header[1] == 3);
-    assert(header[5] == 1);
-    mNelements = header[2] * header[3] * header[4];
-    mData = (float*)malloc(mNelements * sizeof *mData);
-    fread(mData, mNelements, sizeof *mData, file);
-    fclose(file);
-    return mData;
+float *D3D(const char *path) {
+  FILE *file;
+  int header[6];
+  float *mData;
+  file = fopen(path, "r");
+  fread(header, sizeof header, 1, file);
+  assert(header[0] == 1234);
+  assert(header[1] == 3);
+  assert(header[5] == 1);
+  mNelements = header[2] * header[3] * header[4];
+  mData = (float *)malloc(mNelements * sizeof *mData);
+  fread(mData, mNelements, sizeof *mData, file);
+  fclose(file);
+  return mData;
 }
 
 long double LogBernoulli(double u, double y, int Ti) {
@@ -59,7 +59,7 @@ int main(int argc, const char **argv) {
   float *model, *PETdata;
   int N, i;
   long double sum;
-  
+
   PETsigma2 = 0.000361;
   PETscale = 0.85;
   T1uc = 0.7;
