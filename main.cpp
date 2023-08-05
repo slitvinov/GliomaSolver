@@ -7,9 +7,8 @@
 #include <fstream>
 using namespace MRAG;
 static int mNx, mNy, mNz, mNelements;
-class D3D {
-public:
-  D3D(const char *path) {
+static float* D3D(const char *path) {
+    float *mData;
     FILE *file;
     int header[6];
     file = fopen(path, "r");
@@ -24,13 +23,7 @@ public:
     mData = (float *)malloc(mNelements * sizeof *mData);
     fread(mData, mNelements, sizeof *mData, file);
     fclose(file);
-  }
-  float operator()(size_t i, size_t j, size_t k) const {
-    assert(i < mNx && j < mNy && k < mNz);
-    return mData[i + (j + k * mNy) * mNx];
-  }
-private:
-  float *mData;
+    return mData;
 };
 struct ReactionDiffusionOperator {
   int stencil_start[3];
@@ -475,10 +468,10 @@ Glioma_ReactionDiffusion::Glioma_ReactionDiffusion(int argc, const char **argv)
 }
 void Glioma_ReactionDiffusion::_ic(Grid<W, B> &grid, string PatientFileName,
                                    Real &L, Real tumor_ic[3]) {
-  D3D GM("GM.dat");
-  D3D WM("WM.dat");
-  D3D CSF("CSF.dat");
-
+  float *GM, *WM, *CSF;
+  GM = D3D("GM.dat");
+  WM = D3D("WM.dat");
+  CSF = D3D("CSF.dat");
   int brainSizeX = mNx;
   int brainSizeY = mNy;
   int brainSizeZ = mNz;
@@ -513,9 +506,10 @@ void Glioma_ReactionDiffusion::_ic(Grid<W, B> &grid, string PatientFileName,
           if ((mappedBrainX >= 0 && mappedBrainX < brainSizeX) &
                   (mappedBrainY >= 0 && mappedBrainY < brainSizeY) &&
               (mappedBrainZ >= 0 && mappedBrainZ < brainSizeZ)) {
-            pGM = GM(mappedBrainX, mappedBrainY, mappedBrainZ);
-            pWM = WM(mappedBrainX, mappedBrainY, mappedBrainZ);
-            pCSF = CSF(mappedBrainX, mappedBrainY, mappedBrainZ);
+	    int index = mappedBrainX + (mappedBrainY + mappedBrainZ * mNy) * mNx;
+            pGM = GM[index];
+            pWM = WM[index];
+            pCSF = CSF[index];
             double tissue = pWM + pGM;
             pCSF = (pCSF > tissue) ? 1. : 0.;
             pWM = (pCSF > tissue) ? 0. : pWM;
