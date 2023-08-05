@@ -35,21 +35,7 @@ public:
   typedef T ElementType;
 
 public:
-  D3D(const size_t nx, const size_t ny, const size_t nz) { init(nx, ny, nz); }
-  D3D(const size_t nx, const size_t ny, const size_t nz, T *data) {
-    init(nx, ny, nz);
-    for (int i = 0; i < mNelements; ++i) {
-      mData[i] = data[i];
-    }
-  }
-  D3D(const D3D &from) {
-    init(from.mNx, from.mNy, from.mNz);
-    for (int i = 0; i < mNelements; ++i) {
-      mData[i] = from.mData[i];
-    }
-  }
   D3D(const char *filename) : mNx(0), mData(NULL) { load(filename); }
-  D3D(std::istream &is) : mNx(0), mData(NULL) { load(is); }
   ~D3D() { delete mData; }
 
 private:
