@@ -80,22 +80,6 @@ public:
   }
 
 public:
-  void dump(const char *filename, TypeID tid = (TypeID)typeId<T>()) const {
-    std::ofstream fout(filename, std::ios::binary);
-    if (!fout.is_open()) {
-      std::cout << "ERROR while opening " << filename << std::endl;
-      return;
-    }
-    if (!dump(fout, tid)) {
-      std::cout << "ERROR while writing to " << filename << std::endl;
-    }
-    fout.close();
-  }
-  std::ostream &dump(std::ostream &os, TypeID tid = (TypeID)typeId<T>()) const {
-    int header[5] = {1234, 3, mNx, mNy, mNz};
-    os.write((char *)header, 5 * sizeof(int));
-    return serialize(os, mData, mNelements, tid);
-  }
   void load(const char *filename) {
     std::ifstream fin(filename, std::ios::binary);
     if (!fin.is_open()) {
