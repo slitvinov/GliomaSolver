@@ -35,42 +35,6 @@ inline std::istream &deserialize(std::istream &is, T *data, int n_elem) {
   is.read((char *)&data_type, sizeof(int));
   return is.read((char *)data, sizeof(T) * n_elem);
 }
-template <typename T2, typename T>
-inline std::ostream &serializeConvert(std::ostream &os, const T *data,
-                                      int n_elem) {
-  T2 *tmp = new T2[n_elem];
-  for (int i = 0; i < n_elem; ++i) {
-    tmp[i] = (T2)data[i];
-  }
-  os.write((char *)tmp, sizeof(T2) * n_elem);
-  delete tmp;
-  return os;
-}
-template <typename T>
-inline std::ostream &serialize(std::ostream &os, const T *data, int n_elem,
-                               TypeID tid = (TypeID)typeId<T>()) {
-  if (tid == TID_INVALID) {
-    os.clear(std::ios::badbit);
-    return os;
-  }
-  int data_type = tid;
-  os.write((char *)&data_type, sizeof(int));
-  if (tid == typeId<T>()) {
-    return os.write((char *)data, sizeof(T) * n_elem);
-  } else {
-    switch (TypeID(data_type)) {
-    case TID_DOUBLE:
-      return serializeConvert<double>(os, data, n_elem);
-    case TID_FLOAT:
-      return serializeConvert<float>(os, data, n_elem);
-    case TID_INT:
-      return serializeConvert<int>(os, data, n_elem);
-    default:
-      os.clear(std::ios::badbit);
-      return os;
-    }
-  }
-}
 template <typename T> class D3D {
 public:
   typedef T ElementType;
