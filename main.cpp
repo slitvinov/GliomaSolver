@@ -6,83 +6,38 @@
 #include "MRAGcore/MRAGrid.h"
 #include <fstream>
 using namespace MRAG;
-inline std::istream &deserializeHeader(std::istream &is, size_t dim,
-                                       int *size) {
-  int header[2];
-  is.read((char *)header, 2 * sizeof(int));
-  if (header[0] != 1234) {
-    std::cout << "Magic number did not match. Aborting\n";
-    is.clear(std::ios::badbit);
-    return is;
-  }
-  if (header[1] != dim) {
-    std::cout << "Dimensions of matrix do not match. Aborting\n";
-    is.clear(std::ios::badbit);
-    return is;
-  }
-  is.read((char *)size, dim * sizeof(int));
-  return is;
-}
-template <typename T>
-inline std::istream &deserialize(std::istream &is, T *data, int n_elem) {
-
-  int data_type;
-  is.read((char *)&data_type, sizeof(int));
-  return is.read((char *)data, sizeof(T) * n_elem);
-}
-template <typename T> class D3D {
+class D3D {
 public:
-  typedef T ElementType;
-
-public:
-  D3D(const char *filename) : mNx(0), mData(NULL) { load(filename); }
+  D3D(const char *path) {
+    FILE *file;
+    int header[6];
+    file = fopen(path, "r");
+    fread(header, sizeof header, 1, file);
+    assert(header[0] == 1234);
+    assert(header[1] == 3);
+    assert(header[5] == 1);
+    mNelements = header[2] * header[3] * header[4];
+    mNx = header[2];
+    mNy = header[3];
+    mNz = header[4];
+    mData = (float *)malloc(mNelements * sizeof *mData);
+    fread(mData, mNelements, sizeof *mData, file);
+    fclose(file);
+  }
   ~D3D() { delete mData; }
-
-private:
-  void init(const size_t nx, const size_t ny, const size_t nz) {
-    mNx = nx;
-    mNy = ny;
-    mNz = nz;
-    mNelements = nx * ny * nz;
-    mData = new T[mNelements];
-  }
-
-public:
   size_t getSizeX() const { return mNx; }
   size_t getSizeY() const { return mNy; }
   size_t getSizeZ() const { return mNz; }
-  T operator()(size_t i, size_t j, size_t k) const {
+  float operator()(size_t i, size_t j, size_t k) const {
     assert(i < mNx && j < mNy && k < mNz);
     return mData[i + (j + k * mNy) * mNx];
   }
-public:
-  void load(const char *filename) {
-    std::ifstream fin(filename, std::ios::binary);
-    if (!fin.is_open()) {
-      std::cout << "ERROR while opening " << filename << std::endl;
-      return;
-    }
-    if (!load(fin)) {
-      std::cout << "ERROR while reading " << filename << std::endl;
-    }
-    fin.close();
-  }
-  std::istream &load(std::istream &is) {
-    int size[3];
-    deserializeHeader(is, 3, size);
-    if (size[0] != mNx || size[1] != mNy || size[2] != mNz) {
-      delete mData;
-      init(size[0], size[1], size[2]);
-    }
-    return deserialize(is, mData, mNelements);
-  }
-
 private:
   size_t mNx;
   size_t mNy;
   size_t mNz;
   size_t mNelements;
-  T *mData;
+  float *mData;
 };
 struct ReactionDiffusionOperator {
   int stencil_start[3];
@@ -448,7 +403,6 @@ const double refinement_tolerance = 1e-4;
 const double compression_tolerance = 1e-5;
 typedef Block<Cell, blockSize, blockSize, blockSizeZ> B;
 typedef _WAVELET_TYPE W;
-typedef D3D<float> MatrixD3D;
 static const int nThreads = 1;
 typedef Multithreading::BlockProcessing_SingleCPU<B> BlockProcessing;
 class Glioma_ReactionDiffusion {
@@ -528,9 +482,9 @@ Glioma_ReactionDiffusion::Glioma_ReactionDiffusion(int argc, const char **argv)
 }
 void Glioma_ReactionDiffusion::_ic(Grid<W, B> &grid, string PatientFileName,
                                    Real &L, Real tumor_ic[3]) {
-  MatrixD3D GM("GM.dat");
-  MatrixD3D WM("WM.dat");
-  MatrixD3D CSF("CSF.dat");
+  D3D GM("GM.dat");
+  D3D WM("WM.dat");
+  D3D CSF("CSF.dat");
 
   int brainSizeX = (int)GM.getSizeX();
   int brainSizeY = (int)GM.getSizeY();
