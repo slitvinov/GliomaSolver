@@ -74,11 +74,6 @@ public:
     assert(i < mNx && j < mNy && k < mNz);
     return mData[i + (j + k * mNy) * mNx];
   }
-  T &operator()(size_t i, size_t j, size_t k) {
-    assert(i < mNx && j < mNy && k < mNz);
-    return mData[i + (j + k * mNy) * mNx];
-  }
-
 public:
   void load(const char *filename) {
     std::ifstream fin(filename, std::ios::binary);
