@@ -6,6 +6,7 @@
 #include "MRAGcore/MRAGrid.h"
 #include <fstream>
 using namespace MRAG;
+static int mNx, mNy, mNz, mNelements;
 class D3D {
 public:
   D3D(const char *path) {
@@ -24,19 +25,11 @@ public:
     fread(mData, mNelements, sizeof *mData, file);
     fclose(file);
   }
-  ~D3D() { delete mData; }
-  size_t getSizeX() const { return mNx; }
-  size_t getSizeY() const { return mNy; }
-  size_t getSizeZ() const { return mNz; }
   float operator()(size_t i, size_t j, size_t k) const {
     assert(i < mNx && j < mNy && k < mNz);
     return mData[i + (j + k * mNy) * mNx];
   }
 private:
-  size_t mNx;
-  size_t mNy;
-  size_t mNz;
-  size_t mNelements;
   float *mData;
 };
 struct ReactionDiffusionOperator {
@@ -486,9 +479,9 @@ void Glioma_ReactionDiffusion::_ic(Grid<W, B> &grid, string PatientFileName,
   D3D WM("WM.dat");
   D3D CSF("CSF.dat");
 
-  int brainSizeX = (int)GM.getSizeX();
-  int brainSizeY = (int)GM.getSizeY();
-  int brainSizeZ = (int)GM.getSizeZ();
+  int brainSizeX = mNx;
+  int brainSizeY = mNy;
+  int brainSizeZ = mNz;
   printf("brainSizeX=%i, brainSizeY=%i, brainSizeZ=%i \n", brainSizeX,
          brainSizeY, brainSizeZ);
 
