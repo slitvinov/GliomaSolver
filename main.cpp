@@ -6,11 +6,6 @@
 #include "MRAGcore/MRAGrid.h"
 #include <fstream>
 using namespace MRAG;
-enum TypeID { TID_DOUBLE = 0, TID_FLOAT = 1, TID_INT = 2, TID_INVALID = -1 };
-template <typename T> inline int typeId() { return TID_INVALID; }
-template <> inline int typeId<double>() { return TID_DOUBLE; }
-template <> inline int typeId<float>() { return TID_FLOAT; }
-template <> inline int typeId<int>() { return TID_INT; }
 inline std::istream &deserializeHeader(std::istream &is, size_t dim,
                                        int *size) {
   int header[2];
