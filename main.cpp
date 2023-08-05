@@ -7,23 +7,23 @@
 #include <fstream>
 using namespace MRAG;
 static int mNx, mNy, mNz, mNelements;
-static float* D3D(const char *path) {
-    float *mData;
-    FILE *file;
-    int header[6];
-    file = fopen(path, "r");
-    fread(header, sizeof header, 1, file);
-    assert(header[0] == 1234);
-    assert(header[1] == 3);
-    assert(header[5] == 1);
-    mNelements = header[2] * header[3] * header[4];
-    mNx = header[2];
-    mNy = header[3];
-    mNz = header[4];
-    mData = (float *)malloc(mNelements * sizeof *mData);
-    fread(mData, mNelements, sizeof *mData, file);
-    fclose(file);
-    return mData;
+static float *D3D(const char *path) {
+  float *mData;
+  FILE *file;
+  int header[6];
+  file = fopen(path, "r");
+  fread(header, sizeof header, 1, file);
+  assert(header[0] == 1234);
+  assert(header[1] == 3);
+  assert(header[5] == 1);
+  mNelements = header[2] * header[3] * header[4];
+  mNx = header[2];
+  mNy = header[3];
+  mNz = header[4];
+  mData = (float *)malloc(mNelements * sizeof *mData);
+  fread(mData, mNelements, sizeof *mData, file);
+  fclose(file);
+  return mData;
 };
 struct ReactionDiffusionOperator {
   int stencil_start[3];
@@ -505,7 +505,8 @@ void Glioma_ReactionDiffusion::_ic(Grid<W, B> &grid, string PatientFileName,
           if ((mappedBrainX >= 0 && mappedBrainX < brainSizeX) &
                   (mappedBrainY >= 0 && mappedBrainY < brainSizeY) &&
               (mappedBrainZ >= 0 && mappedBrainZ < brainSizeZ)) {
-	    int index = mappedBrainX + (mappedBrainY + mappedBrainZ * mNy) * mNx;
+            int index =
+                mappedBrainX + (mappedBrainY + mappedBrainZ * mNy) * mNx;
             pGM = GM[index];
             pWM = WM[index];
             pCSF = CSF[index];
