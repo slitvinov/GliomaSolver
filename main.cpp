@@ -369,8 +369,6 @@ typedef MRAG::Block<Cell, blockSize, blockSize, blockSizeZ> B;
 typedef MRAG::_WAVELET_TYPE W;
 static const int nThreads = 1;
 typedef MRAG::Multithreading::BlockProcessing_SingleCPU<B> BlockProcessing;
-class Glioma_ReactionDiffusion {
-private:
   MRAG::Grid<W, B> *grid;
   BlockProcessing blockProcessing;
   MRAG::Refiner_SpaceExtension *refiner;
@@ -384,6 +382,8 @@ private:
   bool isDone;
   Real L;
   Real tumor_ic[3];
+class Glioma_ReactionDiffusion {
+private:
 
   static void _ic(MRAG::Grid<W, B> &grid, Real &L,
                   Real tumor_ic[3]);
