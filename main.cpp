@@ -5,7 +5,6 @@
 #include "MRAGcore/MRAGGridNode.h"
 #include "MRAGcore/MRAGrid.h"
 #include <fstream>
-using namespace MRAG;
 static int mNx, mNy, mNz, mNelements;
 static float *D3D(const char *path) {
   float *mData;
@@ -48,7 +47,7 @@ struct ReactionDiffusionOperator {
   }
 
   template <typename LabType, typename BlockType>
-  inline void operator()(LabType &lab, const BlockInfo &info,
+  inline void operator()(LabType &lab, const MRAG::BlockInfo &info,
                          BlockType &o) const {
     double h = info.h[0];
     double ih2 = 1. / (h * h);
@@ -165,7 +164,7 @@ struct UpdateTumor {
   UpdateTumor(const UpdateTumor &copy) : dt(copy.dt) {}
 
   template <typename BlockType>
-  inline void operator()(const BlockInfo &info, BlockType &o) const {
+  inline void operator()(const MRAG::BlockInfo &info, BlockType &o) const {
     for (int iz = 0; iz < BlockType::sizeZ; iz++)
       for (int iy = 0; iy < BlockType::sizeY; iy++)
         for (int ix = 0; ix < BlockType::sizeX; ix++) {
