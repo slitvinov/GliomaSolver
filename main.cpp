@@ -358,28 +358,9 @@ template <typename T, int i> inline Real RD_projector_impl_wav(const T &t) {
 
 make_projector(RD_Projector_Wavelets, RD_projector_impl_wav)
 
-#ifndef _BLOCKSIZE_
-#define _BLOCKSIZE_ 16
-#endif
 
-#ifndef _BLOCKSIZE_Z_
-#define _BLOCKSIZE_Z_ _BLOCKSIZE_
-#endif
-
-#ifndef _BPD_
-#define _BPD_ 4
-#endif
-
-#ifndef _MAXLEVEL_
-#define _MAXLEVEL_ 3
-#endif
-
-#ifndef _RESJUMP_
-#define _RESJUMP_ 1
-#endif
-
-    static const int blockSize = _BLOCKSIZE_;
-static const int blockSizeZ = _BLOCKSIZE_Z_;
+static const int blockSize = _BLOCKSIZE_;
+static const int blockSizeZ = _BLOCKSIZE_;
 static const int blocksPerDimension = _BPD_;
 static const bool bIsCellCentered = true;
 static const int maxLevel = _MAXLEVEL_;
