@@ -382,8 +382,6 @@ typedef MRAG::Multithreading::BlockProcessing_SingleCPU<B> BlockProcessing;
   bool isDone;
   Real L;
   Real tumor_ic[3];
-class Glioma_ReactionDiffusion {
-private:
 
   static void _ic(MRAG::Grid<W, B> &grid, Real &L,
                   Real tumor_ic[3]);
@@ -392,45 +390,9 @@ private:
                               const Real Dg, const Real rho, double dt);
   void _dumpUQoutput();
 
-public:
-  Glioma_ReactionDiffusion();
-  void run();
-};
-
 static int maxStencil[2][3] = {-1, -1, -1, +2, +2, +2};
 
-Glioma_ReactionDiffusion::Glioma_ReactionDiffusion()
-{
-  refiner = new MRAG::Refiner_SpaceExtension(resJump, maxLevel);
-  compressor = new MRAG::Compressor(resJump);
-  grid = new MRAG::Grid<W, B>(blocksPerDimension, blocksPerDimension,
-                        blocksPerDimension, maxStencil);
-  grid->setCompressor(compressor);
-  grid->setRefiner(refiner);
-  stSorter.connect(*grid);
-
-  L = 1;
-
-  ifstream mydata("TumorIC.txt");
-
-  if (mydata.is_open()) {
-    mydata >> tumor_ic[0];
-    mydata >> tumor_ic[1];
-    mydata >> tumor_ic[2];
-    mydata.close();
-  } else {
-    printf("Aborting: missing input file TumorIC.txt \n");
-    abort();
-  }
-
-  _ic(*grid, L, tumor_ic);
-
-  isDone = false;
-  whenToWriteOffset = 50;
-  whenToWrite = whenToWriteOffset;
-  numberOfIterations = 0;
-}
-void Glioma_ReactionDiffusion::_ic(MRAG::Grid<W, B> &grid,
+void _ic(MRAG::Grid<W, B> &grid,
                                    Real &L, Real tumor_ic[3]) {
   float *GM, *WM, *CSF;
   GM = D3D("GM.dat");
@@ -501,7 +463,7 @@ void Glioma_ReactionDiffusion::_ic(MRAG::Grid<W, B> &grid,
   }
 }
 
-void Glioma_ReactionDiffusion::_reactionDiffusionStep(
+void _reactionDiffusionStep(
     MRAG::BoundaryInfo *boundaryInfo, const int nParallelGranularity, const Real Dw,
     const Real Dg, const Real rho, double dt) {
 
@@ -515,7 +477,7 @@ void Glioma_ReactionDiffusion::_reactionDiffusionStep(
   BlockProcessing::process(vInfo, collecton, updateTumor, nParallelGranularity);
 }
 
-void Glioma_ReactionDiffusion::_dumpUQoutput() {
+void _dumpUQoutput() {
   float *d;
   FILE *file;
   int gpd = blocksPerDimension * blockSize;
@@ -569,21 +531,42 @@ void Glioma_ReactionDiffusion::_dumpUQoutput() {
   free(d);
 }
 
-void Glioma_ReactionDiffusion::run() {
+int main(int argc, const char **argv) {
+  refiner = new MRAG::Refiner_SpaceExtension(resJump, maxLevel);
+  compressor = new MRAG::Compressor(resJump);
+  grid = new MRAG::Grid<W, B>(blocksPerDimension, blocksPerDimension,
+                        blocksPerDimension, maxStencil);
+  grid->setCompressor(compressor);
+  grid->setRefiner(refiner);
+  stSorter.connect(*grid);
+
+  L = 1;
+
+  ifstream mydata("TumorIC.txt");
+
+  if (mydata.is_open()) {
+    mydata >> tumor_ic[0];
+    mydata >> tumor_ic[1];
+    mydata >> tumor_ic[2];
+    mydata.close();
+  } else {
+    printf("Aborting: missing input file TumorIC.txt \n");
+    abort();
+  }
+
+  _ic(*grid, L, tumor_ic);
+
+  isDone = false;
+  whenToWriteOffset = 50;
+  whenToWrite = whenToWriteOffset;
+  numberOfIterations = 0;
+
   const int nParallelGranularity = (grid->getBlocksInfo().size() <= 8 ? 1 : 4);
   MRAG::BoundaryInfo *boundaryInfo = &grid->getBoundaryInfo();
   Real Dw, Dg, rho, tend;
-
-  ifstream mydata("InputParameters.txt");
-  if (mydata.is_open()) {
-    mydata >> Dw;
-    mydata >> rho;
-    mydata >> tend;
-    mydata.close();
-  } else {
-    printf("Aborting: missing input file InputParameters.txt \n");
-    abort();
-  }
+  Dw = 0.0013;
+  rho = 0.025;
+  tend = 300;
   Dw = Dw / (L * L);
   Dg = 0.1 * Dw;
 
@@ -612,9 +595,4 @@ void Glioma_ReactionDiffusion::run() {
   MRAG::Science::AutomaticRefinement<0, 0>(*grid, blockfwt, refinement_tolerance,
 					   maxLevel, 1);
   _dumpUQoutput();
-}
-
-int main(int argc, const char **argv) {
-  Glioma_ReactionDiffusion s;
-  s.run();
 }
