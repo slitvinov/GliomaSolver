@@ -175,7 +175,6 @@ struct UpdateTumor {
   }
 };
 
-using namespace MRAG;
 struct Cell {
   /* tumor */
   Real phi;
@@ -366,7 +365,8 @@ static const int maxLevel = _MAXLEVEL_;
 static const int resJump = _RESJUMP_;
 const double refinement_tolerance = 1e-4;
 const double compression_tolerance = 1e-5;
-typedef Block<Cell, blockSize, blockSize, blockSizeZ> B;
+typedef MRAG::Block<Cell, blockSize, blockSize, blockSizeZ> B;
+using namespace MRAG;
 typedef _WAVELET_TYPE W;
 static const int nThreads = 1;
 typedef Multithreading::BlockProcessing_SingleCPU<B> BlockProcessing;
