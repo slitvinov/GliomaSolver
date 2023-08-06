@@ -384,7 +384,6 @@ private:
   double whenToWriteOffset;
   bool isDone;
   bool bAdaptivity;
-  bool bVerbose;
   bool bDumpIC;
   string PatientFileName;
   Real L;
@@ -406,15 +405,9 @@ static int maxStencil[2][3] = {-1, -1, -1, +2, +2, +2};
 
 Glioma_ReactionDiffusion::Glioma_ReactionDiffusion(int argc, const char **argv)
     : parser(argc, argv) {
-  bVerbose = parser("-verbose").asBool(1);
   bDumpIC = parser("-bDumpIC").asBool(1);
   bAdaptivity = parser("-adaptive").asBool(1);
   PatientFileName = parser("-PatFileName").asString();
-  if (bVerbose)
-    printf("Set up: blockSize=%d Wavelets=w%s (blocksPerDimension=%d, "
-           "maxLevel=%d)\n",
-           blockSize, "w", blocksPerDimension, maxLevel);
-
   refiner = new MRAG::Refiner_SpaceExtension(resJump, maxLevel);
   compressor = new MRAG::Compressor(resJump);
   grid = new MRAG::Grid<W, B>(blocksPerDimension, blocksPerDimension,
@@ -605,8 +598,6 @@ void Glioma_ReactionDiffusion::run() {
   Real h = 1. / (blockSize * blocksPerDimension);
   Real dt = 0.99 * h * h / (2. * 3 * max(Dw, Dg));
   int iCounter = 1;
-  if (bVerbose)
-    printf("Dg=%e, Dw=%e, dt= %f, rho=%f , h=%f\n", Dg, Dw, dt, rho, h);
   MRAG::Science::AutomaticRefinement<0, 0>(*grid, blockfwt, refinement_tolerance,
                                      maxLevel, 1);
   MRAG::Science::AutomaticCompression<0, 0>(*grid, blockfwt, compression_tolerance,
