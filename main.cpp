@@ -377,19 +377,15 @@ private:
   MRAG::Compressor *compressor;
   MRAG::BlockFWT<W, B, RD_Projector_Wavelets> blockfwt;
   MRAG::SpaceTimeSorter stSorter;
-  MRAG::ArgumentParser parser;
   MRAG::BlockLab<B> lab;
   int numberOfIterations;
   double whenToWrite;
   double whenToWriteOffset;
   bool isDone;
-  bool bAdaptivity;
-  bool bDumpIC;
-  string PatientFileName;
   Real L;
   Real tumor_ic[3];
 
-  static void _ic(MRAG::Grid<W, B> &grid, string PatientFileName, Real &L,
+  static void _ic(MRAG::Grid<W, B> &grid, Real &L,
                   Real tumor_ic[3]);
   void _reactionDiffusionStep(MRAG::BoundaryInfo *boundaryInfo,
                               const int nParallelGranularity, const Real Dw,
@@ -397,17 +393,14 @@ private:
   void _dumpUQoutput();
 
 public:
-  Glioma_ReactionDiffusion(int argc, const char **argv);
+  Glioma_ReactionDiffusion();
   void run();
 };
 
 static int maxStencil[2][3] = {-1, -1, -1, +2, +2, +2};
 
-Glioma_ReactionDiffusion::Glioma_ReactionDiffusion(int argc, const char **argv)
-    : parser(argc, argv) {
-  bDumpIC = parser("-bDumpIC").asBool(1);
-  bAdaptivity = parser("-adaptive").asBool(1);
-  PatientFileName = parser("-PatFileName").asString();
+Glioma_ReactionDiffusion::Glioma_ReactionDiffusion()
+{
   refiner = new MRAG::Refiner_SpaceExtension(resJump, maxLevel);
   compressor = new MRAG::Compressor(resJump);
   grid = new MRAG::Grid<W, B>(blocksPerDimension, blocksPerDimension,
@@ -430,14 +423,14 @@ Glioma_ReactionDiffusion::Glioma_ReactionDiffusion(int argc, const char **argv)
     abort();
   }
 
-  _ic(*grid, PatientFileName, L, tumor_ic);
+  _ic(*grid, L, tumor_ic);
 
   isDone = false;
-  whenToWriteOffset = parser("-dumpfreq").asDouble();
+  whenToWriteOffset = 50;
   whenToWrite = whenToWriteOffset;
   numberOfIterations = 0;
 }
-void Glioma_ReactionDiffusion::_ic(MRAG::Grid<W, B> &grid, string PatientFileName,
+void Glioma_ReactionDiffusion::_ic(MRAG::Grid<W, B> &grid,
                                    Real &L, Real tumor_ic[3]) {
   float *GM, *WM, *CSF;
   GM = D3D("GM.dat");
@@ -609,22 +602,19 @@ void Glioma_ReactionDiffusion::run() {
     numberOfIterations++;
 
     if (t >= ((double)(whenToWrite))) {
-      if (bAdaptivity) {
-        MRAG::Science::AutomaticRefinement<0, 0>(*grid, blockfwt,
-                                           refinement_tolerance, maxLevel, 1);
-        // Science::AutomaticCompression	<0,0>(*grid, blockfwt,
-        // compression_tolerance, -1, &profiler);
-      }
+      MRAG::Science::AutomaticRefinement<0, 0>(*grid, blockfwt,
+					       refinement_tolerance, maxLevel, 1);
+      // Science::AutomaticCompression	<0,0>(*grid, blockfwt,
+      // compression_tolerance, -1, &profiler);
       whenToWrite = whenToWrite + whenToWriteOffset;
     }
   }
-  if (bAdaptivity)
-    MRAG::Science::AutomaticRefinement<0, 0>(*grid, blockfwt, refinement_tolerance,
-                                       maxLevel, 1);
+  MRAG::Science::AutomaticRefinement<0, 0>(*grid, blockfwt, refinement_tolerance,
+					   maxLevel, 1);
   _dumpUQoutput();
 }
 
 int main(int argc, const char **argv) {
-  Glioma_ReactionDiffusion s(argc, (const char **)argv);
+  Glioma_ReactionDiffusion s;
   s.run();
 }
