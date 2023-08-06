@@ -356,8 +356,7 @@ template <typename T, int i> inline Real RD_projector_impl_wav(const T &t) {
 
 make_projector(RD_Projector_Wavelets, RD_projector_impl_wav)
 
-
-static const int blockSize = _BLOCKSIZE_;
+    static const int blockSize = _BLOCKSIZE_;
 static const int blockSizeZ = _BLOCKSIZE_;
 static const int blocksPerDimension = _BPD_;
 static const bool bIsCellCentered = true;
@@ -369,31 +368,29 @@ typedef MRAG::Block<Cell, blockSize, blockSize, blockSizeZ> B;
 typedef MRAG::_WAVELET_TYPE W;
 static const int nThreads = 1;
 typedef MRAG::Multithreading::BlockProcessing_SingleCPU<B> BlockProcessing;
-  MRAG::Grid<W, B> *grid;
-  BlockProcessing blockProcessing;
-  MRAG::Refiner_SpaceExtension *refiner;
-  MRAG::Compressor *compressor;
-  MRAG::BlockFWT<W, B, RD_Projector_Wavelets> blockfwt;
-  MRAG::SpaceTimeSorter stSorter;
-  MRAG::BlockLab<B> lab;
-  int numberOfIterations;
-  double whenToWrite;
-  double whenToWriteOffset;
-  bool isDone;
-  Real L;
-  Real tumor_ic[3];
+MRAG::Grid<W, B> *grid;
+BlockProcessing blockProcessing;
+MRAG::Refiner_SpaceExtension *refiner;
+MRAG::Compressor *compressor;
+MRAG::BlockFWT<W, B, RD_Projector_Wavelets> blockfwt;
+MRAG::SpaceTimeSorter stSorter;
+MRAG::BlockLab<B> lab;
+int numberOfIterations;
+double whenToWrite;
+double whenToWriteOffset;
+bool isDone;
+Real L;
+Real tumor_ic[3];
 
-  static void _ic(MRAG::Grid<W, B> &grid, Real &L,
-                  Real tumor_ic[3]);
-  void _reactionDiffusionStep(MRAG::BoundaryInfo *boundaryInfo,
-                              const int nParallelGranularity, const Real Dw,
-                              const Real Dg, const Real rho, double dt);
-  void _dumpUQoutput();
+static void _ic(MRAG::Grid<W, B> &grid, Real &L, Real tumor_ic[3]);
+void _reactionDiffusionStep(MRAG::BoundaryInfo *boundaryInfo,
+                            const int nParallelGranularity, const Real Dw,
+                            const Real Dg, const Real rho, double dt);
+void _dumpUQoutput();
 
 static int maxStencil[2][3] = {-1, -1, -1, +2, +2, +2};
 
-void _ic(MRAG::Grid<W, B> &grid,
-                                   Real &L, Real tumor_ic[3]) {
+void _ic(MRAG::Grid<W, B> &grid, Real &L, Real tumor_ic[3]) {
   float *GM, *WM, *CSF;
   GM = D3D("GM.dat");
   WM = D3D("WM.dat");
@@ -463,9 +460,9 @@ void _ic(MRAG::Grid<W, B> &grid,
   }
 }
 
-void _reactionDiffusionStep(
-    MRAG::BoundaryInfo *boundaryInfo, const int nParallelGranularity, const Real Dw,
-    const Real Dg, const Real rho, double dt) {
+void _reactionDiffusionStep(MRAG::BoundaryInfo *boundaryInfo,
+                            const int nParallelGranularity, const Real Dw,
+                            const Real Dg, const Real rho, double dt) {
 
   vector<MRAG::BlockInfo> vInfo = grid->getBlocksInfo();
   const MRAG::BlockCollection<B> &collecton = grid->getBlockCollection();
@@ -535,7 +532,7 @@ int main(int argc, const char **argv) {
   refiner = new MRAG::Refiner_SpaceExtension(resJump, maxLevel);
   compressor = new MRAG::Compressor(resJump);
   grid = new MRAG::Grid<W, B>(blocksPerDimension, blocksPerDimension,
-                        blocksPerDimension, maxStencil);
+                              blocksPerDimension, maxStencil);
   grid->setCompressor(compressor);
   grid->setRefiner(refiner);
   stSorter.connect(*grid);
@@ -574,10 +571,10 @@ int main(int argc, const char **argv) {
   Real h = 1. / (blockSize * blocksPerDimension);
   Real dt = 0.99 * h * h / (2. * 3 * max(Dw, Dg));
   int iCounter = 1;
-  MRAG::Science::AutomaticRefinement<0, 0>(*grid, blockfwt, refinement_tolerance,
-                                     maxLevel, 1);
-  MRAG::Science::AutomaticCompression<0, 0>(*grid, blockfwt, compression_tolerance,
-                                      -1);
+  MRAG::Science::AutomaticRefinement<0, 0>(*grid, blockfwt,
+                                           refinement_tolerance, maxLevel, 1);
+  MRAG::Science::AutomaticCompression<0, 0>(*grid, blockfwt,
+                                            compression_tolerance, -1);
 
   while (t <= tend) {
     _reactionDiffusionStep(boundaryInfo, nParallelGranularity, Dw, Dg, rho, dt);
@@ -585,14 +582,14 @@ int main(int argc, const char **argv) {
     numberOfIterations++;
 
     if (t >= ((double)(whenToWrite))) {
-      MRAG::Science::AutomaticRefinement<0, 0>(*grid, blockfwt,
-					       refinement_tolerance, maxLevel, 1);
+      MRAG::Science::AutomaticRefinement<0, 0>(
+          *grid, blockfwt, refinement_tolerance, maxLevel, 1);
       // Science::AutomaticCompression	<0,0>(*grid, blockfwt,
       // compression_tolerance, -1, &profiler);
       whenToWrite = whenToWrite + whenToWriteOffset;
     }
   }
-  MRAG::Science::AutomaticRefinement<0, 0>(*grid, blockfwt, refinement_tolerance,
-					   maxLevel, 1);
+  MRAG::Science::AutomaticRefinement<0, 0>(*grid, blockfwt,
+                                           refinement_tolerance, maxLevel, 1);
   _dumpUQoutput();
 }
