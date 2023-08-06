@@ -366,20 +366,19 @@ static const int resJump = _RESJUMP_;
 const double refinement_tolerance = 1e-4;
 const double compression_tolerance = 1e-5;
 typedef MRAG::Block<Cell, blockSize, blockSize, blockSizeZ> B;
-using namespace MRAG;
-typedef _WAVELET_TYPE W;
+typedef MRAG::_WAVELET_TYPE W;
 static const int nThreads = 1;
-typedef Multithreading::BlockProcessing_SingleCPU<B> BlockProcessing;
+typedef MRAG::Multithreading::BlockProcessing_SingleCPU<B> BlockProcessing;
 class Glioma_ReactionDiffusion {
 private:
-  Grid<W, B> *grid;
+  MRAG::Grid<W, B> *grid;
   BlockProcessing blockProcessing;
-  Refiner_SpaceExtension *refiner;
-  Compressor *compressor;
-  BlockFWT<W, B, RD_Projector_Wavelets> blockfwt;
-  SpaceTimeSorter stSorter;
-  ArgumentParser parser;
-  BlockLab<B> lab;
+  MRAG::Refiner_SpaceExtension *refiner;
+  MRAG::Compressor *compressor;
+  MRAG::BlockFWT<W, B, RD_Projector_Wavelets> blockfwt;
+  MRAG::SpaceTimeSorter stSorter;
+  MRAG::ArgumentParser parser;
+  MRAG::BlockLab<B> lab;
   int numberOfIterations;
   double whenToWrite;
   double whenToWriteOffset;
@@ -391,9 +390,9 @@ private:
   Real L;
   Real tumor_ic[3];
 
-  static void _ic(Grid<W, B> &grid, string PatientFileName, Real &L,
+  static void _ic(MRAG::Grid<W, B> &grid, string PatientFileName, Real &L,
                   Real tumor_ic[3]);
-  void _reactionDiffusionStep(BoundaryInfo *boundaryInfo,
+  void _reactionDiffusionStep(MRAG::BoundaryInfo *boundaryInfo,
                               const int nParallelGranularity, const Real Dw,
                               const Real Dg, const Real rho, double dt);
   void _dumpUQoutput();
@@ -416,9 +415,9 @@ Glioma_ReactionDiffusion::Glioma_ReactionDiffusion(int argc, const char **argv)
            "maxLevel=%d)\n",
            blockSize, "w", blocksPerDimension, maxLevel);
 
-  refiner = new Refiner_SpaceExtension(resJump, maxLevel);
-  compressor = new Compressor(resJump);
-  grid = new Grid<W, B>(blocksPerDimension, blocksPerDimension,
+  refiner = new MRAG::Refiner_SpaceExtension(resJump, maxLevel);
+  compressor = new MRAG::Compressor(resJump);
+  grid = new MRAG::Grid<W, B>(blocksPerDimension, blocksPerDimension,
                         blocksPerDimension, maxStencil);
   grid->setCompressor(compressor);
   grid->setRefiner(refiner);
@@ -445,7 +444,7 @@ Glioma_ReactionDiffusion::Glioma_ReactionDiffusion(int argc, const char **argv)
   whenToWrite = whenToWriteOffset;
   numberOfIterations = 0;
 }
-void Glioma_ReactionDiffusion::_ic(Grid<W, B> &grid, string PatientFileName,
+void Glioma_ReactionDiffusion::_ic(MRAG::Grid<W, B> &grid, string PatientFileName,
                                    Real &L, Real tumor_ic[3]) {
   float *GM, *WM, *CSF;
   GM = D3D("GM.dat");
@@ -468,9 +467,9 @@ void Glioma_ReactionDiffusion::_ic(Grid<W, B> &grid, string PatientFileName,
   const Real h = 1. / 128;
   const Real iw = 1. / (smooth_sup * h);
   Real pGM, pWM, pCSF;
-  vector<BlockInfo> vInfo = grid.getBlocksInfo();
+  vector<MRAG::BlockInfo> vInfo = grid.getBlocksInfo();
   for (int i = 0; i < vInfo.size(); i++) {
-    BlockInfo &info = vInfo[i];
+    MRAG::BlockInfo &info = vInfo[i];
     B &block = grid.getBlockCollection()[info.blockID];
 
     for (int iz = 0; iz < B::sizeZ; iz++)
@@ -517,11 +516,11 @@ void Glioma_ReactionDiffusion::_ic(Grid<W, B> &grid, string PatientFileName,
 }
 
 void Glioma_ReactionDiffusion::_reactionDiffusionStep(
-    BoundaryInfo *boundaryInfo, const int nParallelGranularity, const Real Dw,
+    MRAG::BoundaryInfo *boundaryInfo, const int nParallelGranularity, const Real Dw,
     const Real Dg, const Real rho, double dt) {
 
-  vector<BlockInfo> vInfo = grid->getBlocksInfo();
-  const BlockCollection<B> &collecton = grid->getBlockCollection();
+  vector<MRAG::BlockInfo> vInfo = grid->getBlocksInfo();
+  const MRAG::BlockCollection<B> &collecton = grid->getBlockCollection();
 
   ReactionDiffusionOperator rhs(Dw, Dg, rho);
   UpdateTumor updateTumor(dt);
@@ -537,9 +536,9 @@ void Glioma_ReactionDiffusion::_dumpUQoutput() {
   double hf = 1. / gpd;
   double eps = hf * 0.5;
   d = (float *)malloc(gpd * gpd * gpd * sizeof *d);
-  vector<BlockInfo> vInfo = grid->getBlocksInfo();
+  vector<MRAG::BlockInfo> vInfo = grid->getBlocksInfo();
   for (int i = 0; i < vInfo.size(); i++) {
-    BlockInfo &info = vInfo[i];
+    MRAG::BlockInfo &info = vInfo[i];
     B &block = grid->getBlockCollection()[info.blockID];
     double h = info.h[0];
     for (int iz = 0; iz < B::sizeZ; iz++)
@@ -586,7 +585,7 @@ void Glioma_ReactionDiffusion::_dumpUQoutput() {
 
 void Glioma_ReactionDiffusion::run() {
   const int nParallelGranularity = (grid->getBlocksInfo().size() <= 8 ? 1 : 4);
-  BoundaryInfo *boundaryInfo = &grid->getBoundaryInfo();
+  MRAG::BoundaryInfo *boundaryInfo = &grid->getBoundaryInfo();
   Real Dw, Dg, rho, tend;
 
   ifstream mydata("InputParameters.txt");
@@ -608,9 +607,9 @@ void Glioma_ReactionDiffusion::run() {
   int iCounter = 1;
   if (bVerbose)
     printf("Dg=%e, Dw=%e, dt= %f, rho=%f , h=%f\n", Dg, Dw, dt, rho, h);
-  Science::AutomaticRefinement<0, 0>(*grid, blockfwt, refinement_tolerance,
+  MRAG::Science::AutomaticRefinement<0, 0>(*grid, blockfwt, refinement_tolerance,
                                      maxLevel, 1);
-  Science::AutomaticCompression<0, 0>(*grid, blockfwt, compression_tolerance,
+  MRAG::Science::AutomaticCompression<0, 0>(*grid, blockfwt, compression_tolerance,
                                       -1);
 
   while (t <= tend) {
@@ -620,7 +619,7 @@ void Glioma_ReactionDiffusion::run() {
 
     if (t >= ((double)(whenToWrite))) {
       if (bAdaptivity) {
-        Science::AutomaticRefinement<0, 0>(*grid, blockfwt,
+        MRAG::Science::AutomaticRefinement<0, 0>(*grid, blockfwt,
                                            refinement_tolerance, maxLevel, 1);
         // Science::AutomaticCompression	<0,0>(*grid, blockfwt,
         // compression_tolerance, -1, &profiler);
@@ -629,7 +628,7 @@ void Glioma_ReactionDiffusion::run() {
     }
   }
   if (bAdaptivity)
-    Science::AutomaticRefinement<0, 0>(*grid, blockfwt, refinement_tolerance,
+    MRAG::Science::AutomaticRefinement<0, 0>(*grid, blockfwt, refinement_tolerance,
                                        maxLevel, 1);
   _dumpUQoutput();
 }
