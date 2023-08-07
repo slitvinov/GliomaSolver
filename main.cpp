@@ -188,10 +188,6 @@ struct Cell {
   Real wm, gm, csf; //
   Real dwmdt, dgmdt, dcsfdt;
 
-  // velocity field + helper fields for WENO
-  Real ux, uy, uz;
-  Real omega, domegadt;
-
   // pressure + auxiliary functions for pressure source, phase filed funtion,
   // charact. function
   Real p, dpdt;
@@ -213,11 +209,8 @@ struct Cell {
     p_csf = 0.0;
     wm = gm = csf = 0.0;
     dwmdt = dgmdt = dcsfdt = 0.0;
-    ux = uy = uz = 0.0;
     p = 0.0;
     dpdt = 0.0;
-    omega = 0.0;
-    domegadt = 0.0;
     f = 0.0;
     chi = 0.0;
     pff = 0.0;
@@ -239,13 +232,8 @@ struct Cell {
     dwmdt += t.dwmdt;
     dgmdt += t.dgmdt;
     dcsfdt += t.dcsfdt;
-    ux += t.ux;
-    uy += t.uy;
-    uz += t.uz;
     p += t.p;
     dpdt += t.dpdt;
-    omega += t.omega;
-    domegadt += t.domegadt;
     f += t.f;
     chi += t.chi;
     pff += t.pff;
@@ -270,13 +258,8 @@ inline Cell operator*(const Cell &p, Real v) {
   c.dwmdt = p.dwmdt * v;
   c.dgmdt = p.dgmdt * v;
   c.dcsfdt = p.dcsfdt * v;
-  c.ux = p.ux * v;
-  c.uy = p.uy * v;
-  c.uz = p.uz * v;
   c.p = p.p * v;
   c.dpdt = p.dpdt * v;
-  c.omega = p.omega * v;
-  c.domegadt = p.domegadt * v;
   c.f = p.f * v;
   c.chi = p.chi * v;
   c.pff = p.pff * v;
