@@ -477,25 +477,19 @@ int main(int argc, const char **argv) {
                                            refinement_tolerance, maxLevel, 1);
   MRAG::Science::AutomaticCompression<0, 0>(*grid, blockfwt,
                                             compression_tolerance, -1);
-
+  ReactionDiffusionOperator rhs(Dw, Dg, rho);
+  UpdateTumor updateTumor(dt);
+  const MRAG::BlockCollection<B> &collecton = grid->getBlockCollection();
   while (t <= tend) {
-    vector<MRAG::BlockInfo> vInfo = grid->getBlocksInfo();
-    const MRAG::BlockCollection<B> &collecton = grid->getBlockCollection();
-
-    ReactionDiffusionOperator rhs(Dw, Dg, rho);
-    UpdateTumor updateTumor(dt);
-
+    vInfo = grid->getBlocksInfo();
     blockProcessing.pipeline_process(vInfo, collecton, *boundaryInfo, rhs);
     BlockProcessing::process(vInfo, collecton, updateTumor,
                              nParallelGranularity);
     t += dt;
     numberOfIterations++;
-
-    if (t >= ((double)(whenToWrite))) {
+    if (t >= whenToWrite) {
       MRAG::Science::AutomaticRefinement<0, 0>(
           *grid, blockfwt, refinement_tolerance, maxLevel, 1);
-      // Science::AutomaticCompression	<0,0>(*grid, blockfwt,
-      // compression_tolerance, -1, &profiler);
       whenToWrite = whenToWrite + whenToWriteOffset;
     }
   }
