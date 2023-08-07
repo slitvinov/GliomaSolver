@@ -195,15 +195,15 @@ namespace MRAG
 				const double dilate = pow(2.0, -node->level);
 				
 				const Real h[3] = {
-					dilate*m_vSize[0]/BlockType::sizeX, 
-					m_vProcessingDirections[1]? dilate*m_vSize[1]/BlockType::sizeY  : 1,
-					m_vProcessingDirections[2]? (dilate*m_vSize[2]/BlockType::sizeZ) : 1
+					(Real)(dilate*m_vSize[0]/BlockType::sizeX),
+					(Real)(m_vProcessingDirections[1]? dilate*m_vSize[1]/BlockType::sizeY  : 1),
+					(Real)(m_vProcessingDirections[2]? (dilate*m_vSize[2]/BlockType::sizeZ) : 1)
 				};
 
 				const Real p[3] = {
-					m_vPosition[0] + node->index[0]*dilate*m_vSize[0] + (WaveletType::bIsCellCentered?0.5*h[0] : 0),
-					m_vPosition[1] + node->index[1]*dilate*m_vSize[1] + (WaveletType::bIsCellCentered?0.5*h[1] : 0),
-					m_vPosition[2] + node->index[2]*dilate*m_vSize[2] + (WaveletType::bIsCellCentered?0.5*h[2] : 0)
+					(Real)(m_vPosition[0] + node->index[0]*dilate*m_vSize[0] + (WaveletType::bIsCellCentered?0.5*h[0] : 0)),
+					(Real)(m_vPosition[1] + node->index[1]*dilate*m_vSize[1] + (WaveletType::bIsCellCentered?0.5*h[1] : 0)),
+					(Real)(m_vPosition[2] + node->index[2]*dilate*m_vSize[2] + (WaveletType::bIsCellCentered?0.5*h[2] : 0))
 				};
 				
 				result.push_back(BlockInfo(node->blockID, node->index, node->level, p, h));

@@ -113,9 +113,9 @@ namespace MRAG
 					{
 						const int index = *itS;
 						const unsigned char i3D[3] = {
-							index % block_size[0], 
-							(index/block_size[0]) % block_size[1],
-							index/(block_size[0]*block_size[1])
+					                (unsigned char)((index % block_size[0])),
+						        (unsigned char)((index/block_size[0]) % block_size[1]),
+						        (unsigned char)(index/(block_size[0]*block_size[1]))
 						};
 						
 						assert(i3D[2]<block_size[2]);
