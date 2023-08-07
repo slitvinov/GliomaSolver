@@ -263,45 +263,6 @@ struct Cell {
     mu += t.mu;
   }
 
-  Real giveMe(int i, Real h = 0) {
-
-    switch (i) {
-    case 0:
-      return phi;
-    case 1:
-      return phi + 0.1 * p_g + 0.2 * p_w;
-    case 2:
-      return p_w;
-    case 3:
-      return p_g;
-    case 4:
-      return p_csf;
-    case 5:
-      return wm;
-    case 6:
-      return gm;
-    case 7:
-      return csf;
-    case 8:
-      return ux;
-    case 9:
-      return uy;
-    case 10:
-      return uz;
-    case 11:
-      return p;
-    case 12:
-      return chi;
-    case 13:
-      return f;
-    case 14:
-      return pff;
-
-    default:
-      abort();
-      return 0;
-    }
-  }
 };
 
 inline Cell operator*(const Cell &p, Real v) {
