@@ -184,16 +184,12 @@ struct Cell {
   /* tissue percentage per voxel*/
   Real p_g, p_w, p_csf;
 
-  /* tissue concentration */
-  Real wm, gm; //
-
   Cell() {
     phi = 0.0;
     dphidt = 0.0;
     p_g = 0.0;
     p_w = 0.0;
     p_csf = 0.0;
-    wm = gm = 0.0;
   }
 
   void operator+=(Cell t) {
@@ -202,8 +198,6 @@ struct Cell {
     p_g += t.p_g;
     p_w += t.p_w;
     p_csf += t.p_csf;
-    wm += t.wm;
-    gm += t.gm;
   }
 
 };
@@ -215,8 +209,6 @@ inline Cell operator*(const Cell &p, Real v) {
   c.p_g = p.p_g * v;
   c.p_w = p.p_w * v;
   c.p_csf = p.p_csf * v;
-  c.wm = p.wm * v;
-  c.gm = p.gm * v;
   return c;
 }
 
