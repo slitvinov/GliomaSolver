@@ -188,11 +188,6 @@ struct Cell {
   Real wm, gm, csf; //
   Real dwmdt, dgmdt, dcsfdt;
 
-  // pressure + auxiliary functions for pressure source, phase filed funtion,
-  // charact. function
-  Real chi;         // domain char. funciton
-  Real pff, dpffdt; // pahse field function of whole anatomy, of tissue
-
   Cell() {
     phi = 0.0;
     dphidt = 0.0;
@@ -201,9 +196,6 @@ struct Cell {
     p_csf = 0.0;
     wm = gm = csf = 0.0;
     dwmdt = dgmdt = dcsfdt = 0.0;
-    chi = 0.0;
-    pff = 0.0;
-    dpffdt = 0.0;
   }
 
   void operator+=(Cell t) {
@@ -218,9 +210,6 @@ struct Cell {
     dwmdt += t.dwmdt;
     dgmdt += t.dgmdt;
     dcsfdt += t.dcsfdt;
-    chi += t.chi;
-    pff += t.pff;
-    dpffdt += t.dpffdt;
   }
 
 };
@@ -238,9 +227,6 @@ inline Cell operator*(const Cell &p, Real v) {
   c.dwmdt = p.dwmdt * v;
   c.dgmdt = p.dgmdt * v;
   c.dcsfdt = p.dcsfdt * v;
-  c.chi = p.chi * v;
-  c.pff = p.pff * v;
-  c.dpffdt = p.dpffdt * v;
 
   return c;
 }
