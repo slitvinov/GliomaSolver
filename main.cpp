@@ -4,8 +4,6 @@
 #include <set>
 #include "MRAGcore/MRAGCommon.h"
 #define _WAVELET_TYPE Wavelets_Interp2ndOrder
-#undef min
-#undef max
 #include "MRAGcore/MRAGBlock.h"
 #include "MRAGcore/MRAGWavelets_Interp2ndOrder.h"
 #include "MRAGcore/MRAGrid.h"
@@ -367,7 +365,6 @@ static MRAG::Compressor *compressor;
 static MRAG::BlockFWT<W, B, RD_Projector_Wavelets> blockfwt;
 static MRAG::SpaceTimeSorter stSorter;
 static MRAG::BlockLab<B> lab;
-static int numberOfIterations;
 static double whenToWrite;
 static double whenToWriteOffset;
 static bool isDone;
@@ -458,7 +455,6 @@ int main(int argc, const char **argv) {
   isDone = false;
   whenToWriteOffset = 50;
   whenToWrite = whenToWriteOffset;
-  numberOfIterations = 0;
 
   const int nParallelGranularity = (grid->getBlocksInfo().size() <= 8 ? 1 : 4);
   MRAG::BoundaryInfo *boundaryInfo = &grid->getBoundaryInfo();
@@ -486,7 +482,6 @@ int main(int argc, const char **argv) {
     BlockProcessing::process(vInfo, collecton, updateTumor,
                              nParallelGranularity);
     t += dt;
-    numberOfIterations++;
     if (t >= whenToWrite) {
       MRAG::Science::AutomaticRefinement<0, 0>(
           *grid, blockfwt, refinement_tolerance, maxLevel, 1);
