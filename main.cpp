@@ -15,7 +15,6 @@
 #include "MRAGmultithreading/MRAGBlockProcessing_SingleCPU.h"
 #include "MRAGio/MRAG_IO_ArgumentParser.h"
 #include "MRAGcore/MRAGBlock.h"
-#include "MRAGcore/MRAGBlockCollection.h"
 #include "MRAGcore/MRAGCommon.h"
 #include <fstream>
 static int mNx, mNy, mNz, mNelements;
