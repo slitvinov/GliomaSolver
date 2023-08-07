@@ -156,7 +156,7 @@ namespace MRAG
 				vNewIDs.push_back(blockinfo);
 			}
 			
-			CompressionResult result = {nCollapsed, vIDs.size()};
+			CompressionResult result = {nCollapsed, (int)vIDs.size()};
 			return result;
 		}
 	};

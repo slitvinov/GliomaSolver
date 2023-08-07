@@ -108,7 +108,7 @@ namespace MRAG
 						
 					if (bAccettableLevelJump)
 					{
-						GridNodeCollapseInfo collapseinfo = {vToCollapse.size(), node};
+					        GridNodeCollapseInfo collapseinfo = {(int)vToCollapse.size(), node};
 						vToCollapse.push_back(collapseinfo);
 					}
 				}

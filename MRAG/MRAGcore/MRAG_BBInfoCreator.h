@@ -227,9 +227,9 @@ class MRAG_BBInfoCreator
 			else
 			{
 				const int n[3] = {
-					matRequests->getSize()[0],
-					matRequests->getSize()[1],
-					matRequests->getSize()[2]
+					(int)matRequests->getSize()[0],
+					(int)matRequests->getSize()[1],
+					(int)matRequests->getSize()[2]
 				};
 				
 				int i[3];

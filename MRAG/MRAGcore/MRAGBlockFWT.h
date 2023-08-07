@@ -89,7 +89,7 @@ private:
 	{
 		assert(m_status == FWTReport_Open);
 		
-		char idx[3] = {code&1, (code>>1)&1, (code>>2)&1};
+		char idx[3] = {(char)(code&1), (char)((code>>1)&1), (char)((code>>2)&1)};
 		
 		double& minVal = m_matMinValues[iChannel]->Access(idx[0], idx[1], idx[2]);
 		double& maxVal = m_matMaxValues[iChannel]->Access(idx[0], idx[1], idx[2]);

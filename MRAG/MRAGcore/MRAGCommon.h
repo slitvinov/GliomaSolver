@@ -115,10 +115,6 @@ struct I4
 	I4(int x_, int y_, int z_, int l_): 
 		x(x_), y(y_), z(z_), l(l_)
 	{
-		this->x = x;
-		this->y = y;
-		this->z = z;
-		this->l = l;
 	}
 	
 	I4(const I4& a):

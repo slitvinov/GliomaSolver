@@ -256,9 +256,9 @@ namespace MRAG
 		
 		//3.
 		const int dir[3] = {
-			floor(i[0]/(double)length),
-			floor(i[1]/(double)length),
-			floor(i[2]/(double)length)
+			(int)floor(i[0]/(double)length),
+			(int)floor(i[1]/(double)length),
+			(int)floor(i[2]/(double)length)
 		};
 
 		const int code = (dir[2]+1)*9 + (dir[1]+1)*3 + (dir[0]+1);
