@@ -357,9 +357,9 @@ template <typename T, int i> inline Real RD_projector_impl_wav(const T &t) {
   //    return (Real)(t.pff) ;
 }
 
-make_projector(RD_Projector_Wavelets, RD_projector_impl_wav)
+make_projector(RD_Projector_Wavelets, RD_projector_impl_wav);
 
-    static const int blockSize = _BLOCKSIZE_;
+static const int blockSize = _BLOCKSIZE_;
 static const int blockSizeZ = _BLOCKSIZE_;
 static const int blocksPerDimension = _BPD_;
 static const bool bIsCellCentered = true;
