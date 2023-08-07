@@ -38,31 +38,9 @@ static float *D3D(const char *path) {
   return mData;
 }
 
-
 static void _applyNoFluxBC(Real (&df)[6], Real n[6]) {
   // n is domain char. func, use to apply bc by modifying the df term by the
   // ghost point
-  Real eps = 0.1;
-
-  if (n[0] < eps) {
-    df[1] *= 2.0;
-  }
-  if (n[1] < eps) {
-    df[0] *= 2.0;
-  }
-  if (n[2] < eps) {
-    df[3] *= 2.0;
-  }
-  if (n[3] < eps) {
-    df[2] *= 2.0;
-  }
-
-  if (n[4] < eps) {
-    df[5] *= 2.0;
-  }
-  if (n[5] < eps) {
-    df[4] *= 2.0;
-  }
 }
 
 struct ReactionDiffusionOperator {
@@ -97,7 +75,7 @@ struct ReactionDiffusionOperator {
                  // use to apply BC
     Real df_loc; // diffusion at the current point (local)
     Real chf_loc; // diffusion at the current point (local)
-
+    Real eps;
     for (int iz = 0; iz < BlockType::sizeZ; iz++)
       for (int iy = 0; iy < BlockType::sizeY; iy++)
         for (int ix = 0; ix < BlockType::sizeX; ix++) {
@@ -112,14 +90,26 @@ struct ReactionDiffusionOperator {
             df[4] = lab(ix, iy, iz - 1).p_w * Dw + lab(ix, iy, iz - 1).p_g * Dg;
             df[5] = lab(ix, iy, iz + 1).p_w * Dw + lab(ix, iy, iz + 1).p_g * Dg;
 
-	    Real eps = 1.0e-08;
-	    /// Di,j = 2 * (Di * Dj / (Di + Dj)
-	    df[0] = (df[0] + df_loc < eps) ? 0. : 2. * df[0] * df_loc / (df[0] + df_loc);
-	    df[1] = (df[1] + df_loc < eps) ? 0. : 2. * df[1] * df_loc / (df[1] + df_loc);
-	    df[2] = (df[2] + df_loc < eps) ? 0. : 2. * df[2] * df_loc / (df[2] + df_loc);
-	    df[3] = (df[3] + df_loc < eps) ? 0. : 2. * df[3] * df_loc / (df[3] + df_loc);
-	    df[4] = (df[4] + df_loc < eps) ? 0. : 2. * df[4] * df_loc / (df[4] + df_loc);
-	    df[5] = (df[5] + df_loc < eps) ? 0. : 2. * df[5] * df_loc / (df[5] + df_loc);
+            eps = 1.0e-08;
+            /// Di,j = 2 * (Di * Dj / (Di + Dj)
+            df[0] = (df[0] + df_loc < eps)
+                        ? 0.
+                        : 2. * df[0] * df_loc / (df[0] + df_loc);
+            df[1] = (df[1] + df_loc < eps)
+                        ? 0.
+                        : 2. * df[1] * df_loc / (df[1] + df_loc);
+            df[2] = (df[2] + df_loc < eps)
+                        ? 0.
+                        : 2. * df[2] * df_loc / (df[2] + df_loc);
+            df[3] = (df[3] + df_loc < eps)
+                        ? 0.
+                        : 2. * df[3] * df_loc / (df[3] + df_loc);
+            df[4] = (df[4] + df_loc < eps)
+                        ? 0.
+                        : 2. * df[4] * df_loc / (df[4] + df_loc);
+            df[5] = (df[5] + df_loc < eps)
+                        ? 0.
+                        : 2. * df[5] * df_loc / (df[5] + df_loc);
 
             chf[0] = lab(ix - 1, iy, iz).phi + lab(ix - 1, iy, iz).p_w +
                      lab(ix - 1, iy, iz).p_g;
@@ -134,8 +124,25 @@ struct ReactionDiffusionOperator {
             chf[5] = lab(ix, iy, iz + 1).phi + lab(ix, iy, iz + 1).p_w +
                      lab(ix, iy, iz + 1).p_g;
 
-            _applyNoFluxBC(df, chf);
-
+            eps = 0.1;
+            if (chf[0] < eps) {
+              df[1] *= 2.0;
+            }
+            if (chf[1] < eps) {
+              df[0] *= 2.0;
+            }
+            if (chf[2] < eps) {
+              df[3] *= 2.0;
+            }
+            if (chf[3] < eps) {
+              df[2] *= 2.0;
+            }
+            if (chf[4] < eps) {
+              df[5] *= 2.0;
+            }
+            if (chf[5] < eps) {
+              df[4] *= 2.0;
+            }
             // diffusion fluxes
             double diffusionFluxIn = ih2 * (df[0] * lab(ix - 1, iy, iz).phi +
                                             df[1] * lab(ix + 1, iy, iz).phi +
