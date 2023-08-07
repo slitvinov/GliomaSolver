@@ -186,7 +186,6 @@ struct Cell {
 
   /* tissue concentration */
   Real wm, gm, csf; //
-  Real dwmdt, dgmdt, dcsfdt;
 
   Cell() {
     phi = 0.0;
@@ -195,7 +194,6 @@ struct Cell {
     p_w = 0.0;
     p_csf = 0.0;
     wm = gm = csf = 0.0;
-    dwmdt = dgmdt = dcsfdt = 0.0;
   }
 
   void operator+=(Cell t) {
@@ -207,9 +205,6 @@ struct Cell {
     wm += t.wm;
     gm += t.gm;
     csf += t.csf;
-    dwmdt += t.dwmdt;
-    dgmdt += t.dgmdt;
-    dcsfdt += t.dcsfdt;
   }
 
 };
@@ -224,10 +219,6 @@ inline Cell operator*(const Cell &p, Real v) {
   c.wm = p.wm * v;
   c.gm = p.gm * v;
   c.csf = p.csf * v;
-  c.dwmdt = p.dwmdt * v;
-  c.dgmdt = p.dgmdt * v;
-  c.dcsfdt = p.dcsfdt * v;
-
   return c;
 }
 
