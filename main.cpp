@@ -342,7 +342,6 @@ int main(int argc, const char **argv) {
   Real t = 0.0;
   Real h = 1. / (blockSize * blocksPerDimension);
   Real dt = 0.99 * h * h / (2. * 3 * max(Dw, Dg));
-  int iCounter = 1;
   MRAG::Science::AutomaticRefinement<0, 0>(*grid, blockfwt,
                                            refinement_tolerance, maxLevel, 1);
   MRAG::Science::AutomaticCompression<0, 0>(*grid, blockfwt,
