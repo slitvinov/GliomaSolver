@@ -385,8 +385,19 @@ bool isDone;
 Real L;
 Real tumor_ic[3];
 static int maxStencil[2][3] = {-1, -1, -1, +2, +2, +2};
+int main(int argc, const char **argv) {
+  refiner = new MRAG::Refiner_SpaceExtension(resJump, maxLevel);
+  compressor = new MRAG::Compressor(resJump);
+  grid = new MRAG::Grid<W, B>(blocksPerDimension, blocksPerDimension,
+                              blocksPerDimension, maxStencil);
+  grid->setCompressor(compressor);
+  grid->setRefiner(refiner);
+  stSorter.connect(*grid);
 
-static void _ic(MRAG::Grid<W, B> &grid, Real &L, Real tumor_ic[3]) {
+  L = 1;
+  tumor_ic[0] = 0.28;
+  tumor_ic[1] = 0.75;
+  tumor_ic[2] = 0.35;
   float *GM, *WM, *CSF;
   GM = D3D("GM.dat");
   WM = D3D("WM.dat");
@@ -405,13 +416,13 @@ static void _ic(MRAG::Grid<W, B> &grid, Real &L, Real tumor_ic[3]) {
   double brainHz = 1.0 / ((double)(brainSizeMax));
   const Real tumorRadius = 0.005;
   const Real smooth_sup = 2.;
-  const Real h = 1. / 128;
-  const Real iw = 1. / (smooth_sup * h);
+  const Real h0 = 1. / 128;
+  const Real iw = 1. / (smooth_sup * h0);
   Real pGM, pWM, pCSF;
-  vector<MRAG::BlockInfo> vInfo = grid.getBlocksInfo();
+  vector<MRAG::BlockInfo> vInfo = grid->getBlocksInfo();
   for (int i = 0; i < vInfo.size(); i++) {
     MRAG::BlockInfo &info = vInfo[i];
-    B &block = grid.getBlockCollection()[info.blockID];
+    B &block = grid->getBlockCollection()[info.blockID];
 
     for (int iz = 0; iz < B::sizeZ; iz++)
       for (int iy = 0; iy < B::sizeY; iy++)
@@ -452,24 +463,8 @@ static void _ic(MRAG::Grid<W, B> &grid, Real &L, Real tumor_ic[3]) {
           }
         }
 
-    grid.getBlockCollection().release(info.blockID);
+    grid->getBlockCollection().release(info.blockID);
   }
-}
-
-int main(int argc, const char **argv) {
-  refiner = new MRAG::Refiner_SpaceExtension(resJump, maxLevel);
-  compressor = new MRAG::Compressor(resJump);
-  grid = new MRAG::Grid<W, B>(blocksPerDimension, blocksPerDimension,
-                              blocksPerDimension, maxStencil);
-  grid->setCompressor(compressor);
-  grid->setRefiner(refiner);
-  stSorter.connect(*grid);
-
-  L = 1;
-  tumor_ic[0] = 0.28;
-  tumor_ic[1] = 0.75;
-  tumor_ic[2] = 0.35;
-  _ic(*grid, L, tumor_ic);
 
   isDone = false;
   whenToWriteOffset = 50;
@@ -523,7 +518,7 @@ int main(int argc, const char **argv) {
   double hf = 1. / gpd;
   double eps = hf * 0.5;
   d = (float *)malloc(gpd * gpd * gpd * sizeof *d);
-  vector<MRAG::BlockInfo> vInfo = grid->getBlocksInfo();
+  vInfo = grid->getBlocksInfo();
   for (int i = 0; i < vInfo.size(); i++) {
     MRAG::BlockInfo &info = vInfo[i];
     B &block = grid->getBlockCollection()[info.blockID];
