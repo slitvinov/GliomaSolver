@@ -37,12 +37,6 @@ static float *D3D(const char *path) {
   fclose(file);
   return mData;
 }
-
-static void _applyNoFluxBC(Real (&df)[6], Real n[6]) {
-  // n is domain char. func, use to apply bc by modifying the df term by the
-  // ghost point
-}
-
 struct ReactionDiffusionOperator {
   int stencil_start[3];
   int stencil_end[3];
