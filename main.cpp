@@ -195,9 +195,6 @@ struct Cell {
   Real chi;         // domain char. funciton
   Real pff, dpffdt; // pahse field function of whole anatomy, of tissue
 
-  // Volume Perception
-  Real vp;
-
   // Cahn-Hilliard
   Real mob, mu; // mobility and chemical potetnial mu
 
@@ -215,7 +212,6 @@ struct Cell {
     chi = 0.0;
     pff = 0.0;
     dpffdt = 0.0;
-    vp = 0.0;
     mob = 0.0;
     mu = 0.0;
   }
@@ -238,7 +234,6 @@ struct Cell {
     chi += t.chi;
     pff += t.pff;
     dpffdt += t.dpffdt;
-    vp += t.vp;
     mob += t.mob;
     mu += t.mu;
   }
@@ -264,7 +259,6 @@ inline Cell operator*(const Cell &p, Real v) {
   c.chi = p.chi * v;
   c.pff = p.pff * v;
   c.dpffdt = p.dpffdt * v;
-  c.vp = p.vp * v;
   c.mob = p.mob * v;
   c.mu = p.mu * v;
 
