@@ -103,14 +103,6 @@ struct Block
 #endif
 	inline DataType& operator[](int i)
 	{
-		//printf("accessing %d\n", i);
-		/*if (i>=cSizeX*cSizeY*cSizeZ || i<0)
-		{
-			/*assert(i>=0);
-			assert(i<cSizeX*cSizeY*cSizeZ);
-			//abort();
-		}*/
-		
 		return *((DataType *)data+i);
 	}
 	

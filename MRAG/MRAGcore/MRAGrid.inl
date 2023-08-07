@@ -9,9 +9,6 @@
 namespace MRAG
 {
 	
-#pragma mark -
-#pragma mark Class Management
-	
 	template <typename WaveletType, typename BlockType>
 	Grid<WaveletType, BlockType>::Grid(int nBlocksX, int nBlocksY, int nBlocksZ, BlockCollection<BlockType>* collection, bool bVerbose):
 		m_blockAtLevel(), 
@@ -213,9 +210,6 @@ namespace MRAG
 		return result;
 	}
 	
-#pragma mark -
-#pragma mark Refinement
-
 	template <typename WaveletType, typename BlockType>
 	void Grid<WaveletType, BlockType>::setBlockSplitter( BlockSplitter<  WaveletType, BlockCollection<BlockType> >* splitter )
 	{
@@ -348,9 +342,6 @@ namespace MRAG
 		//6.
 		return result;
 	}
-	
-#pragma mark -
-#pragma mark Compression
 	
 	template <typename WaveletType, typename BlockType>
 	void Grid<WaveletType, BlockType>::setBlockCollapser( BlockCollapser< WaveletType, BlockCollection<BlockType> > * collapser )
@@ -503,9 +494,6 @@ namespace MRAG
 		parent->isEmpty = false;
 	}
 
-#pragma mark -
-#pragma mark Boundary Info Computation
-	
 	template <typename WaveletType, typename BlockType>
 	BoundaryInfo& Grid<WaveletType, BlockType>::getBoundaryInfo(int * output_stencil_start, int * output_stencil_end)
 	{
@@ -685,9 +673,6 @@ namespace MRAG
 		body(SimpleInterval(0, n));
 		body.collect();
 	}
-
-#pragma mark -
-#pragma mark Helpers const
 
 	template <typename WaveletType, typename BlockType>
 	int Grid<WaveletType, BlockType>::_computeMaxLevel(const HierarchyType& hierarchy) const

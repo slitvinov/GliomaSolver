@@ -58,7 +58,6 @@ const bool cDoDebugChecks = true;
  */
 inline bool _implies(bool A, bool B) { return !A || B;}
 
-#pragma mark struct I3
 /**
  * An integer 3-vector.
  */
@@ -88,7 +87,6 @@ struct I3
 	}
 };
 
-#pragma mark struct SimpleInterval
 /**
  * A simple representation of an interval with integer begin and end.
  */
@@ -103,7 +101,6 @@ struct SimpleInterval
 	int end() const { return mend;}
 };
 
-#pragma mark struct I4
 /**
  * An integer 4-vector.
  */
@@ -142,7 +139,6 @@ struct I4
 namespace MRAG
 {
 	
-#pragma mark struct WTDataType
     
 struct WTDataType
 {
@@ -248,8 +244,6 @@ struct BlockInfo
 	}
 }; // struct BlockInfo
 	
-#pragma mark struct Subspace
-    
 struct Subspace
 {	
 	int start[3];
@@ -279,8 +273,6 @@ struct Subspace
 	}
 }; // struct SubSpace
 
-#pragma mark struct UniformPartition
-    
 struct UniformPartition
 {	
 	unsigned char total_work[3];
