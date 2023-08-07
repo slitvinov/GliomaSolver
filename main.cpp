@@ -37,7 +37,54 @@ static float *D3D(const char *path) {
   fread(mData, mNelements, sizeof *mData, file);
   fclose(file);
   return mData;
-};
+}
+
+// Di,j = 2 * (Di * Dj / (Di + Dj)
+// set Di,j to zero if (Di + Dj = 0) i.e. no update and avoid division by zero
+static void _harmonic_mean(Real (&df)[6], Real df_loc) {
+  Real eps = 1.0e-08; // to avoid divisin by zero
+  
+  df[0] =
+    (df[0] + df_loc < eps) ? 0. : 2. * df[0] * df_loc / (df[0] + df_loc);
+  df[1] =
+    (df[1] + df_loc < eps) ? 0. : 2. * df[1] * df_loc / (df[1] + df_loc);
+  df[2] =
+    (df[2] + df_loc < eps) ? 0. : 2. * df[2] * df_loc / (df[2] + df_loc);
+  df[3] =
+    (df[3] + df_loc < eps) ? 0. : 2. * df[3] * df_loc / (df[3] + df_loc);
+  
+  df[4] =
+    (df[4] + df_loc < eps) ? 0. : 2. * df[4] * df_loc / (df[4] + df_loc);
+  df[5] =
+    (df[5] + df_loc < eps) ? 0. : 2. * df[5] * df_loc / (df[5] + df_loc);
+}
+
+static void _applyNoFluxBC(Real (&df)[6], Real n[6]) {
+  // n is domain char. func, use to apply bc by modifying the df term by the
+  // ghost point
+  Real eps = 0.1;
+  
+  if (n[0] < eps) {
+    df[1] *= 2.0;
+  }
+  if (n[1] < eps) {
+    df[0] *= 2.0;
+  }
+  if (n[2] < eps) {
+    df[3] *= 2.0;
+  }
+  if (n[3] < eps) {
+    df[2] *= 2.0;
+  }
+  
+  if (n[4] < eps) {
+    df[5] *= 2.0;
+  }
+  if (n[5] < eps) {
+    df[4] *= 2.0;
+  }
+}
+
 struct ReactionDiffusionOperator {
   int stencil_start[3];
   int stencil_end[3];
@@ -121,52 +168,6 @@ struct ReactionDiffusionOperator {
           } else
             o(ix, iy, iz).dphidt = 0.;
         }
-  }
-
-  // Di,j = 2 * (Di * Dj / (Di + Dj)
-  // set Di,j to zero if (Di + Dj = 0) i.e. no update and avoid division by zero
-  inline void _harmonic_mean(Real (&df)[6], Real df_loc) const {
-    Real eps = 1.0e-08; // to avoid divisin by zero
-
-    df[0] =
-        (df[0] + df_loc < eps) ? 0. : 2. * df[0] * df_loc / (df[0] + df_loc);
-    df[1] =
-        (df[1] + df_loc < eps) ? 0. : 2. * df[1] * df_loc / (df[1] + df_loc);
-    df[2] =
-        (df[2] + df_loc < eps) ? 0. : 2. * df[2] * df_loc / (df[2] + df_loc);
-    df[3] =
-        (df[3] + df_loc < eps) ? 0. : 2. * df[3] * df_loc / (df[3] + df_loc);
-
-    df[4] =
-        (df[4] + df_loc < eps) ? 0. : 2. * df[4] * df_loc / (df[4] + df_loc);
-    df[5] =
-        (df[5] + df_loc < eps) ? 0. : 2. * df[5] * df_loc / (df[5] + df_loc);
-  }
-
-  inline void _applyNoFluxBC(Real (&df)[6], Real n[6]) const {
-    // n is domain char. func, use to apply bc by modifying the df term by the
-    // ghost point
-    Real eps = 0.1;
-
-    if (n[0] < eps) {
-      df[1] *= 2.0;
-    }
-    if (n[1] < eps) {
-      df[0] *= 2.0;
-    }
-    if (n[2] < eps) {
-      df[3] *= 2.0;
-    }
-    if (n[3] < eps) {
-      df[2] *= 2.0;
-    }
-
-    if (n[4] < eps) {
-      df[5] *= 2.0;
-    }
-    if (n[5] < eps) {
-      df[4] *= 2.0;
-    }
   }
 };
 
@@ -384,15 +385,9 @@ double whenToWriteOffset;
 bool isDone;
 Real L;
 Real tumor_ic[3];
-
-static void _ic(MRAG::Grid<W, B> &grid, Real &L, Real tumor_ic[3]);
-void _reactionDiffusionStep(MRAG::BoundaryInfo *boundaryInfo,
-                            const int nParallelGranularity, const Real Dw,
-                            const Real Dg, const Real rho, double dt);
-
 static int maxStencil[2][3] = {-1, -1, -1, +2, +2, +2};
 
-void _ic(MRAG::Grid<W, B> &grid, Real &L, Real tumor_ic[3]) {
+static void _ic(MRAG::Grid<W, B> &grid, Real &L, Real tumor_ic[3]) {
   float *GM, *WM, *CSF;
   GM = D3D("GM.dat");
   WM = D3D("WM.dat");
