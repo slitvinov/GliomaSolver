@@ -273,16 +273,6 @@ struct Cell {
     mu += t.mu;
   }
 
-  operator Real() { return (Real)phi; }
-
-  void integrate(float dt) {
-    phi += dt * dphidt;
-    dphidt = 0.0;
-  }
-
-  template <int i> Real evaluate_concentration(double dt) {
-    return phi + dt * dphidt;
-  }
 
   Real giveMe(int i, Real h = 0) {
 
@@ -367,7 +357,7 @@ template <typename T, int i> inline Real RD_projector_impl_wav(const T &t) {
 
 make_projector(RD_Projector_Wavelets, RD_projector_impl_wav)
 
-    static const int blockSize = _BLOCKSIZE_;
+static const int blockSize = _BLOCKSIZE_;
 static const int blockSizeZ = _BLOCKSIZE_;
 static const int blocksPerDimension = _BPD_;
 static const bool bIsCellCentered = true;
