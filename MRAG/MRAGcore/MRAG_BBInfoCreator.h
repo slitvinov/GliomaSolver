@@ -11,7 +11,6 @@
 #include "MRAGGridNode.h"
 #include "MRAGCommon.h"
 
-#include <vector>
 #include <map>
 #include <math.h>
 #include <assert.h>

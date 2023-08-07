@@ -9,11 +9,9 @@
 #pragma once
 #undef min
 #undef max
-#include <vector>
 #include <map>
 #undef min
 #undef max
-#include <set>
 using namespace std;
 
 #include "MRAGGridNode.h"

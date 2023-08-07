@@ -8,8 +8,6 @@
  */
 
 #pragma once
-#include <vector>
-#include <stack>
 using namespace std;
 
 #include "../MRAGcore/MRAGCommon.h"

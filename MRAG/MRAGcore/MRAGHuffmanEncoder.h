@@ -319,7 +319,7 @@ namespace MRAG
 					else
 					{
 						assert(next_lut != NULL);
-						printf("symbol=another LUT (0x%x), length = nan\n", next_lut);
+						printf("symbol=another LUT (0x%p), length = nan\n", next_lut);
 					}
 				}
 			};
@@ -363,7 +363,7 @@ namespace MRAG
 			
 			void printLUT() const 
 			{
-				printf("LUT (0x%x):\n", this);
+				printf("LUT (0x%p):\n", this);
 				for(int i=0; i<nEntries; i++)
 				{
 					const unsigned int data = i;

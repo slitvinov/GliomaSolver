@@ -11,7 +11,6 @@
 
 #include <assert.h>
 
-#include <vector>
 #include <map>
 #undef min
 #undef max

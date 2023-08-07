@@ -9,7 +9,6 @@
 #pragma once
 
 #include <math.h>
-#include <vector>
 #include <stdio.h>
 #ifndef log2
 #define log2(x) (log((double)(x))/(double)log(2.))

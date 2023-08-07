@@ -6,11 +6,6 @@
  *  Copyright 2008 CSE Lab, ETH Zurich. All rights reserved.
  *
  */
-#include "MRAGcore/MRAGCommon.h"
-#include "MRAGcore/MRAGBlockFWT.h"
-
-#include <vector>
-#include <set>
 using namespace std;
 namespace MRAG
 {
@@ -60,7 +55,7 @@ namespace MRAG
 					else
 						nSkippedBlocks++;
 				}
-				if(bVerbose) printf("Blocks to FWT (levelset): %d\n", vBlocksToFWT.size());
+				if(bVerbose) printf("Blocks to FWT (levelset): %zu\n", vBlocksToFWT.size());
 				if (vBlocksToFWT.size() == 0) break;
 				
 				vector<FWTReport<iLastChannel - iFirstChannel+1> > vReports = 
@@ -84,7 +79,7 @@ namespace MRAG
 				
 				if (fillGrid != NULL) fillGrid(g);
 				
-				if(bVerbose) printf("AutomaticRefinement:: Refined %d, FWT skipped blocks:%d\n", shouldBeRefined.size(), nSkippedBlocks);
+				if(bVerbose) printf("AutomaticRefinement:: Refined %zu, FWT skipped blocks:%d\n", shouldBeRefined.size(), nSkippedBlocks);
 				
 				loopCounter++;
 				

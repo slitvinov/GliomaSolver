@@ -8,6 +8,9 @@
  */
 #include <math.h>
 #include <assert.h>
+#include <vector>
+#include "MRAGCommon.h"
+#include "MRAGHuffmanEncoder.h"
 #include "MRAGBoundaryBlockInfo.h"
 
 namespace MRAG

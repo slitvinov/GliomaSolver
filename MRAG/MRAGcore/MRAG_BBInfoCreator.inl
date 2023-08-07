@@ -9,7 +9,6 @@
 #include "MRAGGridNode.h"
 #include "MRAGBoundaryBlockInfo.h"
 #include "MRAG_BBInfoCreator.h"
-#include <set>
 
 //HELPER
 template <typename W, typename Real, bool bAnalysisFilter>

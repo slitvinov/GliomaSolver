@@ -1,21 +1,24 @@
 #include <math.h>
 #include <assert.h>
+#include <vector>
+#include <set>
 #include "MRAGcore/MRAGCommon.h"
 #define _WAVELET_TYPE Wavelets_Interp2ndOrder
 #undef min
 #undef max
+#include "MRAGcore/MRAGBlock.h"
 #include "MRAGcore/MRAGWavelets_Interp2ndOrder.h"
 #include "MRAGcore/MRAGrid.h"
 #include "MRAGcore/MRAGRefiner.h"
 #include "MRAGcore/MRAGBlockLab.h"
+#include "MRAGcore/MRAGBlockFWT.h"
 #include "MRAGscience/MRAGScienceCore.h"
+#include "MRAGcore/MRAGCommon.h"
 #include "MRAGscience/MRAGAutomaticRefiner.h"
 #include "MRAGscience/MRAGSpaceTimeSorter.h"
 #include "MRAGscience/MRAGRefiner_SpaceExtension.h"
 #include "MRAGmultithreading/MRAGBlockProcessing_SingleCPU.h"
 #include "MRAGio/MRAG_IO_ArgumentParser.h"
-#include "MRAGcore/MRAGBlock.h"
-#include "MRAGcore/MRAGCommon.h"
 static int mNx, mNy, mNz, mNelements;
 static float *D3D(const char *path) {
   float *mData;
