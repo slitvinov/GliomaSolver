@@ -6,7 +6,8 @@
  *  Copyright 2008 CSE Lab, ETH Zurich. All rights reserved.
  *
  */
-
+#include <math.h>
+#include <assert.h>
 #include "MRAGBoundaryBlockInfo.h"
 
 namespace MRAG

@@ -6,9 +6,6 @@
  *  Copyright 2008 CSE Lab, ETH Zurich. All rights reserved.
  *
  */
-#include <stdlib.h>
-#include <assert.h>
-#include <math.h>
 #pragma once
 
 #ifndef NULL

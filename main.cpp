@@ -1,12 +1,10 @@
+#include <math.h>
+#include <assert.h>
 #include "MRAGcore/MRAGCommon.h"
 #define _WAVELET_TYPE Wavelets_Interp2ndOrder
 #undef min
 #undef max
-#include "MRAGcore/MRAGWavelets_AverageInterp5thOrder.h"
-#include "MRAGcore/MRAGWavelets_Interp4thOrder.h"
-#include "MRAGcore/MRAGWavelets_AverageInterp3rdOrder.h"
 #include "MRAGcore/MRAGWavelets_Interp2ndOrder.h"
-#include "MRAGcore/MRAGWavelets_Haar.h"
 #include "MRAGcore/MRAGrid.h"
 #include "MRAGcore/MRAGRefiner.h"
 #include "MRAGcore/MRAGCompressor.h"
