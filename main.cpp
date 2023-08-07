@@ -273,7 +273,6 @@ struct Cell {
     mu += t.mu;
   }
 
-
   Real giveMe(int i, Real h = 0) {
 
     switch (i) {
@@ -357,7 +356,7 @@ template <typename T, int i> inline Real RD_projector_impl_wav(const T &t) {
 
 make_projector(RD_Projector_Wavelets, RD_projector_impl_wav)
 
-static const int blockSize = _BLOCKSIZE_;
+    static const int blockSize = _BLOCKSIZE_;
 static const int blockSizeZ = _BLOCKSIZE_;
 static const int blocksPerDimension = _BPD_;
 static const bool bIsCellCentered = true;
@@ -499,14 +498,15 @@ int main(int argc, const char **argv) {
                                             compression_tolerance, -1);
 
   while (t <= tend) {
-  vector<MRAG::BlockInfo> vInfo = grid->getBlocksInfo();
-  const MRAG::BlockCollection<B> &collecton = grid->getBlockCollection();
+    vector<MRAG::BlockInfo> vInfo = grid->getBlocksInfo();
+    const MRAG::BlockCollection<B> &collecton = grid->getBlockCollection();
 
-  ReactionDiffusionOperator rhs(Dw, Dg, rho);
-  UpdateTumor updateTumor(dt);
+    ReactionDiffusionOperator rhs(Dw, Dg, rho);
+    UpdateTumor updateTumor(dt);
 
-  blockProcessing.pipeline_process(vInfo, collecton, *boundaryInfo, rhs);
-  BlockProcessing::process(vInfo, collecton, updateTumor, nParallelGranularity);
+    blockProcessing.pipeline_process(vInfo, collecton, *boundaryInfo, rhs);
+    BlockProcessing::process(vInfo, collecton, updateTumor,
+                             nParallelGranularity);
     t += dt;
     numberOfIterations++;
 
