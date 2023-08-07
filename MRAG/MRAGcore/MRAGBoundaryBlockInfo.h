@@ -17,8 +17,6 @@
 #undef min
 #undef max
 
-using namespace std;
-
 #include "MRAGCommon.h"
 #include "MRAGHuffmanEncoder.h"
 
