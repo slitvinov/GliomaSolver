@@ -17,8 +17,6 @@
 #include "MRAGcore/MRAGBlock.h"
 #include "MRAGcore/MRAGBlockCollection.h"
 #include "MRAGcore/MRAGCommon.h"
-#include "MRAGcore/MRAGGridNode.h"
-#include "MRAGcore/MRAGrid.h"
 #include <fstream>
 static int mNx, mNy, mNz, mNelements;
 static float *D3D(const char *path) {
