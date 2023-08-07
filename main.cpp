@@ -18,7 +18,6 @@
 #include "MRAGscience/MRAGSpaceTimeSorter.h"
 #include "MRAGscience/MRAGRefiner_SpaceExtension.h"
 #include "MRAGmultithreading/MRAGBlockProcessing_SingleCPU.h"
-#include "MRAGio/MRAG_IO_ArgumentParser.h"
 static int mNx, mNy, mNz, mNelements;
 static float *D3D(const char *path) {
   float *mData;
