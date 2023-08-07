@@ -460,20 +460,6 @@ void _ic(MRAG::Grid<W, B> &grid, Real &L, Real tumor_ic[3]) {
   }
 }
 
-void _reactionDiffusionStep(MRAG::BoundaryInfo *boundaryInfo,
-                            const int nParallelGranularity, const Real Dw,
-                            const Real Dg, const Real rho, double dt) {
-
-  vector<MRAG::BlockInfo> vInfo = grid->getBlocksInfo();
-  const MRAG::BlockCollection<B> &collecton = grid->getBlockCollection();
-
-  ReactionDiffusionOperator rhs(Dw, Dg, rho);
-  UpdateTumor updateTumor(dt);
-
-  blockProcessing.pipeline_process(vInfo, collecton, *boundaryInfo, rhs);
-  BlockProcessing::process(vInfo, collecton, updateTumor, nParallelGranularity);
-}
-
 int main(int argc, const char **argv) {
   refiner = new MRAG::Refiner_SpaceExtension(resJump, maxLevel);
   compressor = new MRAG::Compressor(resJump);
@@ -513,7 +499,14 @@ int main(int argc, const char **argv) {
                                             compression_tolerance, -1);
 
   while (t <= tend) {
-    _reactionDiffusionStep(boundaryInfo, nParallelGranularity, Dw, Dg, rho, dt);
+  vector<MRAG::BlockInfo> vInfo = grid->getBlocksInfo();
+  const MRAG::BlockCollection<B> &collecton = grid->getBlockCollection();
+
+  ReactionDiffusionOperator rhs(Dw, Dg, rho);
+  UpdateTumor updateTumor(dt);
+
+  blockProcessing.pipeline_process(vInfo, collecton, *boundaryInfo, rhs);
+  BlockProcessing::process(vInfo, collecton, updateTumor, nParallelGranularity);
     t += dt;
     numberOfIterations++;
 
