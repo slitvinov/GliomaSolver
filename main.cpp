@@ -200,7 +200,6 @@ struct Cell {
   Real pff, dpffdt; // pahse field function of whole anatomy, of tissue
 
   // other helper fields
-  Real exact;
   Real tmp;
 
   // Volume Perception
@@ -222,7 +221,6 @@ struct Cell {
     dpdt = 0.0;
     omega = 0.0;
     domegadt = 0.0;
-    exact = 0.0;
     tmp = 0.0;
     f = 0.0;
     chi = 0.0;
@@ -252,7 +250,6 @@ struct Cell {
     dpdt += t.dpdt;
     omega += t.omega;
     domegadt += t.domegadt;
-    exact += t.exact;
     tmp += t.tmp;
     f += t.f;
     chi += t.chi;
@@ -285,7 +282,6 @@ inline Cell operator*(const Cell &p, Real v) {
   c.dpdt = p.dpdt * v;
   c.omega = p.omega * v;
   c.domegadt = p.domegadt * v;
-  c.exact = p.exact * v;
   c.tmp = p.tmp * v;
   c.f = p.f * v;
   c.chi = p.chi * v;
