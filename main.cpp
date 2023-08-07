@@ -16,7 +16,6 @@
 #include "MRAGio/MRAG_IO_ArgumentParser.h"
 #include "MRAGcore/MRAGBlock.h"
 #include "MRAGcore/MRAGCommon.h"
-#include <fstream>
 static int mNx, mNy, mNz, mNelements;
 static float *D3D(const char *path) {
   float *mData;
@@ -550,19 +549,9 @@ int main(int argc, const char **argv) {
   stSorter.connect(*grid);
 
   L = 1;
-
-  ifstream mydata("TumorIC.txt");
-
-  if (mydata.is_open()) {
-    mydata >> tumor_ic[0];
-    mydata >> tumor_ic[1];
-    mydata >> tumor_ic[2];
-    mydata.close();
-  } else {
-    printf("Aborting: missing input file TumorIC.txt \n");
-    abort();
-  }
-
+  tumor_ic[0] = 0.28;
+  tumor_ic[1] = 0.75;
+  tumor_ic[2] = 0.35;
   _ic(*grid, L, tumor_ic);
 
   isDone = false;
