@@ -349,7 +349,6 @@ make_projector(RD_Projector_Wavelets, RD_projector_impl_wav);
 static const int blockSize = _BLOCKSIZE_;
 static const int blockSizeZ = _BLOCKSIZE_;
 static const int blocksPerDimension = _BPD_;
-static const bool bIsCellCentered = true;
 static const int maxLevel = _MAXLEVEL_;
 static const int resJump = _RESJUMP_;
 const double refinement_tolerance = 1e-4;
