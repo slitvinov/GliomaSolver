@@ -387,7 +387,6 @@ static void _ic(MRAG::Grid<W, B> &grid, Real &L, Real tumor_ic[3]);
 void _reactionDiffusionStep(MRAG::BoundaryInfo *boundaryInfo,
                             const int nParallelGranularity, const Real Dw,
                             const Real Dg, const Real rho, double dt);
-void _dumpUQoutput();
 
 static int maxStencil[2][3] = {-1, -1, -1, +2, +2, +2};
 
@@ -475,60 +474,6 @@ void _reactionDiffusionStep(MRAG::BoundaryInfo *boundaryInfo,
   BlockProcessing::process(vInfo, collecton, updateTumor, nParallelGranularity);
 }
 
-void _dumpUQoutput() {
-  float *d;
-  FILE *file;
-  int gpd = blocksPerDimension * blockSize;
-  double hf = 1. / gpd;
-  double eps = hf * 0.5;
-  d = (float *)malloc(gpd * gpd * gpd * sizeof *d);
-  vector<MRAG::BlockInfo> vInfo = grid->getBlocksInfo();
-  for (int i = 0; i < vInfo.size(); i++) {
-    MRAG::BlockInfo &info = vInfo[i];
-    B &block = grid->getBlockCollection()[info.blockID];
-    double h = info.h[0];
-    for (int iz = 0; iz < B::sizeZ; iz++)
-      for (int iy = 0; iy < B::sizeY; iy++)
-        for (int ix = 0; ix < B::sizeX; ix++) {
-          double x[3];
-          info.pos(x, ix, iy, iz);
-          int mx = (int)floor((x[0]) / hf);
-          int my = (int)floor((x[1]) / hf);
-          int mz = (int)floor((x[2]) / hf);
-          if (h < hf + eps) {
-            d[mx + (my + mz * gpd) * gpd] = block(ix, iy, iz).phi;
-          } else if (h < 2. * hf + eps) {
-            for (int cz = 0; cz < 2; cz++)
-              for (int cy = 0; cy < 2; cy++)
-                for (int cx = 0; cx < 2; cx++) {
-                  d[mx + cx + (my + cy + (mz + cz) * gpd) * gpd] =
-                      block(ix, iy, iz).phi;
-                }
-          } else if (h < 3. * hf + eps) {
-            for (int cz = 0; cz < 3; cz++)
-              for (int cy = 0; cy < 3; cy++)
-                for (int cx = 0; cx < 3; cx++) {
-                  d[mx + cx + (my + cy + (mz + cz) * gpd) * gpd] =
-                      block(ix, iy, iz).phi;
-                }
-          } else {
-            for (int cz = 0; cz < 4; cz++)
-              for (int cy = 0; cy < 4; cy++)
-                for (int cx = 0; cx < 4; cx++) {
-                  d[mx + cx + (my + cy + (mz + cz) * gpd) * gpd] =
-                      block(ix, iy, iz).phi;
-                }
-          }
-        }
-  }
-  file = fopen("HGG_data.dat", "w");
-  int header[6] = {1234, 3, gpd, gpd, gpd, 1};
-  fwrite(header, sizeof header, 1, file);
-  fwrite(d, gpd * gpd * gpd, sizeof *d, file);
-  fclose(file);
-  free(d);
-}
-
 int main(int argc, const char **argv) {
   refiner = new MRAG::Refiner_SpaceExtension(resJump, maxLevel);
   compressor = new MRAG::Compressor(resJump);
@@ -582,5 +527,55 @@ int main(int argc, const char **argv) {
   }
   MRAG::Science::AutomaticRefinement<0, 0>(*grid, blockfwt,
                                            refinement_tolerance, maxLevel, 1);
-  _dumpUQoutput();
+  float *d;
+  FILE *file;
+  int gpd = blocksPerDimension * blockSize;
+  double hf = 1. / gpd;
+  double eps = hf * 0.5;
+  d = (float *)malloc(gpd * gpd * gpd * sizeof *d);
+  vector<MRAG::BlockInfo> vInfo = grid->getBlocksInfo();
+  for (int i = 0; i < vInfo.size(); i++) {
+    MRAG::BlockInfo &info = vInfo[i];
+    B &block = grid->getBlockCollection()[info.blockID];
+    double h = info.h[0];
+    for (int iz = 0; iz < B::sizeZ; iz++)
+      for (int iy = 0; iy < B::sizeY; iy++)
+        for (int ix = 0; ix < B::sizeX; ix++) {
+          double x[3];
+          info.pos(x, ix, iy, iz);
+          int mx = (int)floor((x[0]) / hf);
+          int my = (int)floor((x[1]) / hf);
+          int mz = (int)floor((x[2]) / hf);
+          if (h < hf + eps) {
+            d[mx + (my + mz * gpd) * gpd] = block(ix, iy, iz).phi;
+          } else if (h < 2. * hf + eps) {
+            for (int cz = 0; cz < 2; cz++)
+              for (int cy = 0; cy < 2; cy++)
+                for (int cx = 0; cx < 2; cx++) {
+                  d[mx + cx + (my + cy + (mz + cz) * gpd) * gpd] =
+                      block(ix, iy, iz).phi;
+                }
+          } else if (h < 3. * hf + eps) {
+            for (int cz = 0; cz < 3; cz++)
+              for (int cy = 0; cy < 3; cy++)
+                for (int cx = 0; cx < 3; cx++) {
+                  d[mx + cx + (my + cy + (mz + cz) * gpd) * gpd] =
+                      block(ix, iy, iz).phi;
+                }
+          } else {
+            for (int cz = 0; cz < 4; cz++)
+              for (int cy = 0; cy < 4; cy++)
+                for (int cx = 0; cx < 4; cx++) {
+                  d[mx + cx + (my + cy + (mz + cz) * gpd) * gpd] =
+                      block(ix, iy, iz).phi;
+                }
+          }
+        }
+  }
+  file = fopen("HGG_data.dat", "w");
+  int header[6] = {1234, 3, gpd, gpd, gpd, 1};
+  fwrite(header, sizeof header, 1, file);
+  fwrite(d, gpd * gpd * gpd, sizeof *d, file);
+  fclose(file);
+  free(d);
 }
