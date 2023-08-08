@@ -338,7 +338,8 @@ int main(int argc, const char **argv) {
   tend = 300;
   Dw = Dw / (L * L);
   Dg = 0.1 * Dw;
-
+  char path[FILENAME_MAX - 9];
+  int step;
   Real t = 0.0;
   Real h = 1. / (blockSize * blocksPerDimension);
   Real dt = 0.99 * h * h / (2. * 3 * max(Dw, Dg));
@@ -349,16 +350,20 @@ int main(int argc, const char **argv) {
   ReactionDiffusionOperator rhs(Dw, Dg, rho);
   UpdateTumor updateTumor(dt);
   const MRAG::BlockCollection<B> &collecton = grid->getBlockCollection();
+
+  step = 0;
   while (t <= tend) {
     vInfo = grid->getBlocksInfo();
     blockProcessing.pipeline_process(vInfo, collecton, *boundaryInfo, rhs);
     BlockProcessing::process(vInfo, collecton, updateTumor,
                              nParallelGranularity);
     t += dt;
+    step ++;
     if (t >= whenToWrite) {
       MRAG::Science::AutomaticRefinement<0, 0>(
           *grid, blockfwt, refinement_tolerance, maxLevel, 1);
-      write<W, B, MRAG::BlockLab<B>>(grid, boundaryInfo, "preved");
+      sprintf(path, "%09d", step);
+      write<W, B, MRAG::BlockLab<B>>(grid, boundaryInfo, path);
       whenToWrite = whenToWrite + whenToWriteOffset;
     }
   }
