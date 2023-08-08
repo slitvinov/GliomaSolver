@@ -362,7 +362,7 @@ int main(int argc, const char **argv) {
     if (t >= whenToWrite) {
       MRAG::Science::AutomaticRefinement<0, 0>(
           *grid, blockfwt, refinement_tolerance, maxLevel, 1);
-      sprintf(path, "%09d", step);
+      sprintf(path, "a.%09d", step);
       write<W, B, MRAG::BlockLab<B>>(grid, boundaryInfo, path);
       whenToWrite = whenToWrite + whenToWriteOffset;
     }
