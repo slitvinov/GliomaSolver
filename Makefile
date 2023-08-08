@@ -20,3 +20,4 @@ brain: $(OBJECTS); $(CXX) $(OBJECTS) -o $@ $(LDFLAGS)
 .cpp.o:
 	$(CXX) $< -o $@ -c $(DEFS) -IMRAG $(CXXFLAGS)
 clean:; rm -rf $(OBJECTS) brain
+brain: write.h
