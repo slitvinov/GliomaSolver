@@ -200,7 +200,6 @@ struct Cell {
     p_w += t.p_w;
     p_csf += t.p_csf;
   }
-
 };
 
 inline Cell operator*(const Cell &p, Real v) {
@@ -359,6 +358,7 @@ int main(int argc, const char **argv) {
     if (t >= whenToWrite) {
       MRAG::Science::AutomaticRefinement<0, 0>(
           *grid, blockfwt, refinement_tolerance, maxLevel, 1);
+      write<W, B, MRAG::BlockLab<B>>(grid, boundaryInfo, "preved");
       whenToWrite = whenToWrite + whenToWriteOffset;
     }
   }
@@ -415,5 +415,4 @@ int main(int argc, const char **argv) {
   fwrite(d, gpd * gpd * gpd, sizeof *d, file);
   fclose(file);
   free(d);
-  write<W, B, MRAG::BlockLab<B>>(grid, boundaryInfo, "preved");
 }

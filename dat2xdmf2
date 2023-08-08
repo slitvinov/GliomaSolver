@@ -40,6 +40,9 @@ for path in sys.argv[1:]:
             nsxp, nsyp, nszp = nsx + 1, nsy + 1, nsz + 1
             prefix = re.sub("\.[^\.]*$", "", path)
             xdmf_path = "%s.xdmf2" % prefix
+            dx = 1.0 / nx / sx
+            dy = 1.0 / ny / sy
+            dz = 1.0 / nz / sz
             sys.stderr.write("%s\n" % xdmf_path)
             with open(xdmf_path, "w") as xdmf:
                 xdmf.write("""\
@@ -59,7 +62,7 @@ for path in sys.argv[1:]:
         <DataItem
           Name="Spacing"
           Dimensions="3">
-                {sz} {sy} {sx}
+                {dz} {dy} {dx}
         </DataItem>
       </Geometry>
       <Attribute
