@@ -3,7 +3,7 @@
 .SUFFIXES: .o
 
 CXXFLAGS = -O3
-DEFS = -D_BLOCKSIZE_=16\
+DEFS = -D_BLOCKSIZE_=8\
 	-D_BPD_=16\
 	-D_FMMSILENT\
 	-D_MAXLEVEL_=4\
@@ -20,4 +20,4 @@ brain: $(OBJECTS); $(CXX) $(OBJECTS) -o $@ $(LDFLAGS)
 .cpp.o:
 	$(CXX) $< -o $@ -c $(DEFS) -IMRAG $(CXXFLAGS)
 clean:; rm -rf $(OBJECTS) brain
-brain: write.h
+main.o: write.h

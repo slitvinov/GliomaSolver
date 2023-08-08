@@ -415,4 +415,5 @@ int main(int argc, const char **argv) {
   fwrite(d, gpd * gpd * gpd, sizeof *d, file);
   fclose(file);
   free(d);
+  write<W, B, MRAG::BlockLab<B>>(grid, boundaryInfo, "preved");
 }
