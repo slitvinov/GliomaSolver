@@ -241,7 +241,6 @@ static MRAG::SpaceTimeSorter stSorter;
 static MRAG::BlockLab<B> lab;
 static double whenToWrite;
 static double whenToWriteOffset;
-static bool isDone;
 static Real L;
 static Real tumor_ic[3];
 static int maxStencil[2][3] = {-1, -1, -1, +2, +2, +2};
@@ -320,7 +319,6 @@ int main(int argc, const char **argv) {
     grid->getBlockCollection().release(info.blockID);
   }
 
-  isDone = false;
   whenToWriteOffset = 50;
   whenToWrite = whenToWriteOffset;
 
