@@ -23,7 +23,8 @@ static float *D3D(const char *path) {
   FILE *file;
   int header[6];
   if ((file = fopen(path, "r")) == NULL) {
-    fprintf(stderr, "%s:%d: error: fail to open '%s'\n", __FILE__, __LINE__, path);
+    fprintf(stderr, "%s:%d: error: fail to open '%s'\n", __FILE__, __LINE__,
+            path);
     return NULL;
   }
   fread(header, sizeof header, 1, file);
@@ -221,30 +222,31 @@ template <typename T, int i> inline Real RD_projector_impl_wav(const T &t) {
 
 make_projector(RD_Projector_Wavelets, RD_projector_impl_wav);
 
-static const int blockSize = _BLOCKSIZE_;
-static const int blockSizeZ = _BLOCKSIZE_;
-static const int blocksPerDimension = _BPD_;
-static const int maxLevel = _MAXLEVEL_;
-static const int resJump = _RESJUMP_;
-const double refinement_tolerance = 1e-4;
-const double compression_tolerance = 1e-5;
-typedef MRAG::Block<Cell, blockSize, blockSize, blockSizeZ> B;
-typedef MRAG::_WAVELET_TYPE W;
-static const int nThreads = 1;
-typedef MRAG::Multithreading::BlockProcessing_SingleCPU<B> BlockProcessing;
-static MRAG::Grid<W, B> *grid;
-static BlockProcessing blockProcessing;
-static MRAG::Refiner_SpaceExtension *refiner;
-static MRAG::Compressor *compressor;
-static MRAG::BlockFWT<W, B, RD_Projector_Wavelets> blockfwt;
-static MRAG::SpaceTimeSorter stSorter;
-static MRAG::BlockLab<B> lab;
-static double whenToWrite;
-static double whenToWriteOffset;
-static Real L;
-static Real tumor_ic[3];
-static int maxStencil[2][3] = {-1, -1, -1, +2, +2, +2};
 int main(int argc, const char **argv) {
+  const int blockSize = _BLOCKSIZE_;
+  const int blockSizeZ = _BLOCKSIZE_;
+  const int blocksPerDimension = _BPD_;
+  const int maxLevel = _MAXLEVEL_;
+  const int resJump = _RESJUMP_;
+  const double refinement_tolerance = 1e-4;
+  const double compression_tolerance = 1e-5;
+  typedef MRAG::Block<Cell, blockSize, blockSize, blockSizeZ> B;
+  typedef MRAG::_WAVELET_TYPE W;
+  const int nThreads = 1;
+  typedef MRAG::Multithreading::BlockProcessing_SingleCPU<B> BlockProcessing;
+  MRAG::Grid<W, B> *grid;
+  BlockProcessing blockProcessing;
+  MRAG::Refiner_SpaceExtension *refiner;
+  MRAG::Compressor *compressor;
+  MRAG::BlockFWT<W, B, RD_Projector_Wavelets> blockfwt;
+  MRAG::SpaceTimeSorter stSorter;
+  MRAG::BlockLab<B> lab;
+  double whenToWrite;
+  double whenToWriteOffset;
+  Real L;
+  Real tumor_ic[3];
+  int maxStencil[2][3] = {-1, -1, -1, +2, +2, +2};
+
   refiner = new MRAG::Refiner_SpaceExtension(resJump, maxLevel);
   compressor = new MRAG::Compressor(resJump);
   grid = new MRAG::Grid<W, B>(blocksPerDimension, blocksPerDimension,
@@ -350,7 +352,7 @@ int main(int argc, const char **argv) {
     BlockProcessing::process(vInfo, collecton, updateTumor,
                              nParallelGranularity);
     t += dt;
-    step ++;
+    step++;
     if (t >= whenToWrite) {
       MRAG::Science::AutomaticRefinement<0, 0>(
           *grid, blockfwt, refinement_tolerance, maxLevel, 1);
