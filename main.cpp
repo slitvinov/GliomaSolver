@@ -22,7 +22,10 @@ static float *D3D(const char *path) {
   float *mData;
   FILE *file;
   int header[6];
-  file = fopen(path, "r");
+  if ((file = fopen(path, "r")) == NULL) {
+    fprintf(stderr, "%s:%d: error: fail to open '%s'\n", __FILE__, __LINE__, path);
+    return NULL;
+  }
   fread(header, sizeof header, 1, file);
   assert(header[0] == 1234);
   assert(header[1] == 3);
@@ -255,10 +258,9 @@ int main(int argc, const char **argv) {
   tumor_ic[0] = 0.28;
   tumor_ic[1] = 0.75;
   tumor_ic[2] = 0.35;
-  float *GM, *WM, *CSF;
+  float *GM, *WM;
   GM = D3D("GM.dat");
   WM = D3D("WM.dat");
-  CSF = D3D("CSF.dat");
   int brainSizeX = mNx;
   int brainSizeY = mNy;
   int brainSizeZ = mNz;
@@ -275,7 +277,7 @@ int main(int argc, const char **argv) {
   const Real smooth_sup = 2.;
   const Real h0 = 1. / 128;
   const Real iw = 1. / (smooth_sup * h0);
-  Real pGM, pWM, pCSF;
+  Real pGM, pWM;
   vector<MRAG::BlockInfo> vInfo = grid->getBlocksInfo();
   for (int i = 0; i < vInfo.size(); i++) {
     MRAG::BlockInfo &info = vInfo[i];
@@ -297,11 +299,7 @@ int main(int argc, const char **argv) {
                 mappedBrainX + (mappedBrainY + mappedBrainZ * mNy) * mNx;
             pGM = GM[index];
             pWM = WM[index];
-            pCSF = CSF[index];
             double tissue = pWM + pGM;
-            pCSF = (pCSF > tissue) ? 1. : 0.;
-            pWM = (pCSF > tissue) ? 0. : pWM;
-            pGM = (pCSF > tissue) ? 0. : pGM;
             tissue = pWM + pGM;
             block(ix, iy, iz).p_w = (tissue > 0.) ? (pWM / tissue) : 0.;
             block(ix, iy, iz).p_g = (tissue > 0.) ? (pGM / tissue) : 0.;
