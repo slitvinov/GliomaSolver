@@ -12,21 +12,29 @@ def unpack(string, file):
     return struct.unpack(string, buffer)
 
 
-path = sys.argv[1]
-with open(path, "rb") as inp:
-    magic, = unpack('i', inp)
-    if magic != 1234:
-        sys.stderr.write("dat2slice: error: '%s' not a dat file\n" % path)
-        sys.exit(1)
-    dim, = unpack('i', inp)
-    if dim != 3:
-        sys.stderr.write("dat2slice: error: wrong dimension '%d'\n" % dim)
-        sys.exit(1)
-    nx, ny, nz, type_id = unpack('iiii', inp)
-    seek = inp.tell()
-    type_name = {0: "<d", 1: "<f", 2: "<i"}[type_id]
-with open(path, "rb+") as inp:
-    mm = mmap.mmap(inp.fileno(), 0)
-    dtype = np.dtype(type_name)
-    a = np.ndarray((nx, ny, nz), dtype, mm, seek, order='F')
-    print(np.unique(a))
+def read(path):
+    with open(path, "rb") as inp:
+        magic, = unpack('i', inp)
+        if magic != 1234:
+            sys.stderr.write("dat2numpy: error: '%s' not a dat file\n" % path)
+            sys.exit(1)
+        dim, = unpack('i', inp)
+        if dim != 3:
+            sys.stderr.write("dat2numpy: error: wrong dimension '%d'\n" % dim)
+            sys.exit(1)
+        nx, ny, nz, type_id = unpack('iiii', inp)
+        seek = inp.tell()
+        type_name = {0: "<d", 1: "<f", 2: "<i"}[type_id]
+    with open(path, "rb+") as inp:
+        mm = mmap.mmap(inp.fileno(), 0)
+        dtype = np.dtype(type_name)
+        return np.ndarray((nx, ny, nz), dtype, mm, seek, order='F')
+
+
+a = read(sys.argv[1])
+b = read(sys.argv[2])
+print(a.size)
+print(np.count_nonzero(np.logical_and(a == 0, b == 0)))
+print(np.count_nonzero(np.logical_and(a == 0, b == 1)))
+print(np.count_nonzero(np.logical_and(a == 1, b == 0)))
+print(np.count_nonzero(np.logical_and(a == 1, b == 1)))
