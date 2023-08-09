@@ -1,0 +1,22 @@
+<Xdmf>
+  <Domain>
+    <Grid>
+      <Topology
+        TopologyType="3DCORECTMesh"
+        Dimensions="2 2 2"/>
+      <Geometry
+        GeometryType="ORIGIN_DXDYDZ">
+        <DataItem
+          Name="Origin"
+          Dimensions="3">
+                 0 0 0
+        </DataItem>
+        <DataItem
+          Name="Spacing"
+          Dimensions="3">
+                1 1 1
+        </DataItem>
+      </Geometry>
+    </Grid>
+  </Domain>
+</Xdmf>
