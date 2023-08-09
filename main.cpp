@@ -183,14 +183,13 @@ struct Cell {
   Real dphidt;
 
   /* tissue percentage per voxel*/
-  Real p_g, p_w, p_csf;
+  Real p_g, p_w;
 
   Cell() {
     phi = 0.0;
     dphidt = 0.0;
     p_g = 0.0;
     p_w = 0.0;
-    p_csf = 0.0;
   }
 
   void operator+=(Cell t) {
@@ -198,7 +197,6 @@ struct Cell {
     dphidt += t.dphidt;
     p_g += t.p_g;
     p_w += t.p_w;
-    p_csf += t.p_csf;
   }
 };
 
@@ -208,7 +206,6 @@ inline Cell operator*(const Cell &p, Real v) {
   c.dphidt = p.dphidt * v;
   c.p_g = p.p_g * v;
   c.p_w = p.p_w * v;
-  c.p_csf = p.p_csf * v;
   return c;
 }
 
@@ -308,7 +305,6 @@ int main(int argc, const char **argv) {
             tissue = pWM + pGM;
             block(ix, iy, iz).p_w = (tissue > 0.) ? (pWM / tissue) : 0.;
             block(ix, iy, iz).p_g = (tissue > 0.) ? (pGM / tissue) : 0.;
-            block(ix, iy, iz).p_csf = pCSF;
             const Real p[3] = {x[0] - tumor_ic[0], x[1] - tumor_ic[1],
                                x[2] - tumor_ic[2]};
             const Real dist = sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
