@@ -24,9 +24,20 @@
 
 ## Patient Data
 <dl>
-  <dt>tumFLAIR.dat, tumPET.dat, tumT1c.dat</dt>
-  <dd>FLAIR MRI scan, PET-FET scan, T1Gd MRI scan</dd>
+  <dt>tumFLAIR.dat</dt>
+  <dd>binary mask, FLAIR MRI scan</dd>
 </dl>
+
+<dl>
+  <dt>tumT1c.dat</dt>
+  <dd>T1 gadolinium enhanced (T1Gd) scan, categorical 0, 1, 2, 4</dd>
+</dl>
+
+<dl>
+  <dt>tumPET.dat</dt>
+  <dd>PET-FET scan, float</dd>
+</dl>
+
 
 ## Parameters of the likelihood
 <dl>

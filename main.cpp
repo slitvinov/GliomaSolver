@@ -256,9 +256,9 @@ int main(int argc, const char **argv) {
   stSorter.connect(*grid);
 
   L = 1;
-  tumor_ic[0] = 0.28;
-  tumor_ic[1] = 0.75;
-  tumor_ic[2] = 0.35;
+  tumor_ic[0] = 0.6497946102507519;
+  tumor_ic[1] = 0.5908331665234543;
+  tumor_ic[2] = 0.3715947899171972;
   float *GM, *WM;
   GM = D3D("GM.dat");
   WM = D3D("WM.dat");
@@ -329,7 +329,7 @@ int main(int argc, const char **argv) {
   Real Dw, Dg, rho, tend;
   Dw = 0.0013;
   rho = 0.025;
-  tend = 300;
+  tend = 3000;
   Dw = Dw / (L * L);
   Dg = 0.1 * Dw;
   char path[FILENAME_MAX - 9];

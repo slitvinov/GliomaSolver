@@ -32,4 +32,9 @@ def read(path):
 
 
 a = read(sys.argv[1])
-print(np.unique(a))
+b = read(sys.argv[2])
+
+
+for v in np.unique(b):
+    q = a[b == v]
+    print(v, np.min(q), np.max(q), np.size(q))

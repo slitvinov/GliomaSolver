@@ -38,20 +38,23 @@ def roi(x, y, z):
     return abs(x) < 0.075 and abs(y) < 0.075 and abs(z) < 0.075
 
 
-path = "b"
+path = "c"
 xyz_path = "%s.xyz.raw" % path
 topo_path = "%s.topo.raw" % path
 xdmf_path = "%s.xdmf2" % path
+attr_path = "%s.xdmf2" % path
 a = read(sys.argv[1])
-b = read(sys.argv[2])
+# b = read(sys.argv[2])
 nx, ny, nz = np.shape(a)
-x0, y0, z0 = 0.28, 0.75, 0.35
+x0, y0, z0 = 0.6497946102507519, 0.5908331665234543, 0.3715947899171972
 s = 1.0 / nx
 nc = 0
 nn = 0
-with open(xyz_path, "wb") as xyz, open(topo_path, "wb") as topo:
+with open(xyz_path, "wb") as xyz, open(topo_path,
+                                       "wb") as topo, open(attr_path,
+                                                           "wb") as attr:
     for (x, y, z), val in np.ndenumerate(a):
-        if val == 1 and b[x, y, z] == 0 and roi(x, y, z):
+        if val != 0 and roi(x, y, z):
             x *= s
             y *= s
             z *= s
@@ -62,6 +65,7 @@ with open(xyz_path, "wb") as xyz, open(topo_path, "wb") as topo:
             topo.write(
                 struct.pack("<9q", 9, nn, nn + 1, nn + 2, nn + 3, nn + 4,
                             nn + 5, nn + 6, nn + 7))
+            topo.write(struct.pack("<f", val))
             nc += 1
             nn += 8
 with open(xdmf_path, "w") as xdmf:
@@ -87,8 +91,15 @@ with open(xdmf_path, "w") as xdmf:
             %s
           </DataItem>
       </Topology>
+      <Attribute
+          Center="Cell">
+          <DataItem
+             Dimensions="%d" Format="Binary">
+           %s
+          </DataItem>
+      </Attribute>
     </Grid>
   </Domain>
 </Xdmf>
-""" % (nn, os.path.basename(xyz_path), nc, 9 * nc,
-       os.path.basename(topo_path)))
+""" % (nn, os.path.basename(xyz_path), nc, 9 * nc, os.path.basename(topo_path),
+       nc, os.path.basename(attr_path)))
