@@ -32,9 +32,4 @@ def read(path):
 
 
 a = read(sys.argv[1])
-b = read(sys.argv[2])
-print(a.size)
-print(np.count_nonzero(np.logical_and(a == 0, b == 0)))
-print(np.count_nonzero(np.logical_and(a == 0, b == 1)))
-print(np.count_nonzero(np.logical_and(a == 1, b == 0)))
-print(np.count_nonzero(np.logical_and(a == 1, b == 1)))
+print(np.unique(a))
