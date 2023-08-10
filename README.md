@@ -1,7 +1,7 @@
 ## Input for the Reaction-Diffusion model
 <dl>
-  <dt>CSF.dat, GM.dat, WM.dat</dt>
-  <dd>white matter, gray matter,  cerebrospinal fluid</dd>
+  <dt>WM.dat, GM.dat</dt>
+  <dd>white matter binary mask, gray matter binary mask</dd>
 </dl>
 
 ## Model parameters
@@ -19,7 +19,7 @@
 ## Output of the solver
 <dl>
   <dt>HGG_data.dat</dt>
-  <dd>tumor cell density</dd>
+  <dd>tumor cell density [fraction]</dd>
 </dl>
 
 ## Patient Data
