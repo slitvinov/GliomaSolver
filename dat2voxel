@@ -41,8 +41,8 @@ def roi(x, y, z):
 path = "c"
 xyz_path = "%s.xyz.raw" % path
 topo_path = "%s.topo.raw" % path
+attr_path = "%s.attr.raw" % path
 xdmf_path = "%s.xdmf2" % path
-attr_path = "%s.xdmf2" % path
 a = read(sys.argv[1])
 # b = read(sys.argv[2])
 nx, ny, nz = np.shape(a)
@@ -65,7 +65,7 @@ with open(xyz_path, "wb") as xyz, open(topo_path,
             topo.write(
                 struct.pack("<9q", 9, nn, nn + 1, nn + 2, nn + 3, nn + 4,
                             nn + 5, nn + 6, nn + 7))
-            topo.write(struct.pack("<f", val))
+            attr.write(struct.pack("<f", val))
             nc += 1
             nn += 8
 with open(xdmf_path, "w") as xdmf:
@@ -83,20 +83,21 @@ with open(xdmf_path, "w") as xdmf:
       <Topology
           Dimensions="%d"
           Type="Mixed">
-          <DataItem
-              DataType="Int"
-              Dimensions="%d"
-              Format="Binary"
-              Precision="8">
-            %s
-          </DataItem>
+        <DataItem
+            DataType="Int"
+            Dimensions="%d"
+            Format="Binary"
+            Precision="8">
+          %s
+        </DataItem>
       </Topology>
       <Attribute
           Center="Cell">
-          <DataItem
-             Dimensions="%d" Format="Binary">
-           %s
-          </DataItem>
+        <DataItem
+           Dimensions="%d"
+           Format="Binary">
+         %s
+        </DataItem>
       </Attribute>
     </Grid>
   </Domain>
