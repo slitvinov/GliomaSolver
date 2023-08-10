@@ -32,22 +32,22 @@ float *D3D(const char *path) {
   return mData;
 }
 
-long double LogBernoulli(double u, double y, double uc) {
-  double diff = u - uc;
-  long double omega2 = (diff > 0.) ? 1. : diff * diff;
-  long double alpha = 0.5 + 0.5 * sgn(diff) * (1. - exp(-omega2 / slope));
-  return (y == 1) ? log(alpha) : log(1. - alpha);
-}
 long double TiLogLikelihood(float *model, float *data, double uc) {
-  long double sum = 0.;
-  for (int i = 0; i < mNelements; i++)
-    sum += LogBernoulli(model[i], data[i], uc);
+  int i;
+  long double sum, diff, omega2, alpha;
+  sum = 0.0;
+  for (i = 0; i < mNelements; i++)  {
+    diff = model[i] - uc;
+    omega2 = (diff > 0.) ? 1. : diff * diff;
+    alpha = 0.5 + 0.5 * sgn(diff) * (1. - exp(-omega2 / slope));
+    sum += data[i] == 1 ? log(alpha) : log(1. - alpha);
+  }
   return sum;
 }
 int main(int argc, const char **argv) {
   float *model, *PETdata, *tumT1c, *tumFLAIR;
   int N, i;
-  long double sum;
+  long double sum, p1, p2, Lt1, Lt2;
 
   PETsigma2 = 0.000361;
   PETscale = 0.85;
@@ -66,10 +66,9 @@ int main(int argc, const char **argv) {
              (model[i] - PETscale * PETdata[i]);
       N++;
     }
-  long double p1 = -0.5 * N * log(2. * PI * PETsigma2);
-  long double p2 = -0.5 * (1. / PETsigma2) * sum;
-  long double Lpet = p1 + p2;
-  long double Lt1 = TiLogLikelihood(model, tumT1c, T1uc);
-  long double Lt2 = TiLogLikelihood(model, tumFLAIR, T2uc);
-  printf("%.16Le\n", -(Lpet + Lt1 + Lt2));
+  p1 = -0.5 * N * log(2. * PI * PETsigma2);
+  p2 = -0.5 * (1. / PETsigma2) * sum;
+  Lt1 = TiLogLikelihood(model, tumT1c, T1uc);
+  Lt2 = TiLogLikelihood(model, tumFLAIR, T2uc);
+  printf("%.16Le\n", -(p1 + p2 + Lt1 + Lt2));
 };
