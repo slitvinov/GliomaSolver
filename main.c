@@ -1,15 +1,14 @@
 #include <math.h>
 #include <assert.h>
-#include <vector>
-#include <set>
 #include <stdio.h>
+#include <stdlib.h>
 #include "lib.h"
-
 
 const int blockSize = _BLOCKSIZE_;
 const int blockSizeZ = _BLOCKSIZE_;
+#define max(a, b) (a) > (b) ? (a) : (b)
 
-int main(int, char **) {
+int main(void) {
   struct Brain *brain;
   int blocksPerDimension = 16;
   double whenToWrite;
@@ -38,12 +37,12 @@ int main(int, char **) {
   whenToWrite = whenToWriteOffset;
   t = 0.0;
   int brainSizeMax;  
-  brainSizeMax = std::max(nx, std::max(ny, nz));
+  brainSizeMax = max(nx, max(ny, nz));
   float L = brainSizeMax * 0.1;
   h = 1. / (blockSize * blocksPerDimension);
   Dw = Dw / (L * L);
   Dg = 0.1 * Dw;  
-  dt = 0.99 * h * h / (2. * 3 * std::max(Dw, Dg));
+  dt = 0.99 * h * h / (2. * 3 * max(Dw, Dg));
   step = 0;
   while (t <= tend) {
     brain_step(brain);

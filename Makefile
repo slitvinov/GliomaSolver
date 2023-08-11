@@ -1,4 +1,5 @@
 .SUFFIXES:
+.SUFFIXES: .c
 .SUFFIXES: .cpp
 .SUFFIXES: .o
 
@@ -15,6 +16,8 @@ MRAGWavelets_StaticData.o\
 brain: $(OBJECTS); $(CXX) $(OBJECTS) -o $@ $(LDFLAGS)
 .cpp.o:
 	$(CXX) $< -o $@ -c $(DEFS) -IMRAG $(CXXFLAGS)
+.c.o:
+	$(CC) $< -o $@ -c $(DEFS) $(CFLAGS)
 clean:; rm -rf $(OBJECTS) brain
 main.o: write.h lib.h
 lib.o: lib.h
