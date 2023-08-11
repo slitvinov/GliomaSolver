@@ -46,7 +46,7 @@ struct Cell {
   }
 };
 
-Cell operator*(const Cell &p, Real v) {
+static Cell operator*(const Cell &p, Real v) {
   Cell c;
   c.phi = p.phi * v;
   c.dphidt = p.dphidt * v;
