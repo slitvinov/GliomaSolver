@@ -20,17 +20,22 @@ using namespace std;
 #include "MRAGscience/MRAGRefiner_SpaceExtension.h"
 #include "MRAGmultithreading/MRAGBlockProcessing_SingleCPU.h"
 #include "write.h"
-static int mNx, mNy, mNz, mNelements;
+static int mNx, mNy, mNz;
 static float *D3D(const char *path) {
   float *mData;
   FILE *file;
   int header[6];
+  int mNelements;
   if ((file = fopen(path, "r")) == NULL) {
     fprintf(stderr, "%s:%d: error: fail to open '%s'\n", __FILE__, __LINE__,
             path);
     return NULL;
   }
-  fread(header, sizeof header, 1, file);
+  if (fread(header, sizeof header, 1, file) != 1) {
+    fprintf(stderr, "%s:%d: error: fail to read '%s'\n", __FILE__, __LINE__,
+            path);
+    return NULL;
+  }
   assert(header[0] == 1234);
   assert(header[1] == 3);
   assert(header[5] == 1);
@@ -39,7 +44,11 @@ static float *D3D(const char *path) {
   mNy = header[3];
   mNz = header[4];
   mData = (float *)malloc(mNelements * sizeof *mData);
-  fread(mData, mNelements, sizeof *mData, file);
+  if (fread(mData, sizeof *mData, mNelements, file) != mNelements) {
+    fprintf(stderr, "%s:%d: error: fail to read '%s'\n", __FILE__, __LINE__,
+            path);
+    return NULL;
+  }
   fclose(file);
   return mData;
 }
@@ -237,10 +246,7 @@ int main(int argc, const char **argv) {
   typedef MRAG::_WAVELET_TYPE W;
   const int nThreads = 1;
   typedef MRAG::Multithreading::BlockProcessing_SingleCPU<B> BlockProcessing;
-  MRAG::Grid<W, B> *grid;
   BlockProcessing blockProcessing;
-  MRAG::Refiner_SpaceExtension *refiner;
-  MRAG::Compressor *compressor;
   MRAG::BlockFWT<W, B, RD_Projector_Wavelets> blockfwt;
   MRAG::SpaceTimeSorter stSorter;
   MRAG::BlockLab<B> lab;
@@ -250,13 +256,13 @@ int main(int argc, const char **argv) {
   Real tumor_ic[3];
   int maxStencil[2][3] = {-1, -1, -1, +2, +2, +2};
 
-  refiner = new MRAG::Refiner_SpaceExtension(resJump, maxLevel);
-  compressor = new MRAG::Compressor(resJump);
-  grid = new MRAG::Grid<W, B>(blocksPerDimension, blocksPerDimension,
-                              blocksPerDimension, maxStencil);
-  grid->setCompressor(compressor);
-  grid->setRefiner(refiner);
-  stSorter.connect(*grid);
+  MRAG::Refiner_SpaceExtension refiner(resJump, maxLevel);
+  MRAG::Compressor compressor(resJump);
+  MRAG::Grid<W, B> grid(blocksPerDimension, blocksPerDimension,
+                        blocksPerDimension, maxStencil);
+  grid.setCompressor(&compressor);
+  grid.setRefiner(&refiner);
+  stSorter.connect(grid);
 
   L = 1;
   tumor_ic[0] = 0.6497946102507519;
@@ -282,10 +288,10 @@ int main(int argc, const char **argv) {
   const Real h0 = 1. / 128;
   const Real iw = 1. / (smooth_sup * h0);
   Real pGM, pWM;
-  vector<MRAG::BlockInfo> vInfo = grid->getBlocksInfo();
+  vector<MRAG::BlockInfo> vInfo = grid.getBlocksInfo();
   for (int i = 0; i < vInfo.size(); i++) {
     MRAG::BlockInfo &info = vInfo[i];
-    B &block = grid->getBlockCollection()[info.blockID];
+    B &block = grid.getBlockCollection()[info.blockID];
 
     for (int iz = 0; iz < B::sizeZ; iz++)
       for (int iy = 0; iy < B::sizeY; iy++)
@@ -321,18 +327,18 @@ int main(int argc, const char **argv) {
           }
         }
 
-    grid->getBlockCollection().release(info.blockID);
+    grid.getBlockCollection().release(info.blockID);
   }
 
   whenToWriteOffset = 50;
   whenToWrite = whenToWriteOffset;
 
-  const int nParallelGranularity = (grid->getBlocksInfo().size() <= 8 ? 1 : 4);
-  MRAG::BoundaryInfo *boundaryInfo = &grid->getBoundaryInfo();
+  const int nParallelGranularity = (grid.getBlocksInfo().size() <= 8 ? 1 : 4);
+  MRAG::BoundaryInfo *boundaryInfo = &grid.getBoundaryInfo();
   Real Dw, Dg, rho, tend;
   Dw = 0.0013;
   rho = 0.025;
-  tend = 3000;
+  tend = 300;
   Dw = Dw / (L * L);
   Dg = 0.1 * Dw;
   char path[FILENAME_MAX - 9];
@@ -340,17 +346,17 @@ int main(int argc, const char **argv) {
   Real t = 0.0;
   Real h = 1. / (blockSize * blocksPerDimension);
   Real dt = 0.99 * h * h / (2. * 3 * max(Dw, Dg));
-  MRAG::Science::AutomaticRefinement<0, 0>(*grid, blockfwt,
-                                           refinement_tolerance, maxLevel, 1);
-  MRAG::Science::AutomaticCompression<0, 0>(*grid, blockfwt,
+  MRAG::Science::AutomaticRefinement<0, 0>(grid, blockfwt, refinement_tolerance,
+                                           maxLevel, 1);
+  MRAG::Science::AutomaticCompression<0, 0>(grid, blockfwt,
                                             compression_tolerance, -1);
   ReactionDiffusionOperator rhs(Dw, Dg, rho);
   UpdateTumor updateTumor(dt);
-  const MRAG::BlockCollection<B> &collecton = grid->getBlockCollection();
+  const MRAG::BlockCollection<B> &collecton = grid.getBlockCollection();
 
   step = 0;
   while (t <= tend) {
-    vInfo = grid->getBlocksInfo();
+    vInfo = grid.getBlocksInfo();
     blockProcessing.pipeline_process(vInfo, collecton, *boundaryInfo, rhs);
     BlockProcessing::process(vInfo, collecton, updateTumor,
                              nParallelGranularity);
@@ -358,24 +364,24 @@ int main(int argc, const char **argv) {
     step++;
     if (t >= whenToWrite) {
       MRAG::Science::AutomaticRefinement<0, 0>(
-          *grid, blockfwt, refinement_tolerance, maxLevel, 1);
+          grid, blockfwt, refinement_tolerance, maxLevel, 1);
       sprintf(path, "a.%09d", step);
-      write<W, B, MRAG::BlockLab<B>>(grid, boundaryInfo, path);
+      write<W, B, MRAG::BlockLab<B>>(&grid, boundaryInfo, path);
       whenToWrite = whenToWrite + whenToWriteOffset;
     }
   }
-  MRAG::Science::AutomaticRefinement<0, 0>(*grid, blockfwt,
-                                           refinement_tolerance, maxLevel, 1);
+  MRAG::Science::AutomaticRefinement<0, 0>(grid, blockfwt, refinement_tolerance,
+                                           maxLevel, 1);
   float *d;
   FILE *file;
   int gpd = blocksPerDimension * blockSize;
   double hf = 1. / gpd;
   double eps = hf * 0.5;
   d = (float *)malloc(gpd * gpd * gpd * sizeof *d);
-  vInfo = grid->getBlocksInfo();
+  vInfo = grid.getBlocksInfo();
   for (int i = 0; i < vInfo.size(); i++) {
     MRAG::BlockInfo &info = vInfo[i];
-    B &block = grid->getBlockCollection()[info.blockID];
+    B &block = grid.getBlockCollection()[info.blockID];
     double h = info.h[0];
     for (int iz = 0; iz < B::sizeZ; iz++)
       for (int iy = 0; iy < B::sizeY; iy++)
