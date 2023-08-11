@@ -21,7 +21,7 @@ namespace MRAG
 	protected:
 		const int m_nMaxLevelJump;
 		
-		template <typename C, typename K> const bool _isFound(const C& c, const K& k) const
+		template <typename C, typename K> bool _isFound(const C& c, const K& k) const
 		{
 			typename C::const_iterator it = c.find(k);
 			return (it != c.end() );
@@ -29,7 +29,7 @@ namespace MRAG
 		
 	public:
 		
-		const int getMaxLevelJump() const
+		int getMaxLevelJump() const
 		{
 			return m_nMaxLevelJump;
 		}

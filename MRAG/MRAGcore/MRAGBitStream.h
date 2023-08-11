@@ -117,7 +117,7 @@ namespace MRAG
 			printf("\n");
 		}
 		
-		const unsigned int getLength() const
+		unsigned int getLength() const
 		{
 			return 32*(word32_index) + bits_end;
 		}

@@ -79,7 +79,7 @@ public:
 	
 	virtual float getMemorySize(bool bCountTrashAlso=false) const;
 	
-	const float getBlockSize() const{ return sizeof(BlockType); }
+	float getBlockSize() const{ return sizeof(BlockType); }
 protected:
 
 	struct Chunk

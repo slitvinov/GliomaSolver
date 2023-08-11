@@ -38,7 +38,7 @@ namespace MRAG
 		
 		const GridNode * findLyingNode(const int level, const int index[3]) const;
 		
-		const int findLyingLevel(const int level, const int index[3]) const;
+		int findLyingLevel(const int level, const int index[3]) const;
 		
 		PointIndex * findData(const int level, I3& i, const GridNode ** node=NULL) const;
 		
@@ -297,7 +297,7 @@ namespace MRAG
 		return result;
 	}
 	
-	inline const int SmartBlockFinder::findLyingLevel(const int level, const int index[3]) const
+	inline int SmartBlockFinder::findLyingLevel(const int level, const int index[3]) const
 	{
 		return findLyingNode(level, index)->level;
 	}

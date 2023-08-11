@@ -92,7 +92,7 @@ namespace MRAG
 		int nChildrenBlocks;
 		int nCollapsedParentBlocks;
 		
-		const bool hasFailed() const { return bFailed; }
+		bool hasFailed() const { return bFailed; }
 		
 		RefinementResult(const bool bFailed_=false):nChildrenBlocks(0), nCollapsedParentBlocks(0), bFailed(bFailed_){}
 		

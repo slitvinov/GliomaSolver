@@ -81,7 +81,7 @@ struct I3
 	
 	I3(){ i[0] = i[1] = i[2] = 0;}
 	
-	const bool operator<(const I3& a) const
+	bool operator<(const I3& a) const
 	{
 		return (i[0]<a.i[0] || i[0]==a.i[0] && i[1]<a.i[1] ||  i[0]==a.i[0] && i[1]==a.i[1] && i[2]<a.i[2]);
 	}
@@ -125,12 +125,12 @@ struct I4
 	
 	I4(): x(0), y(0), z(0), l(0){}
 	
-	const bool operator<(const I4& i) const
+	bool operator<(const I4& i) const
 	{
 		return (l<i.l || l==i.l && x<i.x || l==i.l && x==i.x && y<i.y || l==i.l && x==i.x && y==i.y && z<i.z);
 	}
 	
-	const bool operator ==(const I4& i) const
+	bool operator ==(const I4& i) const
 	{
 		return l==i.l && x==i.x && y==i.y && z==i.z;
 	}
@@ -324,7 +324,7 @@ struct UniformPartition
 		passes_per_dim[2] =  (int)ceil(total_work[2]/(double)(work_per_thread[2]*nThreads[2]));
 	}
 	
-	const int passes_CPU()
+	int passes_CPU()
 	{
 		return passes_per_dim[0]*passes_per_dim[1]*passes_per_dim[2];
 	}
@@ -332,7 +332,7 @@ struct UniformPartition
 #ifdef _CUDA_SIDE
 	__device__
 #endif
-	const int passes()
+	int passes()
 	{
 		return passes_per_dim[0]*passes_per_dim[1]*passes_per_dim[2];
 	}

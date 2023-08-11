@@ -54,7 +54,7 @@ namespace MRAG
 		}
 		
 	public:
-		const int getMaxLevelJump() const
+		int getMaxLevelJump() const
 		{
 			return m_nMaxLevelJump;
 		}
