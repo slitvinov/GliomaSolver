@@ -334,8 +334,6 @@ int main(int, char **) {
 
   whenToWriteOffset = 50;
   whenToWrite = whenToWriteOffset;
-
-  const int nParallelGranularity = (grid.getBlocksInfo().size() <= 8 ? 1 : 4);
   MRAG::BoundaryInfo *boundaryInfo = &grid.getBoundaryInfo();
   Real Dw, Dg, rho, tend;
   Dw = 0.0013;
@@ -357,8 +355,7 @@ int main(int, char **) {
   while (t <= tend) {
     vInfo = grid.getBlocksInfo();
     blockProcessing.pipeline_process(vInfo, collecton, *boundaryInfo, rhs);
-    BlockProcessing::process(vInfo, collecton, updateTumor,
-                             nParallelGranularity);
+    BlockProcessing::process(vInfo, collecton, updateTumor);
     t += dt;
     step++;
     if (t >= whenToWrite) {
