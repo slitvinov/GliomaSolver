@@ -229,8 +229,6 @@ int main(int, char **) {
   Real rho, tend;
   double Dw, Dg;
   double tumorRadius, smooth_sup, h0, iw;
-  ReactionDiffusionOperator *rhs;
-  UpdateTumor *updateTumor;
   struct Brain0 {
     MRAG::Refiner_SpaceExtension *refiner;
     MRAG::Compressor *compressor;
@@ -238,6 +236,8 @@ int main(int, char **) {
     MRAG::BlockFWT<W, B, RD_Projector_Wavelets> *blockfwt;
     MRAG::SpaceTimeSorter *stSorter;
     BlockProcessing *blockProcessing;
+    ReactionDiffusionOperator *rhs;
+    UpdateTumor *updateTumor;
   } *brain0;
 
   brain0 = new Brain0;
@@ -327,14 +327,14 @@ int main(int, char **) {
                                            maxLevel, 1);
   MRAG::Science::AutomaticCompression<0, 0>(*brain0->grid, *brain0->blockfwt,
                                             compression_tolerance, -1);
-  rhs = new ReactionDiffusionOperator(Dw, Dg, rho);
-  updateTumor = new UpdateTumor(dt);
+  brain0->rhs = new ReactionDiffusionOperator(Dw, Dg, rho);
+  brain0->updateTumor = new UpdateTumor(dt);
   const MRAG::BlockCollection<B> &collecton = brain0->grid->getBlockCollection();
   step = 0;
   while (t <= tend) {
     vInfo = brain0->grid->getBlocksInfo();
-    brain0->blockProcessing->pipeline_process(vInfo, collecton, *boundaryInfo, *rhs);
-    BlockProcessing::process(vInfo, collecton, *updateTumor);
+    brain0->blockProcessing->pipeline_process(vInfo, collecton, *boundaryInfo, *brain0->rhs);
+    BlockProcessing::process(vInfo, collecton, *brain0->updateTumor);
     t += dt;
     step++;
     if (t >= whenToWrite) {
