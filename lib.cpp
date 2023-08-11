@@ -3,7 +3,6 @@
 #include <math.h>
 #include <assert.h>
 #include <vector>
-#include <algorithm>
 #include <set>
 #include "MRAGcore/MRAGCommon.h"
 #define _WAVELET_TYPE Wavelets_Interp2ndOrder
