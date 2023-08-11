@@ -117,6 +117,9 @@ namespace MRAG
 			delete &m_blockCollection;
 
 		//3.
+		delete m_blockCollapser;
+		delete m_blockSplitter;
+
 		m_refRefiner = NULL;
 		m_refCompressor = NULL;
 	}
