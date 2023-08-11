@@ -241,7 +241,6 @@ int main(int, char **) {
   } *brain0;
 
   brain0 = new Brain0;
-
   brain0->grid = new MRAG::Grid<W, B>(blocksPerDimension, blocksPerDimension,
                         blocksPerDimension, maxStencil);
   brain0->blockfwt = new MRAG::BlockFWT<W, B, RD_Projector_Wavelets>;
@@ -263,7 +262,7 @@ int main(int, char **) {
   Dw = 0.0013;
   rho = 0.025;
   tend = 300;
-  brain_ini(nx, ny, nz, GM, WM, Dw, rho, &brain);
+  brain_ini(nx, ny, nz, GM, WM, ic, Dw, rho, &brain);
   brainSizeMax = max(nx, max(ny, nz));
   L = brainSizeMax * 0.1;
   printf("Characteristic Lenght L=%f \n", L);

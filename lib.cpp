@@ -3,6 +3,7 @@
 #include <math.h>
 #include <assert.h>
 #include <vector>
+#include <algorithm>
 #include <set>
 #include "MRAGcore/MRAGCommon.h"
 #define _WAVELET_TYPE Wavelets_Interp2ndOrder
@@ -214,13 +215,115 @@ struct Brain {
   UpdateTumor *updateTumor;
 };
 
-int brain_ini(int nx, int ny, int nz, float *GM, float *WM, double Dw,
+int brain_ini(int nx, int ny, int nz, const float *GM, const float *WM, const double *ic, double dw,
               double rho, struct Brain **pbrain) {
   struct Brain *brain;
+  int blocksPerDimension = 16;
+  int maxLevel = 4;
+  int resJump = 1;;
+  double refinement_tolerance = 1e-4;
+  double compression_tolerance = 1e-5;
+  double whenToWrite;
+  double whenToWriteOffset;
+  Real L;
+  int maxStencil[2][3] = {-1, -1, -1, +2, +2, +2};
+  int brainSizeMax;
+  double brainHx, brainHy, brainHz;
+  Real pGM, pWM;
+  double tissue;
+  int i, ix, iy, iz, cx, cy, cz;
+  Real x[3], dist, psi;
+  char path[FILENAME_MAX - 9];
+  int step;
+  int mappedBrainX, mappedBrainY, mappedBrainZ;
+  int index;
+  int mx, my, mz;
+  Real tend;
+  double tumorRadius, smooth_sup, h0, iw;
   if ((brain = (struct Brain *)malloc(sizeof *brain)) == NULL) {
     fprintf(stderr, "%s:%d: malloc failed\n", __FILE__, __LINE__);
     return 1;
   }
+  brain = new Brain;
+  brain->grid = new MRAG::Grid<W, B>(blocksPerDimension, blocksPerDimension,
+                        blocksPerDimension, maxStencil);
+  brain->blockfwt = new MRAG::BlockFWT<W, B, RD_Projector_Wavelets>;
+  brain->blockProcessing = new BlockProcessing;
+  brain->refiner = new MRAG::Refiner_SpaceExtension(resJump, maxLevel);
+  brain->compressor = new MRAG::Compressor(resJump);
+  brain->stSorter = new MRAG::SpaceTimeSorter;
+
+  brain->grid->setCompressor(brain->compressor);
+  brain->grid->setRefiner(brain->refiner);
+  brain->stSorter->connect(*brain->grid);
+
+  L = 1;
+  tend = 300;
+  brainSizeMax = max(nx, max(ny, nz));
+  L = brainSizeMax * 0.1;
+  printf("Characteristic Lenght L=%f \n", L);
+  brainHx = 1.0 / ((double)(brainSizeMax));
+  brainHy = 1.0 / ((double)(brainSizeMax));
+  brainHz = 1.0 / ((double)(brainSizeMax));
+  tumorRadius = 0.005;
+  smooth_sup = 2.;
+  h0 = 1. / 128;
+  iw = 1. / (smooth_sup * h0);
+  vector<MRAG::BlockInfo> vInfo = brain->grid->getBlocksInfo();
+  for (i = 0; i < vInfo.size(); i++) {
+    MRAG::BlockInfo &info = vInfo[i];
+    B &block = brain->grid->getBlockCollection()[info.blockID];
+    for (iz = 0; iz < B::sizeZ; iz++)
+      for (iy = 0; iy < B::sizeY; iy++)
+        for (ix = 0; ix < B::sizeX; ix++) {
+          info.pos(x, ix, iy, iz);
+
+          mappedBrainX = (int)floor(x[0] / brainHx);
+          mappedBrainY = (int)floor(x[1] / brainHy);
+          mappedBrainZ = (int)floor(x[2] / brainHz);
+          if ((mappedBrainX >= 0 && mappedBrainX < nx) &
+                  (mappedBrainY >= 0 && mappedBrainY < ny) &&
+              (mappedBrainZ >= 0 && mappedBrainZ < nz)) {
+            index = mappedBrainX + (mappedBrainY + mappedBrainZ * ny) * nx;
+            pGM = GM[index];
+            pWM = WM[index];
+            tissue = pWM + pGM;
+            tissue = pWM + pGM;
+            block(ix, iy, iz).p_w = (tissue > 0.) ? (pWM / tissue) : 0.;
+            block(ix, iy, iz).p_g = (tissue > 0.) ? (pGM / tissue) : 0.;
+            const Real p[3] = {x[0] - (Real)ic[0], x[1] - (Real)ic[1],
+                               x[2] - (Real)ic[2]};
+            dist = sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
+            psi = (dist - tumorRadius) * iw;
+            if ((psi < -1) && (pGM + pWM > 0.001))
+              block(ix, iy, iz).phi = 1.0;
+            else if (((-1 <= psi) && (psi <= 1)) && (pGM + pWM > 0))
+              block(ix, iy, iz).phi =
+                  1.0 * 0.5 * (1 - psi - sin(M_PI * psi) / (M_PI));
+            else
+              block(ix, iy, iz).phi = 0.0;
+          }
+        }
+
+    brain->grid->getBlockCollection().release(info.blockID);
+  }
+  whenToWriteOffset = 50;
+  whenToWrite = whenToWriteOffset;
+  MRAG::BoundaryInfo *boundaryInfo = &brain->grid->getBoundaryInfo();
+  Real Dw = dw / (L * L);
+  Real Dg = 0.1 * Dw;
+  Real t = 0.0;
+  Real h = 1. / (blockSize * blocksPerDimension);
+  Real dt = 0.99 * h * h / (2. * 3 * max(Dw, Dg));
+  MRAG::Science::AutomaticRefinement<0, 0>(*brain->grid, *brain->blockfwt, refinement_tolerance,
+                                           maxLevel, 1);
+  MRAG::Science::AutomaticCompression<0, 0>(*brain->grid, *brain->blockfwt,
+                                            compression_tolerance, -1);
+  brain->rhs = new ReactionDiffusionOperator(Dw, Dg, rho);
+  brain->updateTumor = new UpdateTumor(dt);
+  const MRAG::BlockCollection<B> &collecton = brain->grid->getBlockCollection();
+  step = 0;
+  
   *pbrain = brain;
   return 0;
 }
