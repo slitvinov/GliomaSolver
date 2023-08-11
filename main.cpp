@@ -198,6 +198,7 @@ template <typename T, int i> inline Real RD_projector_impl_wav(const T &t) {
 make_projector(RD_Projector_Wavelets, RD_projector_impl_wav);
 
 int main(int, char **) {
+  struct Brain *brain;
   const int blockSize = _BLOCKSIZE_;
   const int blockSizeZ = _BLOCKSIZE_;
   const int blocksPerDimension = _BPD_;
@@ -234,6 +235,8 @@ int main(int, char **) {
   int index;
   int mx, my, mz;
   int nx, ny, nz;
+  Real rho, tend;
+  double Dw, Dg;
 
   grid.setCompressor(&compressor);
   grid.setRefiner(&refiner);
@@ -245,6 +248,10 @@ int main(int, char **) {
   tumor_ic[2] = 0.3715947899171972;
   GM = brain_read("GM.dat", &nx, &ny, &nz);
   WM = brain_read("WM.dat", &nx, &ny, &nz);
+  Dw = 0.0013;
+  rho = 0.025;
+  tend = 300;
+  brain_ini(nx, ny, nz, GM, WM, Dw, rho, &brain);
   brainSizeX = nx;
   brainSizeY = ny;
   brainSizeZ = nz;
@@ -306,10 +313,6 @@ int main(int, char **) {
   whenToWriteOffset = 50;
   whenToWrite = whenToWriteOffset;
   MRAG::BoundaryInfo *boundaryInfo = &grid.getBoundaryInfo();
-  Real Dw, Dg, rho, tend;
-  Dw = 0.0013;
-  rho = 0.025;
-  tend = 300;
   Dw = Dw / (L * L);
   Dg = 0.1 * Dw;
   Real t = 0.0;
@@ -389,4 +392,5 @@ int main(int, char **) {
   fwrite(d, gpd * gpd * gpd, sizeof *d, file);
   fclose(file);
   free(d);
+  brain_fin(brain);
 }
