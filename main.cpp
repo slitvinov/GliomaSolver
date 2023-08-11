@@ -181,7 +181,7 @@ struct UpdateTumor {
   UpdateTumor(const UpdateTumor &copy) : dt(copy.dt) {}
 
   template <typename BlockType>
-  inline void operator()(const MRAG::BlockInfo &info, BlockType &o) const {
+  inline void operator()(const MRAG::BlockInfo &, BlockType &o) const {
     for (int iz = 0; iz < BlockType::sizeZ; iz++)
       for (int iy = 0; iy < BlockType::sizeY; iy++)
         for (int ix = 0; ix < BlockType::sizeX; ix++) {
@@ -233,7 +233,7 @@ template <typename T, int i> inline Real RD_projector_impl_wav(const T &t) {
 
 make_projector(RD_Projector_Wavelets, RD_projector_impl_wav);
 
-int main(int argc, const char **argv) {
+int main(int, char **) {
   const int blockSize = _BLOCKSIZE_;
   const int blockSizeZ = _BLOCKSIZE_;
   const int blocksPerDimension = _BPD_;
