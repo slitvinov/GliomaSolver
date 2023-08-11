@@ -15,11 +15,9 @@ int main(void) {
   double whenToWriteOffset;
   double ic[3];
   float *GM, *WM, *d;
-  float t, h, dt;
   char path[FILENAME_MAX - 9];
   int nx, ny, nz, step, gpd;
-  double Dw, Dg;
-  double rho, tend;
+  double Dw, Dg, rho, tend, h, L, t, dt;
   FILE *file;
   
   ic[0] = 0.6497946102507519;
@@ -30,7 +28,12 @@ int main(void) {
   Dw = 0.0013;
   rho = 0.025;
   tend = 300;
-  brain_ini(nx, ny, nz, GM, WM, ic, Dw, rho, &brain);
+  L = 1;
+  Dw = Dw / (L * L);
+  Dg = 0.1 * Dw;
+  h = 1. / (blockSize * blocksPerDimension);
+  dt = 0.99 * h * h / (2. * 3 * max(Dw, Dg));
+  brain_ini(nx, ny, nz, GM, WM, ic, Dw, Dg, rho, dt, &brain);
   free(GM);
   free(WM);
   whenToWriteOffset = 50;
@@ -38,7 +41,7 @@ int main(void) {
   t = 0.0;
   int brainSizeMax;  
   brainSizeMax = max(nx, max(ny, nz));
-  float L = brainSizeMax * 0.1;
+  L = brainSizeMax * 0.1;
   h = 1. / (blockSize * blocksPerDimension);
   Dw = Dw / (L * L);
   Dg = 0.1 * Dw;  

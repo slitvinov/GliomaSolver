@@ -213,8 +213,8 @@ struct Brain {
   UpdateTumor *updateTumor;
 };
 
-int brain_ini(int nx, int ny, int nz, const float *GM, const float *WM, const double *ic, double dw,
-              double rho, struct Brain **pbrain) {
+int brain_ini(int nx, int ny, int nz, const float *GM, const float *WM, const double *ic, double Dw, double Dg,
+              double rho, double dt, struct Brain **pbrain) {
   struct Brain *brain;
   int blocksPerDimension = 16;
   int maxLevel = 4;
@@ -298,10 +298,6 @@ int brain_ini(int nx, int ny, int nz, const float *GM, const float *WM, const do
 
     brain->grid->getBlockCollection().release(info.blockID);
   }
-  Real Dw = dw / (L * L);
-  Real Dg = 0.1 * Dw;
-  Real h = 1. / (blockSize * blocksPerDimension);
-  double dt = 0.99 * h * h / (2. * 3 * max(Dw, Dg));
   MRAG::Science::AutomaticRefinement<0, 0>(*brain->grid, *brain->blockfwt, refinement_tolerance,
                                            maxLevel, 1);
   MRAG::Science::AutomaticCompression<0, 0>(*brain->grid, *brain->blockfwt,
