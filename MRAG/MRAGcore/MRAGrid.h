@@ -14,7 +14,6 @@
 #undef max
 using namespace std;
 
-#include "MRAGGridNode.h"
 #include "MRAGCompressor.h"
 #include "MRAGRefinementPlan.h"
 #include "MRAGCommon.h"
