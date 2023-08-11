@@ -229,24 +229,30 @@ int main(int, char **) {
   Real rho, tend;
   double Dw, Dg;
   double tumorRadius, smooth_sup, h0, iw;
-  MRAG::Refiner_SpaceExtension *refiner;
-  MRAG::Compressor *compressor;
-  MRAG::Grid<W, B> *grid;
-  MRAG::BlockFWT<W, B, RD_Projector_Wavelets> *blockfwt;
-  MRAG::SpaceTimeSorter *stSorter;
-  BlockProcessing *blockProcessing;
+  ReactionDiffusionOperator *rhs;
+  UpdateTumor *updateTumor;
+  struct Brain0 {
+    MRAG::Refiner_SpaceExtension *refiner;
+    MRAG::Compressor *compressor;
+    MRAG::Grid<W, B> *grid;
+    MRAG::BlockFWT<W, B, RD_Projector_Wavelets> *blockfwt;
+    MRAG::SpaceTimeSorter *stSorter;
+    BlockProcessing *blockProcessing;
+  } *brain0;
 
-  grid = new MRAG::Grid<W, B>(blocksPerDimension, blocksPerDimension,
+  brain0 = new Brain0;
+
+  brain0->grid = new MRAG::Grid<W, B>(blocksPerDimension, blocksPerDimension,
                         blocksPerDimension, maxStencil);
-  blockfwt = new MRAG::BlockFWT<W, B, RD_Projector_Wavelets>;
-  blockProcessing = new BlockProcessing;
-  refiner = new MRAG::Refiner_SpaceExtension(resJump, maxLevel);
-  compressor = new MRAG::Compressor(resJump);
-  stSorter = new MRAG::SpaceTimeSorter;
+  brain0->blockfwt = new MRAG::BlockFWT<W, B, RD_Projector_Wavelets>;
+  brain0->blockProcessing = new BlockProcessing;
+  brain0->refiner = new MRAG::Refiner_SpaceExtension(resJump, maxLevel);
+  brain0->compressor = new MRAG::Compressor(resJump);
+  brain0->stSorter = new MRAG::SpaceTimeSorter;
 
-  grid->setCompressor(compressor);
-  grid->setRefiner(refiner);
-  stSorter->connect(*grid);
+  brain0->grid->setCompressor(brain0->compressor);
+  brain0->grid->setRefiner(brain0->refiner);
+  brain0->stSorter->connect(*brain0->grid);
 
   L = 1;
   ic[0] = 0.6497946102507519;
@@ -268,10 +274,10 @@ int main(int, char **) {
   smooth_sup = 2.;
   h0 = 1. / 128;
   iw = 1. / (smooth_sup * h0);
-  vector<MRAG::BlockInfo> vInfo = grid->getBlocksInfo();
+  vector<MRAG::BlockInfo> vInfo = brain0->grid->getBlocksInfo();
   for (i = 0; i < vInfo.size(); i++) {
     MRAG::BlockInfo &info = vInfo[i];
-    B &block = grid->getBlockCollection()[info.blockID];
+    B &block = brain0->grid->getBlockCollection()[info.blockID];
     for (iz = 0; iz < B::sizeZ; iz++)
       for (iy = 0; iy < B::sizeY; iy++)
         for (ix = 0; ix < B::sizeX; ix++) {
@@ -304,42 +310,42 @@ int main(int, char **) {
           }
         }
 
-    grid->getBlockCollection().release(info.blockID);
+    brain0->grid->getBlockCollection().release(info.blockID);
   }
   free(GM);
   free(WM);
 
   whenToWriteOffset = 50;
   whenToWrite = whenToWriteOffset;
-  MRAG::BoundaryInfo *boundaryInfo = &grid->getBoundaryInfo();
+  MRAG::BoundaryInfo *boundaryInfo = &brain0->grid->getBoundaryInfo();
   Dw = Dw / (L * L);
   Dg = 0.1 * Dw;
   Real t = 0.0;
   Real h = 1. / (blockSize * blocksPerDimension);
   Real dt = 0.99 * h * h / (2. * 3 * max(Dw, Dg));
-  MRAG::Science::AutomaticRefinement<0, 0>(*grid, *blockfwt, refinement_tolerance,
+  MRAG::Science::AutomaticRefinement<0, 0>(*brain0->grid, *brain0->blockfwt, refinement_tolerance,
                                            maxLevel, 1);
-  MRAG::Science::AutomaticCompression<0, 0>(*grid, *blockfwt,
+  MRAG::Science::AutomaticCompression<0, 0>(*brain0->grid, *brain0->blockfwt,
                                             compression_tolerance, -1);
-  ReactionDiffusionOperator rhs(Dw, Dg, rho);
-  UpdateTumor updateTumor(dt);
-  const MRAG::BlockCollection<B> &collecton = grid->getBlockCollection();
+  rhs = new ReactionDiffusionOperator(Dw, Dg, rho);
+  updateTumor = new UpdateTumor(dt);
+  const MRAG::BlockCollection<B> &collecton = brain0->grid->getBlockCollection();
   step = 0;
   while (t <= tend) {
-    vInfo = grid->getBlocksInfo();
-    blockProcessing->pipeline_process(vInfo, collecton, *boundaryInfo, rhs);
-    BlockProcessing::process(vInfo, collecton, updateTumor);
+    vInfo = brain0->grid->getBlocksInfo();
+    brain0->blockProcessing->pipeline_process(vInfo, collecton, *boundaryInfo, *rhs);
+    BlockProcessing::process(vInfo, collecton, *updateTumor);
     t += dt;
     step++;
     if (t >= whenToWrite) {
       MRAG::Science::AutomaticRefinement<0, 0>(
-          *grid, *blockfwt, refinement_tolerance, maxLevel, 1);
+          *brain0->grid, *brain0->blockfwt, refinement_tolerance, maxLevel, 1);
       sprintf(path, "a.%09d", step);
-      write<W, B, MRAG::BlockLab<B>>(grid, boundaryInfo, path);
+      write<W, B, MRAG::BlockLab<B>>(brain0->grid, boundaryInfo, path);
       whenToWrite = whenToWrite + whenToWriteOffset;
     }
   }
-  MRAG::Science::AutomaticRefinement<0, 0>(*grid, *blockfwt, refinement_tolerance,
+  MRAG::Science::AutomaticRefinement<0, 0>(*brain0->grid, *brain0->blockfwt, refinement_tolerance,
                                            maxLevel, 1);
   float *d;
   FILE *file;
@@ -347,10 +353,10 @@ int main(int, char **) {
   double hf = 1. / gpd;
   double eps = hf * 0.5;
   d = (float *)malloc(gpd * gpd * gpd * sizeof *d);
-  vInfo = grid->getBlocksInfo();
+  vInfo = brain0->grid->getBlocksInfo();
   for (int i = 0; i < vInfo.size(); i++) {
     MRAG::BlockInfo &info = vInfo[i];
-    B &block = grid->getBlockCollection()[info.blockID];
+    B &block = brain0->grid->getBlockCollection()[info.blockID];
     double h = info.h[0];
     for (iz = 0; iz < B::sizeZ; iz++)
       for (iy = 0; iy < B::sizeY; iy++)
