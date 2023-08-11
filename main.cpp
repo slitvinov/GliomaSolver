@@ -208,18 +208,11 @@ int main(int, char **) {
   int resJump = 1;;
   const double refinement_tolerance = 1e-4;
   const double compression_tolerance = 1e-5;
-  BlockProcessing blockProcessing;
-  MRAG::BlockFWT<W, B, RD_Projector_Wavelets> blockfwt;
-  MRAG::SpaceTimeSorter stSorter;
-  MRAG::BlockLab<B> lab;
   double whenToWrite;
   double whenToWriteOffset;
   Real L;
   double ic[3];
   int maxStencil[2][3] = {-1, -1, -1, +2, +2, +2};
-  MRAG::Refiner_SpaceExtension refiner(resJump, maxLevel);
-  MRAG::Compressor compressor(resJump);
-  MRAG::Grid<W, B> *grid;
   float *GM, *WM;
   int brainSizeMax;
   double brainHx, brainHy, brainHz;
@@ -236,13 +229,24 @@ int main(int, char **) {
   Real rho, tend;
   double Dw, Dg;
   double tumorRadius, smooth_sup, h0, iw;
+  MRAG::Refiner_SpaceExtension *refiner;
+  MRAG::Compressor *compressor;
+  MRAG::Grid<W, B> *grid;
+  MRAG::BlockFWT<W, B, RD_Projector_Wavelets> *blockfwt;
+  MRAG::SpaceTimeSorter *stSorter;
+  BlockProcessing *blockProcessing;
 
   grid = new MRAG::Grid<W, B>(blocksPerDimension, blocksPerDimension,
                         blocksPerDimension, maxStencil);
+  blockfwt = new MRAG::BlockFWT<W, B, RD_Projector_Wavelets>;
+  blockProcessing = new BlockProcessing;
+  refiner = new MRAG::Refiner_SpaceExtension(resJump, maxLevel);
+  compressor = new MRAG::Compressor(resJump);
+  stSorter = new MRAG::SpaceTimeSorter;
 
-  grid->setCompressor(&compressor);
-  grid->setRefiner(&refiner);
-  stSorter.connect(*grid);
+  grid->setCompressor(compressor);
+  grid->setRefiner(refiner);
+  stSorter->connect(*grid);
 
   L = 1;
   ic[0] = 0.6497946102507519;
@@ -313,9 +317,9 @@ int main(int, char **) {
   Real t = 0.0;
   Real h = 1. / (blockSize * blocksPerDimension);
   Real dt = 0.99 * h * h / (2. * 3 * max(Dw, Dg));
-  MRAG::Science::AutomaticRefinement<0, 0>(*grid, blockfwt, refinement_tolerance,
+  MRAG::Science::AutomaticRefinement<0, 0>(*grid, *blockfwt, refinement_tolerance,
                                            maxLevel, 1);
-  MRAG::Science::AutomaticCompression<0, 0>(*grid, blockfwt,
+  MRAG::Science::AutomaticCompression<0, 0>(*grid, *blockfwt,
                                             compression_tolerance, -1);
   ReactionDiffusionOperator rhs(Dw, Dg, rho);
   UpdateTumor updateTumor(dt);
@@ -323,19 +327,19 @@ int main(int, char **) {
   step = 0;
   while (t <= tend) {
     vInfo = grid->getBlocksInfo();
-    blockProcessing.pipeline_process(vInfo, collecton, *boundaryInfo, rhs);
+    blockProcessing->pipeline_process(vInfo, collecton, *boundaryInfo, rhs);
     BlockProcessing::process(vInfo, collecton, updateTumor);
     t += dt;
     step++;
     if (t >= whenToWrite) {
       MRAG::Science::AutomaticRefinement<0, 0>(
-          *grid, blockfwt, refinement_tolerance, maxLevel, 1);
+          *grid, *blockfwt, refinement_tolerance, maxLevel, 1);
       sprintf(path, "a.%09d", step);
       write<W, B, MRAG::BlockLab<B>>(grid, boundaryInfo, path);
       whenToWrite = whenToWrite + whenToWriteOffset;
     }
   }
-  MRAG::Science::AutomaticRefinement<0, 0>(*grid, blockfwt, refinement_tolerance,
+  MRAG::Science::AutomaticRefinement<0, 0>(*grid, *blockfwt, refinement_tolerance,
                                            maxLevel, 1);
   float *d;
   FILE *file;
