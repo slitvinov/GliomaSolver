@@ -7,19 +7,10 @@
  *
  */
 #pragma once
-#undef min
-#undef max
-#include <map>
-#undef min
-#undef max
 using namespace std;
 
 #include "MRAGCompressor.h"
-#include "MRAGRefinementPlan.h"
-#include "MRAGCommon.h"
 #include "MRAGBoundaryBlockInfo.h"
-#include "MRAGBlockCollection.h"
-#include "MRAGMatrix2D.h"
 #include "MRAGBlockCollapser.h"
 #include "MRAGBlockSplitter.h"
 
