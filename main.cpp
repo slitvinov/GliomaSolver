@@ -18,10 +18,11 @@ int main(int, char **) {
   int maxStencil[2][3] = {-1, -1, -1, +2, +2, +2};
   float *GM, *WM, *d;
   char path[FILENAME_MAX - 9];
-  int step;
-  int nx, ny, nz;
+  int nx, ny, nz, step, gpd;
   double Dw, Dg;
   double rho, tend;
+  FILE *file;
+  
   ic[0] = 0.6497946102507519;
   ic[1] = 0.5908331665234543;
   ic[2] = 0.3715947899171972;
@@ -49,8 +50,7 @@ int main(int, char **) {
       whenToWrite = whenToWrite + whenToWriteOffset;
     }
   }
-  FILE *file;
-  int gpd = blocksPerDimension * blockSize;
+  gpd = blocksPerDimension * blockSize;
   d = (float *)malloc(gpd * gpd * gpd * sizeof *d);
   brain_project(brain, d);
   file = fopen("HGG_data.dat", "w");
