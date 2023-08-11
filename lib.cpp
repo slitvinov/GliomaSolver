@@ -203,7 +203,16 @@ template <typename T, int i> inline Real RD_projector_impl_wav(const T &t) {
 make_projector(RD_Projector_Wavelets, RD_projector_impl_wav);
 
 
-struct Brain {};
+struct Brain {
+  MRAG::Refiner_SpaceExtension *refiner;
+  MRAG::Compressor *compressor;
+  MRAG::Grid<W, B> *grid;
+  MRAG::BlockFWT<W, B, RD_Projector_Wavelets> *blockfwt;
+  MRAG::SpaceTimeSorter *stSorter;
+  BlockProcessing *blockProcessing;
+  ReactionDiffusionOperator *rhs;
+  UpdateTumor *updateTumor;
+};
 
 int brain_ini(int nx, int ny, int nz, float *GM, float *WM, double Dw,
               double rho, struct Brain **pbrain) {
