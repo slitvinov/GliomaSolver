@@ -201,9 +201,9 @@ int main(int, char **) {
   struct Brain *brain;
   const int blockSize = _BLOCKSIZE_;
   const int blockSizeZ = _BLOCKSIZE_;
-  const int blocksPerDimension = _BPD_;
-  const int maxLevel = _MAXLEVEL_;
-  const int resJump = _RESJUMP_;
+  int blocksPerDimension = 16;
+  int maxLevel = 4;
+  int resJump = 1;;
   const double refinement_tolerance = 1e-4;
   const double compression_tolerance = 1e-5;
   typedef MRAG::Block<Cell, blockSize, blockSize, blockSizeZ> B;
