@@ -237,6 +237,7 @@ int main(int, char **) {
   int nx, ny, nz;
   Real rho, tend;
   double Dw, Dg;
+  double tumorRadius, smooth_sup, h0, iw;
 
   grid.setCompressor(&compressor);
   grid.setRefiner(&refiner);
@@ -258,15 +259,14 @@ int main(int, char **) {
   brainHx = 1.0 / ((double)(brainSizeMax));
   brainHy = 1.0 / ((double)(brainSizeMax));
   brainHz = 1.0 / ((double)(brainSizeMax));
-  const Real tumorRadius = 0.005;
-  const Real smooth_sup = 2.;
-  const Real h0 = 1. / 128;
-  const Real iw = 1. / (smooth_sup * h0);
+  tumorRadius = 0.005;
+  smooth_sup = 2.;
+  h0 = 1. / 128;
+  iw = 1. / (smooth_sup * h0);
   vector<MRAG::BlockInfo> vInfo = grid.getBlocksInfo();
   for (i = 0; i < vInfo.size(); i++) {
     MRAG::BlockInfo &info = vInfo[i];
     B &block = grid.getBlockCollection()[info.blockID];
-
     for (iz = 0; iz < B::sizeZ; iz++)
       for (iy = 0; iy < B::sizeY; iy++)
         for (ix = 0; ix < B::sizeX; ix++) {
