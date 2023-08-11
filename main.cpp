@@ -21,7 +21,7 @@ using namespace std;
 #include "MRAGmultithreading/MRAGBlockProcessing_SingleCPU.h"
 #include "write.h"
 static float *D3D(const char *path, int *nx, int *ny, int *nz) {
-  float *mData;
+  float *d;
   FILE *file;
   int32_t header[6];
   int n;
@@ -35,22 +35,35 @@ static float *D3D(const char *path, int *nx, int *ny, int *nz) {
             path);
     return NULL;
   }
-  assert(header[0] == 1234);
-  assert(header[1] == 3);
-  assert(header[5] == 1);
+  if (header[0] != 1234) {
+    fprintf(stderr, "%s:%d: not a data file '%s'\n", __FILE__, __LINE__, path);
+    return NULL;
+  }
+  if (header[1] != 3) {
+    fprintf(stderr, "%s:%d: not a three dimensional file '%s'\n", __FILE__, __LINE__, path);
+    return NULL;
+  }
+  if (header[5] != 1) {
+    fprintf(stderr, "%s:%d: not a float32 file '%s'\n", __FILE__, __LINE__, path);
+    return NULL;
+  }
   n = header[2] * header[3] * header[4];
   *nx = header[2];
   *ny = header[3];
   *nz = header[4];
-  mData = (float *)malloc(n * sizeof *mData);
-  if (fread(mData, sizeof *mData, n, file) != n) {
+  if ((d = (float *)malloc(n * sizeof *d)) == NULL) {
+    fprintf(stderr, "%s:%d: malloc failed for '%s'\n", __FILE__, __LINE__, path);
+    return NULL;
+  }
+  if (fread(d, sizeof *d, n, file) != n) {
     fprintf(stderr, "%s:%d: error: fail to read '%s'\n", __FILE__, __LINE__,
             path);
     return NULL;
   }
   fclose(file);
-  return mData;
+  return d;
 }
+
 struct ReactionDiffusionOperator {
   int stencil_start[3];
   int stencil_end[3];
