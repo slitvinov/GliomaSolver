@@ -216,14 +216,14 @@ int main(int, char **) {
   double whenToWrite;
   double whenToWriteOffset;
   Real L;
-  Real tumor_ic[3];
+  Real ic[3];
   int maxStencil[2][3] = {-1, -1, -1, +2, +2, +2};
   MRAG::Refiner_SpaceExtension refiner(resJump, maxLevel);
   MRAG::Compressor compressor(resJump);
   MRAG::Grid<W, B> grid(blocksPerDimension, blocksPerDimension,
                         blocksPerDimension, maxStencil);
   float *GM, *WM;
-  int brainSizeX, brainSizeY, brainSizeZ, brainSizeMax;
+  int brainSizeMax;
   double brainHx, brainHy, brainHz;
   Real pGM, pWM;
   double tissue;
@@ -243,22 +243,16 @@ int main(int, char **) {
   stSorter.connect(grid);
 
   L = 1;
-  tumor_ic[0] = 0.6497946102507519;
-  tumor_ic[1] = 0.5908331665234543;
-  tumor_ic[2] = 0.3715947899171972;
+  ic[0] = 0.6497946102507519;
+  ic[1] = 0.5908331665234543;
+  ic[2] = 0.3715947899171972;
   GM = brain_read("GM.dat", &nx, &ny, &nz);
   WM = brain_read("WM.dat", &nx, &ny, &nz);
   Dw = 0.0013;
   rho = 0.025;
   tend = 300;
   brain_ini(nx, ny, nz, GM, WM, Dw, rho, &brain);
-  brainSizeX = nx;
-  brainSizeY = ny;
-  brainSizeZ = nz;
-  printf("brainSizeX=%i, brainSizeY=%i, brainSizeZ=%i \n", brainSizeX,
-         brainSizeY, brainSizeZ);
-
-  brainSizeMax = max(brainSizeX, max(brainSizeY, brainSizeZ));
+  brainSizeMax = max(nx, max(ny, nz));
   L = brainSizeMax * 0.1;
   printf("Characteristic Lenght L=%f \n", L);
   brainHx = 1.0 / ((double)(brainSizeMax));
@@ -281,9 +275,9 @@ int main(int, char **) {
           mappedBrainX = (int)floor(x[0] / brainHx);
           mappedBrainY = (int)floor(x[1] / brainHy);
           mappedBrainZ = (int)floor(x[2] / brainHz);
-          if ((mappedBrainX >= 0 && mappedBrainX < brainSizeX) &
-                  (mappedBrainY >= 0 && mappedBrainY < brainSizeY) &&
-              (mappedBrainZ >= 0 && mappedBrainZ < brainSizeZ)) {
+          if ((mappedBrainX >= 0 && mappedBrainX < nx) &
+                  (mappedBrainY >= 0 && mappedBrainY < ny) &&
+              (mappedBrainZ >= 0 && mappedBrainZ < nz)) {
             index = mappedBrainX + (mappedBrainY + mappedBrainZ * ny) * nx;
             pGM = GM[index];
             pWM = WM[index];
@@ -291,8 +285,8 @@ int main(int, char **) {
             tissue = pWM + pGM;
             block(ix, iy, iz).p_w = (tissue > 0.) ? (pWM / tissue) : 0.;
             block(ix, iy, iz).p_g = (tissue > 0.) ? (pGM / tissue) : 0.;
-            const Real p[3] = {x[0] - tumor_ic[0], x[1] - tumor_ic[1],
-                               x[2] - tumor_ic[2]};
+            const Real p[3] = {x[0] - ic[0], x[1] - ic[1],
+                               x[2] - ic[2]};
             const Real dist = sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
             const Real psi = (dist - tumorRadius) * iw;
             if ((psi < -1) && (pGM + pWM > 0.001))
