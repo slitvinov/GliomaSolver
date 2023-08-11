@@ -55,7 +55,6 @@ static float *D3D(const char *path) {
 struct ReactionDiffusionOperator {
   int stencil_start[3];
   int stencil_end[3];
-
   const Real Dw, Dg, rho;
 
   ReactionDiffusionOperator(const Real Dw_, const Real Dg_, const Real rho_)
@@ -84,10 +83,11 @@ struct ReactionDiffusionOperator {
                  // use to apply BC
     Real df_loc; // diffusion at the current point (local)
     Real eps;
-    for (int iz = 0; iz < BlockType::sizeZ; iz++)
-      for (int iy = 0; iy < BlockType::sizeY; iy++)
-        for (int ix = 0; ix < BlockType::sizeX; ix++) {
-          // check if we are in the brain domain
+    int iz, iy, ix;
+    double diffusionFluxIn, diffusionFluxOut, reactionFlux;
+    for (iz = 0; iz < BlockType::sizeZ; iz++)
+      for (iy = 0; iy < BlockType::sizeY; iy++)
+        for (ix = 0; ix < BlockType::sizeX; ix++) {
           if (lab(ix, iy, iz).p_w + lab(ix, iy, iz).p_g + lab(ix, iy, iz).phi >
               0.) {
             df_loc = lab(ix, iy, iz).p_w * Dw + lab(ix, iy, iz).p_g * Dg;
@@ -151,18 +151,17 @@ struct ReactionDiffusionOperator {
             if (chf[5] < eps) {
               df[4] *= 2.0;
             }
-            // diffusion fluxes
-            double diffusionFluxIn = ih2 * (df[0] * lab(ix - 1, iy, iz).phi +
-                                            df[1] * lab(ix + 1, iy, iz).phi +
-                                            df[2] * lab(ix, iy - 1, iz).phi +
-                                            df[3] * lab(ix, iy + 1, iz).phi +
-                                            df[4] * lab(ix, iy, iz - 1).phi +
-                                            df[5] * lab(ix, iy, iz + 1).phi);
+            diffusionFluxIn = ih2 * (df[0] * lab(ix - 1, iy, iz).phi +
+                                     df[1] * lab(ix + 1, iy, iz).phi +
+                                     df[2] * lab(ix, iy - 1, iz).phi +
+                                     df[3] * lab(ix, iy + 1, iz).phi +
+                                     df[4] * lab(ix, iy, iz - 1).phi +
+                                     df[5] * lab(ix, iy, iz + 1).phi);
 
-            double diffusionFluxOut =
+            diffusionFluxOut =
                 -((df[0] + df[1] + df[2] + df[3] + df[4] + df[5]) *
                   lab(ix, iy, iz).phi * ih2);
-            double reactionFlux =
+            reactionFlux =
                 rho * lab(ix, iy, iz).phi * (1. - lab(ix, iy, iz).phi);
 
             o(ix, iy, iz).dphidt =
@@ -182,9 +181,10 @@ struct UpdateTumor {
 
   template <typename BlockType>
   inline void operator()(const MRAG::BlockInfo &, BlockType &o) const {
-    for (int iz = 0; iz < BlockType::sizeZ; iz++)
-      for (int iy = 0; iy < BlockType::sizeY; iy++)
-        for (int ix = 0; ix < BlockType::sizeX; ix++) {
+    int ix, iy, iz;
+    for (iz = 0; iz < BlockType::sizeZ; iz++)
+      for (iy = 0; iy < BlockType::sizeY; iy++)
+        for (ix = 0; ix < BlockType::sizeX; ix++) {
           o(ix, iy, iz).phi += dt * o(ix, iy, iz).dphidt;
           o(ix, iy, iz).phi = max((Real)0., o(ix, iy, iz).phi);
           o(ix, iy, iz).phi = min((Real)1., o(ix, iy, iz).phi);
@@ -196,8 +196,6 @@ struct Cell {
   /* tumor */
   Real phi;
   Real dphidt;
-
-  /* tissue percentage per voxel*/
   Real p_g, p_w;
 
   Cell() {
@@ -225,12 +223,8 @@ inline Cell operator*(const Cell &p, Real v) {
 }
 
 template <typename T, int i> inline Real RD_projector_impl_wav(const T &t) {
-  // return i==0 ? (Real)(t.phi) : (Real)(t.p_w);  // for refinment w.r.t 2
-  // channels
   return (Real)(t.phi);
-  //    return (Real)(t.pff) ;
 }
-
 make_projector(RD_Projector_Wavelets, RD_projector_impl_wav);
 
 int main(int, char **) {
@@ -253,11 +247,23 @@ int main(int, char **) {
   Real L;
   Real tumor_ic[3];
   int maxStencil[2][3] = {-1, -1, -1, +2, +2, +2};
-
   MRAG::Refiner_SpaceExtension refiner(resJump, maxLevel);
   MRAG::Compressor compressor(resJump);
   MRAG::Grid<W, B> grid(blocksPerDimension, blocksPerDimension,
                         blocksPerDimension, maxStencil);
+  float *GM, *WM;
+  int brainSizeX, brainSizeY, brainSizeZ, brainSizeMax;
+  double brainHx, brainHy, brainHz;
+  Real pGM, pWM;
+  double tissue;
+  int i, ix, iy, iz, cx, cy, cz;
+  Real x[3];
+  char path[FILENAME_MAX - 9];
+  int step;
+  int mappedBrainX, mappedBrainY, mappedBrainZ;
+  int index;
+  int mx, my, mz;
+
   grid.setCompressor(&compressor);
   grid.setRefiner(&refiner);
   stSorter.connect(grid);
@@ -266,48 +272,44 @@ int main(int, char **) {
   tumor_ic[0] = 0.6497946102507519;
   tumor_ic[1] = 0.5908331665234543;
   tumor_ic[2] = 0.3715947899171972;
-  float *GM, *WM;
   GM = D3D("GM.dat");
   WM = D3D("WM.dat");
-  int brainSizeX = mNx;
-  int brainSizeY = mNy;
-  int brainSizeZ = mNz;
+  brainSizeX = mNx;
+  brainSizeY = mNy;
+  brainSizeZ = mNz;
   printf("brainSizeX=%i, brainSizeY=%i, brainSizeZ=%i \n", brainSizeX,
          brainSizeY, brainSizeZ);
 
-  int brainSizeMax = max(brainSizeX, max(brainSizeY, brainSizeZ));
+  brainSizeMax = max(brainSizeX, max(brainSizeY, brainSizeZ));
   L = brainSizeMax * 0.1;
   printf("Characteristic Lenght L=%f \n", L);
-  double brainHx = 1.0 / ((double)(brainSizeMax));
-  double brainHy = 1.0 / ((double)(brainSizeMax));
-  double brainHz = 1.0 / ((double)(brainSizeMax));
+  brainHx = 1.0 / ((double)(brainSizeMax));
+  brainHy = 1.0 / ((double)(brainSizeMax));
+  brainHz = 1.0 / ((double)(brainSizeMax));
   const Real tumorRadius = 0.005;
   const Real smooth_sup = 2.;
   const Real h0 = 1. / 128;
   const Real iw = 1. / (smooth_sup * h0);
-  Real pGM, pWM;
   vector<MRAG::BlockInfo> vInfo = grid.getBlocksInfo();
-  for (int i = 0; i < vInfo.size(); i++) {
+  for (i = 0; i < vInfo.size(); i++) {
     MRAG::BlockInfo &info = vInfo[i];
     B &block = grid.getBlockCollection()[info.blockID];
 
-    for (int iz = 0; iz < B::sizeZ; iz++)
-      for (int iy = 0; iy < B::sizeY; iy++)
-        for (int ix = 0; ix < B::sizeX; ix++) {
-          Real x[3];
+    for (iz = 0; iz < B::sizeZ; iz++)
+      for (iy = 0; iy < B::sizeY; iy++)
+        for (ix = 0; ix < B::sizeX; ix++) {
           info.pos(x, ix, iy, iz);
 
-          int mappedBrainX = (int)floor(x[0] / brainHx);
-          int mappedBrainY = (int)floor(x[1] / brainHy);
-          int mappedBrainZ = (int)floor(x[2] / brainHz);
+          mappedBrainX = (int)floor(x[0] / brainHx);
+          mappedBrainY = (int)floor(x[1] / brainHy);
+          mappedBrainZ = (int)floor(x[2] / brainHz);
           if ((mappedBrainX >= 0 && mappedBrainX < brainSizeX) &
                   (mappedBrainY >= 0 && mappedBrainY < brainSizeY) &&
               (mappedBrainZ >= 0 && mappedBrainZ < brainSizeZ)) {
-            int index =
-                mappedBrainX + (mappedBrainY + mappedBrainZ * mNy) * mNx;
+            index = mappedBrainX + (mappedBrainY + mappedBrainZ * mNy) * mNx;
             pGM = GM[index];
             pWM = WM[index];
-            double tissue = pWM + pGM;
+            tissue = pWM + pGM;
             tissue = pWM + pGM;
             block(ix, iy, iz).p_w = (tissue > 0.) ? (pWM / tissue) : 0.;
             block(ix, iy, iz).p_g = (tissue > 0.) ? (pGM / tissue) : 0.;
@@ -341,8 +343,6 @@ int main(int, char **) {
   tend = 300;
   Dw = Dw / (L * L);
   Dg = 0.1 * Dw;
-  char path[FILENAME_MAX - 9];
-  int step;
   Real t = 0.0;
   Real h = 1. / (blockSize * blocksPerDimension);
   Real dt = 0.99 * h * h / (2. * 3 * max(Dw, Dg));
@@ -353,7 +353,6 @@ int main(int, char **) {
   ReactionDiffusionOperator rhs(Dw, Dg, rho);
   UpdateTumor updateTumor(dt);
   const MRAG::BlockCollection<B> &collecton = grid.getBlockCollection();
-
   step = 0;
   while (t <= tend) {
     vInfo = grid.getBlocksInfo();
@@ -383,34 +382,33 @@ int main(int, char **) {
     MRAG::BlockInfo &info = vInfo[i];
     B &block = grid.getBlockCollection()[info.blockID];
     double h = info.h[0];
-    for (int iz = 0; iz < B::sizeZ; iz++)
-      for (int iy = 0; iy < B::sizeY; iy++)
-        for (int ix = 0; ix < B::sizeX; ix++) {
-          double x[3];
+    for (iz = 0; iz < B::sizeZ; iz++)
+      for (iy = 0; iy < B::sizeY; iy++)
+        for (ix = 0; ix < B::sizeX; ix++) {
           info.pos(x, ix, iy, iz);
-          int mx = (int)floor((x[0]) / hf);
-          int my = (int)floor((x[1]) / hf);
-          int mz = (int)floor((x[2]) / hf);
+          mx = (int)floor((x[0]) / hf);
+          my = (int)floor((x[1]) / hf);
+          mz = (int)floor((x[2]) / hf);
           if (h < hf + eps) {
             d[mx + (my + mz * gpd) * gpd] = block(ix, iy, iz).phi;
           } else if (h < 2. * hf + eps) {
-            for (int cz = 0; cz < 2; cz++)
-              for (int cy = 0; cy < 2; cy++)
-                for (int cx = 0; cx < 2; cx++) {
+            for (cz = 0; cz < 2; cz++)
+              for (cy = 0; cy < 2; cy++)
+                for (cx = 0; cx < 2; cx++) {
                   d[mx + cx + (my + cy + (mz + cz) * gpd) * gpd] =
                       block(ix, iy, iz).phi;
                 }
           } else if (h < 3. * hf + eps) {
-            for (int cz = 0; cz < 3; cz++)
-              for (int cy = 0; cy < 3; cy++)
-                for (int cx = 0; cx < 3; cx++) {
+            for (cz = 0; cz < 3; cz++)
+              for (cy = 0; cy < 3; cy++)
+                for (cx = 0; cx < 3; cx++) {
                   d[mx + cx + (my + cy + (mz + cz) * gpd) * gpd] =
                       block(ix, iy, iz).phi;
                 }
           } else {
-            for (int cz = 0; cz < 4; cz++)
-              for (int cy = 0; cy < 4; cy++)
-                for (int cx = 0; cx < 4; cx++) {
+            for (cz = 0; cz < 4; cz++)
+              for (cy = 0; cy < 4; cy++)
+                for (cx = 0; cx < 4; cx++) {
                   d[mx + cx + (my + cy + (mz + cz) * gpd) * gpd] =
                       block(ix, iy, iz).phi;
                 }
