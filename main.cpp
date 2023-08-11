@@ -20,12 +20,11 @@ using namespace std;
 #include "MRAGscience/MRAGRefiner_SpaceExtension.h"
 #include "MRAGmultithreading/MRAGBlockProcessing_SingleCPU.h"
 #include "write.h"
-static int mNx, mNy, mNz;
 static float *D3D(const char *path, int *nx, int *ny, int *nz) {
   float *mData;
   FILE *file;
-  int header[6];
-  int mNelements;
+  int32_t header[6];
+  int n;
   if ((file = fopen(path, "r")) == NULL) {
     fprintf(stderr, "%s:%d: error: fail to open '%s'\n", __FILE__, __LINE__,
             path);
@@ -39,12 +38,12 @@ static float *D3D(const char *path, int *nx, int *ny, int *nz) {
   assert(header[0] == 1234);
   assert(header[1] == 3);
   assert(header[5] == 1);
-  mNelements = header[2] * header[3] * header[4];
-  *nx = mNx = header[2];
-  *ny = mNy = header[3];
-  *nz = mNz = header[4];
-  mData = (float *)malloc(mNelements * sizeof *mData);
-  if (fread(mData, sizeof *mData, mNelements, file) != mNelements) {
+  n = header[2] * header[3] * header[4];
+  *nx = header[2];
+  *ny = header[3];
+  *nz = header[4];
+  mData = (float *)malloc(n * sizeof *mData);
+  if (fread(mData, sizeof *mData, n, file) != n) {
     fprintf(stderr, "%s:%d: error: fail to read '%s'\n", __FILE__, __LINE__,
             path);
     return NULL;
@@ -275,9 +274,9 @@ int main(int, char **) {
   tumor_ic[2] = 0.3715947899171972;
   GM = D3D("GM.dat", &nx, &ny, &nz);
   WM = D3D("WM.dat", &nx, &ny, &nz);
-  brainSizeX = mNx;
-  brainSizeY = mNy;
-  brainSizeZ = mNz;
+  brainSizeX = nx;
+  brainSizeY = ny;
+  brainSizeZ = nz;
   printf("brainSizeX=%i, brainSizeY=%i, brainSizeZ=%i \n", brainSizeX,
          brainSizeY, brainSizeZ);
 
@@ -307,7 +306,7 @@ int main(int, char **) {
           if ((mappedBrainX >= 0 && mappedBrainX < brainSizeX) &
                   (mappedBrainY >= 0 && mappedBrainY < brainSizeY) &&
               (mappedBrainZ >= 0 && mappedBrainZ < brainSizeZ)) {
-            index = mappedBrainX + (mappedBrainY + mappedBrainZ * mNy) * mNx;
+            index = mappedBrainX + (mappedBrainY + mappedBrainZ * ny) * nx;
             pGM = GM[index];
             pWM = WM[index];
             tissue = pWM + pGM;
