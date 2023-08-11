@@ -12,6 +12,7 @@ VPATH = MRAG MRAG/MRAGcore
 
 OBJECTS =\
 main.o\
+lib.o\
 MRAGBoundaryBlockInfo.o\
 MRAGWavelets_StaticData.o\
 
@@ -19,4 +20,5 @@ brain: $(OBJECTS); $(CXX) $(OBJECTS) -o $@ $(LDFLAGS)
 .cpp.o:
 	$(CXX) $< -o $@ -c $(DEFS) -IMRAG $(CXXFLAGS)
 clean:; rm -rf $(OBJECTS) brain
-main.o: write.h
+main.o: write.h lib.h
+lib.o: lib.h
