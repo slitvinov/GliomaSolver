@@ -228,7 +228,7 @@ int main(int, char **) {
   Real pGM, pWM;
   double tissue;
   int i, ix, iy, iz, cx, cy, cz;
-  Real x[3];
+  Real x[3], dist, psi;
   char path[FILENAME_MAX - 9];
   int step;
   int mappedBrainX, mappedBrainY, mappedBrainZ;
@@ -287,8 +287,8 @@ int main(int, char **) {
             block(ix, iy, iz).p_g = (tissue > 0.) ? (pGM / tissue) : 0.;
             const Real p[3] = {x[0] - (Real)ic[0], x[1] - (Real)ic[1],
                                x[2] - (Real)ic[2]};
-            const Real dist = sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
-            const Real psi = (dist - tumorRadius) * iw;
+            dist = sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
+            psi = (dist - tumorRadius) * iw;
             if ((psi < -1) && (pGM + pWM > 0.001))
               block(ix, iy, iz).phi = 1.0;
             else if (((-1 <= psi) && (psi <= 1)) && (pGM + pWM > 0))
