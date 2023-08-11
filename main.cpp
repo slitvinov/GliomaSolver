@@ -6,6 +6,9 @@
 #define _WAVELET_TYPE Wavelets_Interp2ndOrder
 #include "MRAGcore/MRAGBlock.h"
 #include "MRAGcore/MRAGWavelets_Interp2ndOrder.h"
+using namespace std;
+#include "MRAGcore/MRAGCompressor.h"
+#include "MRAGcore/MRAGBoundaryBlockInfo.h"
 #include "MRAGcore/MRAGrid.h"
 #include "MRAGcore/MRAGRefiner.h"
 #include "MRAGcore/MRAGBlockLab.h"

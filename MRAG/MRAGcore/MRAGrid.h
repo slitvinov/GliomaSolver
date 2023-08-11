@@ -9,8 +9,6 @@
 #pragma once
 using namespace std;
 
-#include "MRAGCompressor.h"
-#include "MRAGBoundaryBlockInfo.h"
 #include "MRAGBlockCollapser.h"
 #include "MRAGBlockSplitter.h"
 
