@@ -82,10 +82,9 @@ struct ReactionDiffusionOperator {
                          BlockType &o) const {
     double h = info.h[0];
     double ih2 = 1. / (h * h);
-    Real df[6];  // diffusion coefficient
-    Real chf[6]; // domain charact. func, chf=0 -> outside, chf=1 inside domain:
-                 // use to apply BC
-    Real df_loc; // diffusion at the current point (local)
+    Real df[6];
+    Real chf[6];
+    Real df_loc;
     Real eps;
     int iz, iy, ix;
     double diffusionFluxIn, diffusionFluxOut, reactionFlux;
@@ -314,6 +313,14 @@ int brain_ini(int nx, int ny, int nz, const float *GM, const float *WM, const do
 }
 
 int brain_fin(struct Brain *brain) {
+  delete brain->refiner;
+  delete brain->compressor;
+  delete brain->grid;
+  delete brain->blockfwt;
+  delete brain->stSorter;
+  delete brain->blockProcessing;
+  delete brain->rhs;
+  delete brain->updateTumor;
   free(brain);
   return 0;
 }
