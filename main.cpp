@@ -83,7 +83,6 @@ struct ReactionDiffusionOperator {
     Real chf[6]; // domain charact. func, chf=0 -> outside, chf=1 inside domain:
                  // use to apply BC
     Real df_loc; // diffusion at the current point (local)
-    Real chf_loc; // diffusion at the current point (local)
     Real eps;
     for (int iz = 0; iz < BlockType::sizeZ; iz++)
       for (int iy = 0; iy < BlockType::sizeY; iy++)
@@ -244,7 +243,6 @@ int main(int argc, const char **argv) {
   const double compression_tolerance = 1e-5;
   typedef MRAG::Block<Cell, blockSize, blockSize, blockSizeZ> B;
   typedef MRAG::_WAVELET_TYPE W;
-  const int nThreads = 1;
   typedef MRAG::Multithreading::BlockProcessing_SingleCPU<B> BlockProcessing;
   BlockProcessing blockProcessing;
   MRAG::BlockFWT<W, B, RD_Projector_Wavelets> blockfwt;
