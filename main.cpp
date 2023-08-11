@@ -17,6 +17,7 @@ int main(int, char **) {
   double ic[3];
   int maxStencil[2][3] = {-1, -1, -1, +2, +2, +2};
   float *GM, *WM, *d;
+  float t, h, dt;
   char path[FILENAME_MAX - 9];
   int nx, ny, nz, step, gpd;
   double Dw, Dg;
@@ -36,11 +37,17 @@ int main(int, char **) {
   free(WM);
   whenToWriteOffset = 50;
   whenToWrite = whenToWriteOffset;
-  float t = 0.0;
-  float h = 1. / (blockSize * blocksPerDimension);
-  float dt = 0.99 * h * h / (2. * 3 * std::max(Dw, Dg));
+  t = 0.0;
+  int brainSizeMax;  
+  brainSizeMax = std::max(nx, std::max(ny, nz));
+  float L = brainSizeMax * 0.1;
+  h = 1. / (blockSize * blocksPerDimension);
+  Dw = Dw / (L * L);
+  Dg = 0.1 * Dw;  
+  dt = 0.99 * h * h / (2. * 3 * std::max(Dw, Dg));
   step = 0;
   while (t <= tend) {
+    fprintf(stderr, "t, dt = %g, %g\n", t, dt);
     brain_step(brain);
     t += dt;
     step++;
