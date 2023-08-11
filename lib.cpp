@@ -222,22 +222,16 @@ int brain_ini(int nx, int ny, int nz, const float *GM, const float *WM, const do
   int resJump = 1;;
   double refinement_tolerance = 1e-4;
   double compression_tolerance = 1e-5;
-  double whenToWrite;
-  double whenToWriteOffset;
   Real L;
   int maxStencil[2][3] = {-1, -1, -1, +2, +2, +2};
   int brainSizeMax;
   double brainHx, brainHy, brainHz;
   Real pGM, pWM;
   double tissue;
-  int i, ix, iy, iz, cx, cy, cz;
+  int i, ix, iy, iz;
   Real x[3], dist, psi;
-  char path[FILENAME_MAX - 9];
-  int step;
   int mappedBrainX, mappedBrainY, mappedBrainZ;
   int index;
-  int mx, my, mz;
-  Real tend;
   double tumorRadius, smooth_sup, h0, iw;
   if ((brain = (struct Brain *)malloc(sizeof *brain)) == NULL) {
     fprintf(stderr, "%s:%d: malloc failed\n", __FILE__, __LINE__);
@@ -257,7 +251,6 @@ int brain_ini(int nx, int ny, int nz, const float *GM, const float *WM, const do
   brain->stSorter->connect(*brain->grid);
 
   L = 1;
-  tend = 300;
   brainSizeMax = max(nx, max(ny, nz));
   L = brainSizeMax * 0.1;
   printf("Characteristic Lenght L=%f \n", L);
@@ -306,12 +299,8 @@ int brain_ini(int nx, int ny, int nz, const float *GM, const float *WM, const do
 
     brain->grid->getBlockCollection().release(info.blockID);
   }
-  whenToWriteOffset = 50;
-  whenToWrite = whenToWriteOffset;
-  MRAG::BoundaryInfo *boundaryInfo = &brain->grid->getBoundaryInfo();
   Real Dw = dw / (L * L);
   Real Dg = 0.1 * Dw;
-  Real t = 0.0;
   Real h = 1. / (blockSize * blocksPerDimension);
   double dt = 0.99 * h * h / (2. * 3 * max(Dw, Dg));
   MRAG::Science::AutomaticRefinement<0, 0>(*brain->grid, *brain->blockfwt, refinement_tolerance,
@@ -320,9 +309,6 @@ int brain_ini(int nx, int ny, int nz, const float *GM, const float *WM, const do
                                             compression_tolerance, -1);
   brain->rhs = new ReactionDiffusionOperator(Dw, Dg, rho);
   brain->updateTumor = new UpdateTumor(dt);
-  const MRAG::BlockCollection<B> &collecton = brain->grid->getBlockCollection();
-  step = 0;
-  
   *pbrain = brain;
   return 0;
 }
@@ -333,34 +319,13 @@ int brain_fin(struct Brain *brain) {
 }
 
 int brain_step(struct Brain *brain) {
-  int blocksPerDimension = 16;
   int maxLevel = 4;
-  int resJump = 1;;
   double refinement_tolerance = 1e-4;
-  double compression_tolerance = 1e-5;
-  double whenToWrite;
-  double whenToWriteOffset;
-  Real L;
-  int maxStencil[2][3] = {-1, -1, -1, +2, +2, +2};
-  int brainSizeMax;
-  double brainHx, brainHy, brainHz;
-  Real pGM, pWM;
-  double tissue;
-  int i, ix, iy, iz, cx, cy, cz;
-  Real x[3], dist, psi;
-  char path[FILENAME_MAX - 9];
-  int step;
-  int mappedBrainX, mappedBrainY, mappedBrainZ;
-  int index;
-  int mx, my, mz;
-  Real tend;
-  double tumorRadius, smooth_sup, h0, iw;
   const MRAG::BlockCollection<B> &collecton = brain->grid->getBlockCollection();
   vector<MRAG::BlockInfo> vInfo = brain->grid->getBlocksInfo();
   MRAG::BoundaryInfo *boundaryInfo = &brain->grid->getBoundaryInfo();
   brain->blockProcessing->pipeline_process(vInfo, collecton, *boundaryInfo, *brain->rhs);
   BlockProcessing::process(vInfo, collecton, *brain->updateTumor);
-  step++;
   MRAG::Science::AutomaticRefinement<0, 0>(
 					     *brain->grid, *brain->blockfwt, refinement_tolerance, maxLevel, 1);
   return 0;
@@ -374,31 +339,9 @@ int brain_dump(struct Brain *brain, const char *path) {
 
 int brain_project(struct Brain * brain, float * d) {
   int blocksPerDimension = 16;
-  int maxLevel = 4;
-  int resJump = 1;;
-  const double refinement_tolerance = 1e-4;
-  const double compression_tolerance = 1e-5;
-  double whenToWrite;
-  double whenToWriteOffset;
-  Real L;
-  double ic[3];
-  int maxStencil[2][3] = {-1, -1, -1, +2, +2, +2};
-  float *GM, *WM;
-  int brainSizeMax;
-  double brainHx, brainHy, brainHz;
-  Real pGM, pWM;
-  double tissue;
-  int i, ix, iy, iz, cx, cy, cz;
-  Real x[3], dist, psi;
-  char path[FILENAME_MAX - 9];
-  int step;
-  int mappedBrainX, mappedBrainY, mappedBrainZ;
-  int index;
+  int ix, iy, iz, cx, cy, cz;
+  Real x[3];
   int mx, my, mz;
-  int nx, ny, nz;
-  Real rho, tend;
-  double Dw, Dg;
-  double tumorRadius, smooth_sup, h0, iw;
   int gpd = blocksPerDimension * blockSize;
   double hf = 1. / gpd;
   double eps = hf * 0.5;

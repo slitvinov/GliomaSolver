@@ -15,7 +15,6 @@ int main(int, char **) {
   double whenToWrite;
   double whenToWriteOffset;
   double ic[3];
-  int maxStencil[2][3] = {-1, -1, -1, +2, +2, +2};
   float *GM, *WM, *d;
   float t, h, dt;
   char path[FILENAME_MAX - 9];
