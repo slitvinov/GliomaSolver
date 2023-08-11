@@ -41,6 +41,10 @@ float *brain_read(const char *path, int *nx, int *ny, int *nz) {
             path);
     return NULL;
   }
-  fclose(file);
+  if (fclose(file) != 0) {
+    fprintf(stderr, "%s:%d: error: fail to close '%s'\n", __FILE__, __LINE__,
+            path);
+    return NULL;
+  }
   return d;
 }
