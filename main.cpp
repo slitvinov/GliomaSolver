@@ -22,6 +22,39 @@ using namespace std;
 #include "write.h"
 #include "lib.h"
 
+
+const int blockSize = _BLOCKSIZE_;
+const int blockSizeZ = _BLOCKSIZE_;
+typedef MRAG::Block<struct Cell, blockSize, blockSize, blockSizeZ> B;
+typedef MRAG::_WAVELET_TYPE W;
+typedef MRAG::Multithreading::BlockProcessing_SingleCPU<B> BlockProcessing;
+
+struct Cell {
+  Real phi, dphidt, p_g, p_w;
+  Cell() {
+    phi = 0.0;
+    dphidt = 0.0;
+    p_g = 0.0;
+    p_w = 0.0;
+  }
+
+  void operator+=(Cell t) {
+    phi += t.phi;
+    dphidt += t.dphidt;
+    p_g += t.p_g;
+    p_w += t.p_w;
+  }
+};
+
+Cell operator*(const Cell &p, Real v) {
+  Cell c;
+  c.phi = p.phi * v;
+  c.dphidt = p.dphidt * v;
+  c.p_g = p.p_g * v;
+  c.p_w = p.p_w * v;
+  return c;
+}
+
 struct ReactionDiffusionOperator {
   int stencil_start[3];
   int stencil_end[3];
@@ -162,35 +195,6 @@ struct UpdateTumor {
   }
 };
 
-struct Cell {
-  /* tumor */
-  Real phi;
-  Real dphidt;
-  Real p_g, p_w;
-
-  Cell() {
-    phi = 0.0;
-    dphidt = 0.0;
-    p_g = 0.0;
-    p_w = 0.0;
-  }
-
-  void operator+=(Cell t) {
-    phi += t.phi;
-    dphidt += t.dphidt;
-    p_g += t.p_g;
-    p_w += t.p_w;
-  }
-};
-
-inline Cell operator*(const Cell &p, Real v) {
-  Cell c;
-  c.phi = p.phi * v;
-  c.dphidt = p.dphidt * v;
-  c.p_g = p.p_g * v;
-  c.p_w = p.p_w * v;
-  return c;
-}
 
 template <typename T, int i> inline Real RD_projector_impl_wav(const T &t) {
   return (Real)(t.phi);
@@ -199,16 +203,11 @@ make_projector(RD_Projector_Wavelets, RD_projector_impl_wav);
 
 int main(int, char **) {
   struct Brain *brain;
-  const int blockSize = _BLOCKSIZE_;
-  const int blockSizeZ = _BLOCKSIZE_;
   int blocksPerDimension = 16;
   int maxLevel = 4;
   int resJump = 1;;
   const double refinement_tolerance = 1e-4;
   const double compression_tolerance = 1e-5;
-  typedef MRAG::Block<Cell, blockSize, blockSize, blockSizeZ> B;
-  typedef MRAG::_WAVELET_TYPE W;
-  typedef MRAG::Multithreading::BlockProcessing_SingleCPU<B> BlockProcessing;
   BlockProcessing blockProcessing;
   MRAG::BlockFWT<W, B, RD_Projector_Wavelets> blockfwt;
   MRAG::SpaceTimeSorter stSorter;
