@@ -313,7 +313,7 @@ int brain_ini(int nx, int ny, int nz, const float *GM, const float *WM, const do
   Real Dg = 0.1 * Dw;
   Real t = 0.0;
   Real h = 1. / (blockSize * blocksPerDimension);
-  Real dt = 0.99 * h * h / (2. * 3 * max(Dw, Dg));
+  double dt = 0.99 * h * h / (2. * 3 * max(Dw, Dg));
   MRAG::Science::AutomaticRefinement<0, 0>(*brain->grid, *brain->blockfwt, refinement_tolerance,
                                            maxLevel, 1);
   MRAG::Science::AutomaticCompression<0, 0>(*brain->grid, *brain->blockfwt,
@@ -329,6 +329,117 @@ int brain_ini(int nx, int ny, int nz, const float *GM, const float *WM, const do
 
 int brain_fin(struct Brain *brain) {
   free(brain);
+  return 0;
+}
+
+int brain_step(struct Brain *brain) {
+  int blocksPerDimension = 16;
+  int maxLevel = 4;
+  int resJump = 1;;
+  double refinement_tolerance = 1e-4;
+  double compression_tolerance = 1e-5;
+  double whenToWrite;
+  double whenToWriteOffset;
+  Real L;
+  int maxStencil[2][3] = {-1, -1, -1, +2, +2, +2};
+  int brainSizeMax;
+  double brainHx, brainHy, brainHz;
+  Real pGM, pWM;
+  double tissue;
+  int i, ix, iy, iz, cx, cy, cz;
+  Real x[3], dist, psi;
+  char path[FILENAME_MAX - 9];
+  int step;
+  int mappedBrainX, mappedBrainY, mappedBrainZ;
+  int index;
+  int mx, my, mz;
+  Real tend;
+  double tumorRadius, smooth_sup, h0, iw;
+  const MRAG::BlockCollection<B> &collecton = brain->grid->getBlockCollection();
+  vector<MRAG::BlockInfo> vInfo = brain->grid->getBlocksInfo();
+  MRAG::BoundaryInfo *boundaryInfo = &brain->grid->getBoundaryInfo();
+  brain->blockProcessing->pipeline_process(vInfo, collecton, *boundaryInfo, *brain->rhs);
+  BlockProcessing::process(vInfo, collecton, *brain->updateTumor);
+  step++;
+  MRAG::Science::AutomaticRefinement<0, 0>(
+					     *brain->grid, *brain->blockfwt, refinement_tolerance, maxLevel, 1);
+  return 0;
+}
+
+int brain_dump(struct Brain *brain, const char *path) {
+  MRAG::BoundaryInfo *boundaryInfo = &brain->grid->getBoundaryInfo();
+  write<W, B, MRAG::BlockLab<B>>(brain->grid, boundaryInfo, path);
+  return 0;
+}
+
+int brain_project(struct Brain * brain, float * d) {
+  int blocksPerDimension = 16;
+  int maxLevel = 4;
+  int resJump = 1;;
+  const double refinement_tolerance = 1e-4;
+  const double compression_tolerance = 1e-5;
+  double whenToWrite;
+  double whenToWriteOffset;
+  Real L;
+  double ic[3];
+  int maxStencil[2][3] = {-1, -1, -1, +2, +2, +2};
+  float *GM, *WM;
+  int brainSizeMax;
+  double brainHx, brainHy, brainHz;
+  Real pGM, pWM;
+  double tissue;
+  int i, ix, iy, iz, cx, cy, cz;
+  Real x[3], dist, psi;
+  char path[FILENAME_MAX - 9];
+  int step;
+  int mappedBrainX, mappedBrainY, mappedBrainZ;
+  int index;
+  int mx, my, mz;
+  int nx, ny, nz;
+  Real rho, tend;
+  double Dw, Dg;
+  double tumorRadius, smooth_sup, h0, iw;
+  int gpd = blocksPerDimension * blockSize;
+  double hf = 1. / gpd;
+  double eps = hf * 0.5;
+  vector<MRAG::BlockInfo> vInfo = brain->grid->getBlocksInfo();
+  for (int i = 0; i < vInfo.size(); i++) {
+    MRAG::BlockInfo &info = vInfo[i];
+    B &block = brain->grid->getBlockCollection()[info.blockID];
+    double h = info.h[0];
+    for (iz = 0; iz < B::sizeZ; iz++)
+      for (iy = 0; iy < B::sizeY; iy++)
+        for (ix = 0; ix < B::sizeX; ix++) {
+          info.pos(x, ix, iy, iz);
+          mx = (int)floor((x[0]) / hf);
+          my = (int)floor((x[1]) / hf);
+          mz = (int)floor((x[2]) / hf);
+          if (h < hf + eps) {
+            d[mx + (my + mz * gpd) * gpd] = block(ix, iy, iz).phi;
+          } else if (h < 2. * hf + eps) {
+            for (cz = 0; cz < 2; cz++)
+              for (cy = 0; cy < 2; cy++)
+                for (cx = 0; cx < 2; cx++) {
+                  d[mx + cx + (my + cy + (mz + cz) * gpd) * gpd] =
+                      block(ix, iy, iz).phi;
+                }
+          } else if (h < 3. * hf + eps) {
+            for (cz = 0; cz < 3; cz++)
+              for (cy = 0; cy < 3; cy++)
+                for (cx = 0; cx < 3; cx++) {
+                  d[mx + cx + (my + cy + (mz + cz) * gpd) * gpd] =
+                      block(ix, iy, iz).phi;
+                }
+          } else {
+            for (cz = 0; cz < 4; cz++)
+              for (cy = 0; cy < 4; cy++)
+                for (cx = 0; cx < 4; cx++) {
+                  d[mx + cx + (my + cy + (mz + cz) * gpd) * gpd] =
+                      block(ix, iy, iz).phi;
+                }
+          }
+        }
+  }
   return 0;
 }
 
