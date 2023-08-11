@@ -46,7 +46,6 @@ int main(int, char **) {
   dt = 0.99 * h * h / (2. * 3 * std::max(Dw, Dg));
   step = 0;
   while (t <= tend) {
-    fprintf(stderr, "t, dt = %g, %g\n", t, dt);
     brain_step(brain);
     t += dt;
     step++;
