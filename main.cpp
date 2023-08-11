@@ -21,7 +21,7 @@ using namespace std;
 #include "MRAGmultithreading/MRAGBlockProcessing_SingleCPU.h"
 #include "write.h"
 static int mNx, mNy, mNz;
-static float *D3D(const char *path) {
+static float *D3D(const char *path, int *nx, int *ny, int *nz) {
   float *mData;
   FILE *file;
   int header[6];
@@ -40,9 +40,9 @@ static float *D3D(const char *path) {
   assert(header[1] == 3);
   assert(header[5] == 1);
   mNelements = header[2] * header[3] * header[4];
-  mNx = header[2];
-  mNy = header[3];
-  mNz = header[4];
+  *nx = mNx = header[2];
+  *ny = mNy = header[3];
+  *nz = mNz = header[4];
   mData = (float *)malloc(mNelements * sizeof *mData);
   if (fread(mData, sizeof *mData, mNelements, file) != mNelements) {
     fprintf(stderr, "%s:%d: error: fail to read '%s'\n", __FILE__, __LINE__,
@@ -263,6 +263,7 @@ int main(int, char **) {
   int mappedBrainX, mappedBrainY, mappedBrainZ;
   int index;
   int mx, my, mz;
+  int nx, ny, nz;
 
   grid.setCompressor(&compressor);
   grid.setRefiner(&refiner);
@@ -272,8 +273,8 @@ int main(int, char **) {
   tumor_ic[0] = 0.6497946102507519;
   tumor_ic[1] = 0.5908331665234543;
   tumor_ic[2] = 0.3715947899171972;
-  GM = D3D("GM.dat");
-  WM = D3D("WM.dat");
+  GM = D3D("GM.dat", &nx, &ny, &nz);
+  WM = D3D("WM.dat", &nx, &ny, &nz);
   brainSizeX = mNx;
   brainSizeY = mNy;
   brainSizeZ = mNz;
