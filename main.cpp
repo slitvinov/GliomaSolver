@@ -327,6 +327,8 @@ int main(int, char **) {
 
     grid.getBlockCollection().release(info.blockID);
   }
+  free(GM);
+  free(WM);
 
   whenToWriteOffset = 50;
   whenToWrite = whenToWriteOffset;
