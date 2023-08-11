@@ -216,7 +216,7 @@ int main(int, char **) {
   double whenToWrite;
   double whenToWriteOffset;
   Real L;
-  Real ic[3];
+  double ic[3];
   int maxStencil[2][3] = {-1, -1, -1, +2, +2, +2};
   MRAG::Refiner_SpaceExtension refiner(resJump, maxLevel);
   MRAG::Compressor compressor(resJump);
@@ -285,8 +285,8 @@ int main(int, char **) {
             tissue = pWM + pGM;
             block(ix, iy, iz).p_w = (tissue > 0.) ? (pWM / tissue) : 0.;
             block(ix, iy, iz).p_g = (tissue > 0.) ? (pGM / tissue) : 0.;
-            const Real p[3] = {x[0] - ic[0], x[1] - ic[1],
-                               x[2] - ic[2]};
+            const Real p[3] = {x[0] - (Real)ic[0], x[1] - (Real)ic[1],
+                               x[2] - (Real)ic[2]};
             const Real dist = sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
             const Real psi = (dist - tumorRadius) * iw;
             if ((psi < -1) && (pGM + pWM > 0.001))
