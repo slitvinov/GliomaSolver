@@ -5,7 +5,7 @@
 
 CXXFLAGS = -O3
 DEFS = -D_BLOCKSIZE_=8
-VPATH = MRAG MRAG/MRAGcore
+VPATH = MRAG/MRAGcore
 
 OBJECTS =\
 main.o\
