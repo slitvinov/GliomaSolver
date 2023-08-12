@@ -195,12 +195,10 @@ struct UpdateTumor {
   }
 };
 
-
 template <typename T, int i> inline Real RD_projector_impl_wav(const T &t) {
   return (Real)(t.phi);
 }
 make_projector(RD_Projector_Wavelets, RD_projector_impl_wav);
-
 
 struct Brain {
   MRAG::Refiner_SpaceExtension *refiner;
@@ -213,12 +211,14 @@ struct Brain {
   UpdateTumor *updateTumor;
 };
 
-int brain_ini(int nx, int ny, int nz, const float *GM, const float *WM, const double *ic, double Dw, double Dg,
-              double rho, double dt, struct Brain **pbrain) {
+int brain_ini(int nx, int ny, int nz, const float *GM, const float *WM,
+              const double *ic, double Dw, double Dg, double rho, double dt,
+              struct Brain **pbrain) {
   struct Brain *brain;
   int blocksPerDimension = 16;
   int maxLevel = 4;
-  int resJump = 1;;
+  int resJump = 1;
+  ;
   double refinement_tolerance = 1e-4;
   double compression_tolerance = 1e-5;
   Real L;
@@ -238,7 +238,7 @@ int brain_ini(int nx, int ny, int nz, const float *GM, const float *WM, const do
   }
   brain = new Brain;
   brain->grid = new MRAG::Grid<W, B>(blocksPerDimension, blocksPerDimension,
-                        blocksPerDimension, maxStencil);
+                                     blocksPerDimension, maxStencil);
   brain->blockfwt = new MRAG::BlockFWT<W, B, RD_Projector_Wavelets>;
   brain->blockProcessing = new BlockProcessing;
   brain->refiner = new MRAG::Refiner_SpaceExtension(resJump, maxLevel);
@@ -298,8 +298,8 @@ int brain_ini(int nx, int ny, int nz, const float *GM, const float *WM, const do
 
     brain->grid->getBlockCollection().release(info.blockID);
   }
-  MRAG::Science::AutomaticRefinement<0, 0>(*brain->grid, *brain->blockfwt, refinement_tolerance,
-                                           maxLevel, 1);
+  MRAG::Science::AutomaticRefinement<0, 0>(*brain->grid, *brain->blockfwt,
+                                           refinement_tolerance, maxLevel, 1);
   MRAG::Science::AutomaticCompression<0, 0>(*brain->grid, *brain->blockfwt,
                                             compression_tolerance, -1);
   brain->rhs = new ReactionDiffusionOperator(Dw, Dg, rho);
@@ -327,10 +327,11 @@ int brain_step(struct Brain *brain) {
   const MRAG::BlockCollection<B> &collecton = brain->grid->getBlockCollection();
   vector<MRAG::BlockInfo> vInfo = brain->grid->getBlocksInfo();
   MRAG::BoundaryInfo *boundaryInfo = &brain->grid->getBoundaryInfo();
-  brain->blockProcessing->pipeline_process(vInfo, collecton, *boundaryInfo, *brain->rhs);
+  brain->blockProcessing->pipeline_process(vInfo, collecton, *boundaryInfo,
+                                           *brain->rhs);
   BlockProcessing::process(vInfo, collecton, *brain->updateTumor);
-  MRAG::Science::AutomaticRefinement<0, 0>(
-					     *brain->grid, *brain->blockfwt, refinement_tolerance, maxLevel, 1);
+  MRAG::Science::AutomaticRefinement<0, 0>(*brain->grid, *brain->blockfwt,
+                                           refinement_tolerance, maxLevel, 1);
   return 0;
 }
 
@@ -340,19 +341,16 @@ int brain_dump(struct Brain *brain, const char *path) {
   return 0;
 }
 
-int brain_project(struct Brain * brain, float * d) {
+int brain_project(struct Brain *brain, float *d) {
   int blocksPerDimension = 16;
-  int ix, iy, iz, cx, cy, cz;
+  int ix, iy, iz, cx, cy, cz, mx, my, mz, gpd = blocksPerDimension * blockSize;
   Real x[3];
-  int mx, my, mz;
-  int gpd = blocksPerDimension * blockSize;
-  double hf = 1. / gpd;
-  double eps = hf * 0.5;
+  double h, hf = 1. / gpd, eps = hf * 0.5;
   vector<MRAG::BlockInfo> vInfo = brain->grid->getBlocksInfo();
   for (int i = 0; i < vInfo.size(); i++) {
     MRAG::BlockInfo &info = vInfo[i];
     B &block = brain->grid->getBlockCollection()[info.blockID];
-    double h = info.h[0];
+    h = info.h[0];
     for (iz = 0; iz < B::sizeZ; iz++)
       for (iy = 0; iy < B::sizeY; iy++)
         for (ix = 0; ix < B::sizeX; ix++) {
