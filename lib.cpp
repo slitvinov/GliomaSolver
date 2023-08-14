@@ -299,7 +299,7 @@ int brain_ini(struct BrainParams *params,
                                            refinement_tolerance, maxLevel, 1);
   MRAG::Science::AutomaticCompression<0, 0>(*brain->grid, *brain->blockfwt,
                                             compression_tolerance, -1);
-  brain->rhs = new ReactionDiffusionOperator(params->Dw, params->Dg, params->rho);
+  brain->rhs = new ReactionDiffusionOperator(params->Dw, 0.1 * params->Dw, params->rho);
   brain->updateTumor = new UpdateTumor(params->dt);
   *pbrain = brain;
   return 0;

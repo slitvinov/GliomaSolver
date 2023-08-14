@@ -8,7 +8,7 @@ struct BrainParams {
   int n[3];
   float *GM, *WM;
   double ic[3];
-  double Dw, Dg, rho, dt;
+  double Dw, rho, dt;
 };
 float *brain_read(const char *, int *, int *, int *);
 int brain_ini(struct BrainParams *, struct Brain **);
