@@ -5,7 +5,6 @@
 #include <vector>
 #include <set>
 #include "MRAGcore/MRAGCommon.h"
-#define _WAVELET_TYPE Wavelets_Interp2ndOrder
 #include "MRAGcore/MRAGBlock.h"
 #include "MRAGcore/MRAGWavelets_Interp2ndOrder.h"
 using namespace std;
@@ -27,7 +26,7 @@ using namespace std;
 const int blockSize = _BLOCKSIZE_;
 const int blockSizeZ = _BLOCKSIZE_;
 typedef MRAG::Block<struct Cell, blockSize, blockSize, blockSizeZ> B;
-typedef MRAG::_WAVELET_TYPE W;
+typedef MRAG::Wavelets_Interp2ndOrder W;
 typedef MRAG::Multithreading::BlockProcessing_SingleCPU<B> BlockProcessing;
 
 struct Cell {
