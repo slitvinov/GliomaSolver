@@ -210,7 +210,6 @@ struct Brain {
 
 int brain_ini(struct BrainParams *params, struct Brain **pbrain) {
   struct Brain *brain;
-  int blocksPerDimension = 16;
   int maxLevel = 4;
   int resJump = 1;
   double refinement_tolerance = 1e-4;
