@@ -2,9 +2,9 @@ from setuptools import Extension
 from setuptools import setup
 
 module = Extension(
-    "mueler_brown",
+    "glioma_solver",
     sources=[
-        "lib.cpp", "MRAGBoundaryBlockInfo.cpp", "MRAGWavelets_StaticData.cpp"
+        "glioma_solver.c", "lib.cpp", "MRAGBoundaryBlockInfo.cpp", "MRAGWavelets_StaticData.cpp"
     ],
     extra_compile_args=["-D_BLOCKSIZE_=8"],
 )
