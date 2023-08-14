@@ -257,7 +257,6 @@ int brain_ini(struct BrainParams *params, struct Brain **pbrain) {
       for (iy = 0; iy < B::sizeY; iy++)
         for (ix = 0; ix < B::sizeX; ix++) {
           info.pos(x, ix, iy, iz);
-
           mX = (int)floor(x[0] / brainHx);
           mY = (int)floor(x[1] / brainHy);
           mZ = (int)floor(x[2] / brainHz);
