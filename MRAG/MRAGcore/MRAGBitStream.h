@@ -46,7 +46,7 @@ namespace MRAG
 			assert(bits == NULL);
 			
 			const unsigned int nMinimumWords32 = 10;
-			words32 = max(nMinimumWords32, (unsigned int)ceil(nSizeInBits/32.));
+			words32 = std::max(nMinimumWords32, (unsigned int)ceil(nSizeInBits/32.));
 			bits = (unsigned int *) malloc(sizeof(unsigned int)*words32);
 		}
 		
@@ -64,7 +64,7 @@ namespace MRAG
 
 			_CopyToTheEnd(bits[word32_index], new_bits, bits_end);
 			
-			const int copied_bits = min(32-bits_end, nof_bits);
+			const int copied_bits = std::min(32-bits_end, nof_bits);
 			
 			word32_index += (bits_end + copied_bits & 0x00000020)>>5;
 			bits_end = (bits_end + copied_bits) & 0x0000001F;
@@ -92,7 +92,7 @@ namespace MRAG
 			const int bit_index = bit_start % 32;
 
 			const unsigned int s1 = bit_index; 
-			const unsigned int e1 = min((unsigned int)32, bit_index+nof_bits); 
+			const unsigned int e1 = std::min((unsigned int)32, bit_index+nof_bits);
 			const unsigned int L1 = e1 - s1;
 			const unsigned int m1 = ((0xFFFFFFFF << 32-e1) >> 32-L1) << s1;
 			const unsigned int w1 = (bits[word_index] & m1) >> s1;

@@ -8,31 +8,6 @@
  */
 #pragma once
 
-#ifndef NULL
-/**
- * Define NULL if necessary.
- */
-#define NULL 0
-#endif
-
-#ifndef _CUDA_SIDE
-#ifndef max
-/**
- * Define preprocessor max.
- */
-// Gery-note: why not inline?
-#define max(a,b) (((a)>=(b))? (a) : (b))
-#endif
-#endif
-
-#ifndef min
-/**
- * Define preprocessor min.
- */
-// Gery-note: why not inline?
-#define min(a,b) (((a)<(b))? (a) : (b))
-#endif
-
 /**
  * Define a default representation for real numbers.
  */
@@ -304,15 +279,15 @@ struct UniformPartition
 		
 		if (vMaxWorkPerThread!= NULL)
 		{
-			work_per_thread[0] = min(vMaxWorkPerThread[0], max(1, total_work[0]/nThreads[0]));
-			work_per_thread[1] = min(vMaxWorkPerThread[1], max(1, total_work[1]/nThreads[1]));
-			work_per_thread[2] = min(vMaxWorkPerThread[2], max(1, total_work[2]/nThreads[2]));
+		  work_per_thread[0] = std::min(vMaxWorkPerThread[0], std::max(1, total_work[0]/nThreads[0]));
+		  work_per_thread[1] = std::min(vMaxWorkPerThread[1], std::max(1, total_work[1]/nThreads[1]));
+		  work_per_thread[2] = std::min(vMaxWorkPerThread[2], std::max(1, total_work[2]/nThreads[2]));
 		}
 		else
 		{
-			work_per_thread[0] = max(1, total_work[0]/nThreads[0]);
-			work_per_thread[1] = max(1, total_work[1]/nThreads[1]);
-			work_per_thread[2] = max(1, total_work[2]/nThreads[2]);
+		  work_per_thread[0] = std::max(1, total_work[0]/nThreads[0]);
+		  work_per_thread[1] = std::max(1, total_work[1]/nThreads[1]);
+		  work_per_thread[2] = std::max(1, total_work[2]/nThreads[2]);
 		}
 		
 		start[0] = s[0];
@@ -360,9 +335,9 @@ struct UniformPartition
 		base_index[1] = start[1] + offset[1];
 		base_index[2] = start[2] + offset[2];
 		
-		end_index[0] = start[0] + min(offset[0] + threads[0]*work_per_thread[0], (int)total_work[0]);
-		end_index[1] = start[1] + min(offset[1] + threads[1]*work_per_thread[1], (int)total_work[1]);
-		end_index[2] = start[2] + min(offset[2] + threads[2]*work_per_thread[2], (int)total_work[2]);
+		end_index[0] = start[0] + std::min(offset[0] + threads[0]*work_per_thread[0], (int)total_work[0]);
+		end_index[1] = start[1] + std::min(offset[1] + threads[1]*work_per_thread[1], (int)total_work[1]);
+		end_index[2] = start[2] + std::min(offset[2] + threads[2]*work_per_thread[2], (int)total_work[2]);
 
 		return true;
 	}
@@ -425,13 +400,13 @@ struct UniformPartition
 			work_per_thread[2]*(threads[2]*pass[2] + thread_index[2])
 		};
 		
-		s[0] = start[0] + min(offset[0], (int)total_work[0]);
-		s[1] = start[1] + min(offset[1], (int)total_work[1]);
-		s[2] = start[2] + min(offset[2], (int)total_work[2]);
+		s[0] = start[0] + std::min(offset[0], (int)total_work[0]);
+		s[1] = start[1] + std::min(offset[1], (int)total_work[1]);
+		s[2] = start[2] + std::min(offset[2], (int)total_work[2]);
 		
-		e[0] = start[0] + min(offset[0]+work_per_thread[0], (int)total_work[0]);
-		e[1] = start[1] + min(offset[1]+work_per_thread[1], (int)total_work[1]);
-		e[2] = start[2] + min(offset[2]+work_per_thread[2], (int)total_work[2]);
+		e[0] = start[0] + std::min(offset[0]+work_per_thread[0], (int)total_work[0]);
+		e[1] = start[1] + std::min(offset[1]+work_per_thread[1], (int)total_work[1]);
+		e[2] = start[2] + std::min(offset[2]+work_per_thread[2], (int)total_work[2]);
 		
 		if ((e[0]-s[0])*(e[1]-s[1])*(e[2]-s[2]) > 0) 
 			return true;

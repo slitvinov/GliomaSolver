@@ -3,7 +3,7 @@ from setuptools import setup
 
 module = Extension(
     "mueler_brown",
-    sources=["lib.cpp", "MRAG/MRAGcore/MRAGBoundaryBlockInfo.cpp"],
+    sources=["lib.cpp", "MRAGBoundaryBlockInfo.cpp", "MRAGWavelets_StaticData.cpp"],
     extra_compile_args = ["-D_BLOCKSIZE_=8"],
 )
 setup(
