@@ -22,10 +22,8 @@ using namespace std;
 #include "MRAGmultithreading/MRAGBlockProcessing_SingleCPU.h"
 #include "write.h"
 #include "lib.h"
-
 const int blockSize = _BLOCKSIZE_;
-const int blockSizeZ = _BLOCKSIZE_;
-typedef MRAG::Block<struct Cell, blockSize, blockSize, blockSizeZ> B;
+typedef MRAG::Block<struct Cell, blockSize, blockSize, blockSize> B;
 typedef MRAG::Wavelets_Interp2ndOrder W;
 typedef MRAG::Multithreading::BlockProcessing_SingleCPU<B> BlockProcessing;
 
@@ -210,8 +208,7 @@ struct Brain {
   UpdateTumor *updateTumor;
 };
 
-int brain_ini(struct BrainParams *params,
-              struct Brain **pbrain) {
+int brain_ini(struct BrainParams *params, struct Brain **pbrain) {
   struct Brain *brain;
   int blocksPerDimension = 16;
   int maxLevel = 4;
@@ -264,17 +261,16 @@ int brain_ini(struct BrainParams *params,
           mX = (int)floor(x[0] / brainHx);
           mY = (int)floor(x[1] / brainHy);
           mZ = (int)floor(x[2] / brainHz);
-          if ((mX >= 0 && mX < params->n[0]) &
-                  (mY >= 0 && mY < params->n[1]) &&
-              (mZ >= 0 && mZ < params->n[2])) {
+          if (mX >= 0 && mX < params->n[0] && mY >= 0 && mY < params->n[1] &&
+              mZ >= 0 && mZ < params->n[2]) {
             index = mX + (mY + mZ * params->n[1]) * params->n[0];
             pGM = params->GM[index];
             pWM = params->WM[index];
             tissue = pWM + pGM;
-            tissue = pWM + pGM;
             block(ix, iy, iz).p_w = (tissue > 0.) ? (pWM / tissue) : 0.;
             block(ix, iy, iz).p_g = (tissue > 0.) ? (pGM / tissue) : 0.;
-            const Real p[3] = {x[0] - (Real)params->ic[0], x[1] - (Real)params->ic[1],
+            const Real p[3] = {x[0] - (Real)params->ic[0],
+                               x[1] - (Real)params->ic[1],
                                x[2] - (Real)params->ic[2]};
             dist = sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
             psi = (dist - tumorRadius) * iw;
@@ -294,7 +290,8 @@ int brain_ini(struct BrainParams *params,
                                            refinement_tolerance, maxLevel, 1);
   MRAG::Science::AutomaticCompression<0, 0>(*brain->grid, *brain->blockfwt,
                                             compression_tolerance, -1);
-  brain->rhs = new ReactionDiffusionOperator(params->Dw, 0.1 * params->Dw, params->rho);
+  brain->rhs =
+      new ReactionDiffusionOperator(params->Dw, 0.1 * params->Dw, params->rho);
   brain->updateTumor = new UpdateTumor(params->dt);
   *pbrain = brain;
   return 0;

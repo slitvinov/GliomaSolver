@@ -1,13 +1,13 @@
+#include "lib.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "lib.h"
 
 const int blockSize = _BLOCKSIZE_;
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
 int main(void) {
   struct Brain *brain;
-  double whenToWrite, whenToWriteOffset, tend, h, t;
+  double whenToWrite, whenToWriteOffset, tend, h, t, L;
   float *d;
   char path[FILENAME_MAX - 9];
   int step, gpd;
@@ -23,7 +23,7 @@ int main(void) {
   params.WM = brain_read("WM.dat", params.n);
   gpd = blockSize * params.blocksPerDimension;
   h = 1. / gpd;
-  double L = max(params.n[0], max(params.n[1], params.n[2])) * 0.1;
+  L = max(params.n[0], max(params.n[1], params.n[2])) * 0.1;
   params.Dw = 0.0013 / (L * L);
   params.rho = 0.025;
   tend = 300;
