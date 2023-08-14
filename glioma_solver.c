@@ -1,9 +1,18 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
+#include "lib.h"
 
 static PyObject *run(PyObject *self, PyObject *args) {
-  double x, y;
-  if (!PyArg_ParseTuple(args, "dd", &x, &y))
+  struct BrainParams params;
+  PyObject *GM, *WM;
+  Py_buffer view;
+  if (!PyArg_ParseTuple(args, "OO", &GM, &WM))
+    return NULL;
+  if (!PyObject_CheckBuffer(GM))
+    return NULL;
+  if (!PyObject_CheckBuffer(WM))
+    return NULL;
+  if (PyObject_GetBuffer(GM, &view, PyBUF_SIMPLE | PyBUF_WRITABLE) == -1)
     return NULL;
   return PyFloat_FromDouble(0.0);
 }
