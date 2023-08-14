@@ -11,18 +11,20 @@ int main(void) {
   double whenToWrite;
   double whenToWriteOffset;
   double ic[3];
-  float *GM, *WM, *d;
+  float *d;
   char path[FILENAME_MAX - 9];
   int nx, ny, nz, step, gpd, brainSizeMax;
   int32_t header[6];
   double Dw, Dg, rho, tend, h, L, t, dt;
   FILE *file;
+  struct BrainParams params;
+
 
   ic[0] = 0.6497946102507519;
   ic[1] = 0.5908331665234543;
   ic[2] = 0.3715947899171972;
-  GM = brain_read("GM.dat", &nx, &ny, &nz);
-  WM = brain_read("WM.dat", &nx, &ny, &nz);
+  params.GM = brain_read("GM.dat", &nx, &ny, &nz);
+  params.WM = brain_read("WM.dat", &nx, &ny, &nz);
   Dw = 0.0013;
   rho = 0.025;
   tend = 300;
@@ -31,9 +33,22 @@ int main(void) {
   Dg = 0.1 * Dw;
   h = 1. / (blockSize * blocksPerDimension);
   dt = 0.99 * h * h / (2. * 3 * max(Dw, Dg));
-  brain_ini(nx, ny, nz, GM, WM, ic, Dw, Dg, rho, dt, &brain);
-  free(GM);
-  free(WM);
+
+  params.blocksPerDimension = 16;
+  params.n[0] = nx;
+  params.n[1] = ny;
+  params.n[2] = nz;
+  params.ic[0] = ic[0];
+  params.ic[1] = ic[1];
+  params.ic[2] = ic[2];
+  params.Dw = Dw;
+  params.Dg = Dg;
+  params.rho = rho;
+  params.dt = dt;
+
+  brain_ini(&params, &brain);
+  free(params.GM);
+  free(params.WM);
   whenToWriteOffset = 50;
   whenToWrite = whenToWriteOffset;
   t = 0.0;

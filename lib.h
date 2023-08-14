@@ -3,9 +3,15 @@ extern "C" {
 #endif
 
 struct Brain;
+struct BrainParams {
+  int blocksPerDimension;
+  int n[3];
+  float *GM, *WM;
+  double ic[3];
+  double Dw, Dg, rho, dt;
+};
 float *brain_read(const char *, int *, int *, int *);
-int brain_ini(int, int, int, const float *, const float *, const double *,
-              double, double, double, double, struct Brain **);
+int brain_ini(struct BrainParams *, struct Brain **);
 int brain_step(struct Brain *);
 int brain_dump(struct Brain *, const char *);
 int brain_project(struct Brain *, float *);

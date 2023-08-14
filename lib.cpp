@@ -210,14 +210,12 @@ struct Brain {
   UpdateTumor *updateTumor;
 };
 
-int brain_ini(int nx, int ny, int nz, const float *GM, const float *WM,
-              const double *ic, double Dw, double Dg, double rho, double dt,
+int brain_ini(struct BrainParams *params,
               struct Brain **pbrain) {
   struct Brain *brain;
   int blocksPerDimension = 16;
   int maxLevel = 4;
   int resJump = 1;
-  ;
   double refinement_tolerance = 1e-4;
   double compression_tolerance = 1e-5;
   Real L;
@@ -249,7 +247,7 @@ int brain_ini(int nx, int ny, int nz, const float *GM, const float *WM,
   brain->stSorter->connect(*brain->grid);
 
   L = 1;
-  brainSizeMax = max(nx, max(ny, nz));
+  brainSizeMax = max(params->n[0], max(params->n[1], params->n[2]));
   L = brainSizeMax * 0.1;
   printf("Characteristic Lenght L=%f \n", L);
   brainHx = 1.0 / ((double)(brainSizeMax));
@@ -271,18 +269,18 @@ int brain_ini(int nx, int ny, int nz, const float *GM, const float *WM,
           mappedBrainX = (int)floor(x[0] / brainHx);
           mappedBrainY = (int)floor(x[1] / brainHy);
           mappedBrainZ = (int)floor(x[2] / brainHz);
-          if ((mappedBrainX >= 0 && mappedBrainX < nx) &
-                  (mappedBrainY >= 0 && mappedBrainY < ny) &&
-              (mappedBrainZ >= 0 && mappedBrainZ < nz)) {
-            index = mappedBrainX + (mappedBrainY + mappedBrainZ * ny) * nx;
-            pGM = GM[index];
-            pWM = WM[index];
+          if ((mappedBrainX >= 0 && mappedBrainX < params->n[0]) &
+                  (mappedBrainY >= 0 && mappedBrainY < params->n[1]) &&
+              (mappedBrainZ >= 0 && mappedBrainZ < params->n[2])) {
+            index = mappedBrainX + (mappedBrainY + mappedBrainZ * params->n[1]) * params->n[0];
+            pGM = params->GM[index];
+            pWM = params->WM[index];
             tissue = pWM + pGM;
             tissue = pWM + pGM;
             block(ix, iy, iz).p_w = (tissue > 0.) ? (pWM / tissue) : 0.;
             block(ix, iy, iz).p_g = (tissue > 0.) ? (pGM / tissue) : 0.;
-            const Real p[3] = {x[0] - (Real)ic[0], x[1] - (Real)ic[1],
-                               x[2] - (Real)ic[2]};
+            const Real p[3] = {x[0] - (Real)params->ic[0], x[1] - (Real)params->ic[1],
+                               x[2] - (Real)params->ic[2]};
             dist = sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
             psi = (dist - tumorRadius) * iw;
             if ((psi < -1) && (pGM + pWM > 0.001))
@@ -301,8 +299,8 @@ int brain_ini(int nx, int ny, int nz, const float *GM, const float *WM,
                                            refinement_tolerance, maxLevel, 1);
   MRAG::Science::AutomaticCompression<0, 0>(*brain->grid, *brain->blockfwt,
                                             compression_tolerance, -1);
-  brain->rhs = new ReactionDiffusionOperator(Dw, Dg, rho);
-  brain->updateTumor = new UpdateTumor(dt);
+  brain->rhs = new ReactionDiffusionOperator(params->Dw, params->Dg, params->rho);
+  brain->updateTumor = new UpdateTumor(params->dt);
   *pbrain = brain;
   return 0;
 }
