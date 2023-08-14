@@ -242,6 +242,7 @@ int brain_ini(struct BrainParams *params, struct Brain **pbrain) {
   brain->grid->setRefiner(brain->refiner);
   brain->stSorter->connect(*brain->grid);
 
+  brainSizeMax = std::max(params->n[0], std::max(params->n[1], params->n[2]));
   brainHx = 1.0 / ((double)(brainSizeMax));
   brainHy = 1.0 / ((double)(brainSizeMax));
   brainHz = 1.0 / ((double)(brainSizeMax));
