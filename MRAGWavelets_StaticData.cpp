@@ -8,6 +8,7 @@
  */
 #include <math.h>
 #include <assert.h>
+#include <algorithm>
 #include "MRAG/MRAGcore/MRAGCommon.h"
 #include "MRAG/MRAGcore/MRAGWavelets_Interp2ndOrder.h"
 namespace MRAG
