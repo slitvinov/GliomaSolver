@@ -16,7 +16,7 @@ MRAGWavelets_StaticData.o\
 
 brain: $(OBJECTS); $(CXX) $(OBJECTS) -o $@ $(LDFLAGS)
 .cpp.o:
-	$(CXX) $< -o $@ -c $(DEFS) -IMRAG $(CXXFLAGS)
+	$(CXX) $< -o $@ -c $(DEFS) $(CXXFLAGS)
 .c.o:
 	$(CC) $< -o $@ -c $(DEFS) $(CFLAGS)
 clean:; rm -rf $(OBJECTS) brain
