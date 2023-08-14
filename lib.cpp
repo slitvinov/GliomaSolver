@@ -384,11 +384,11 @@ int brain_project(struct Brain *brain, float *d) {
   return 0;
 }
 
-float *brain_read(const char *path, int *nx, int *ny, int *nz) {
+float *brain_read(const char *path, int *n) {
   float *d;
   FILE *file;
   int32_t header[6];
-  int n;
+  size_t m;
   if ((file = fopen(path, "r")) == NULL) {
     fprintf(stderr, "%s:%d: error: fail to open '%s'\n", __FILE__, __LINE__,
             path);
@@ -413,16 +413,16 @@ float *brain_read(const char *path, int *nx, int *ny, int *nz) {
             path);
     return NULL;
   }
-  n = header[2] * header[3] * header[4];
-  *nx = header[2];
-  *ny = header[3];
-  *nz = header[4];
-  if ((d = (float *)malloc(n * sizeof *d)) == NULL) {
+  n[0] = header[2];
+  n[1] = header[3];
+  n[2] = header[4];
+  m = n[0] * n[1] * n[2];
+  if ((d = (float *)malloc(m * sizeof *d)) == NULL) {
     fprintf(stderr, "%s:%d: malloc failed for '%s'\n", __FILE__, __LINE__,
             path);
     return NULL;
   }
-  if (fread(d, sizeof *d, n, file) != n) {
+  if (fread(d, sizeof *d, m, file) != m) {
     fprintf(stderr, "%s:%d: error: fail to read '%s'\n", __FILE__, __LINE__,
             path);
     return NULL;

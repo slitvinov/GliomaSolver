@@ -10,7 +10,7 @@ struct BrainParams {
   double ic[3];
   double Dw, rho, dt;
 };
-float *brain_read(const char *, int *, int *, int *);
+float *brain_read(const char *, int *);
 int brain_ini(struct BrainParams *, struct Brain **);
 int brain_step(struct Brain *);
 int brain_dump(struct Brain *, const char *);
