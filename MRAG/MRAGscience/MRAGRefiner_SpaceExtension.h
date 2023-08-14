@@ -10,8 +10,6 @@
 
 #pragma once
 
-#include "MRAGcore/MRAGRefiner.h"
-
 namespace MRAG
 {
 	class Refiner_SpaceExtension: public Refiner
