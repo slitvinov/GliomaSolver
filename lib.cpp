@@ -218,7 +218,6 @@ int brain_ini(struct BrainParams *params,
   int resJump = 1;
   double refinement_tolerance = 1e-4;
   double compression_tolerance = 1e-5;
-  Real L;
   int maxStencil[2][3] = {-1, -1, -1, +2, +2, +2};
   int brainSizeMax;
   double brainHx, brainHy, brainHz;
@@ -226,7 +225,7 @@ int brain_ini(struct BrainParams *params,
   double tissue;
   int i, ix, iy, iz;
   Real x[3], dist, psi;
-  int mappedBrainX, mappedBrainY, mappedBrainZ;
+  int mX, mY, mZ;
   int index;
   double tumorRadius, smooth_sup, h0, iw;
   if ((brain = (struct Brain *)malloc(sizeof *brain)) == NULL) {
@@ -246,10 +245,6 @@ int brain_ini(struct BrainParams *params,
   brain->grid->setRefiner(brain->refiner);
   brain->stSorter->connect(*brain->grid);
 
-  L = 1;
-  brainSizeMax = max(params->n[0], max(params->n[1], params->n[2]));
-  L = brainSizeMax * 0.1;
-  printf("Characteristic Lenght L=%f \n", L);
   brainHx = 1.0 / ((double)(brainSizeMax));
   brainHy = 1.0 / ((double)(brainSizeMax));
   brainHz = 1.0 / ((double)(brainSizeMax));
@@ -266,13 +261,13 @@ int brain_ini(struct BrainParams *params,
         for (ix = 0; ix < B::sizeX; ix++) {
           info.pos(x, ix, iy, iz);
 
-          mappedBrainX = (int)floor(x[0] / brainHx);
-          mappedBrainY = (int)floor(x[1] / brainHy);
-          mappedBrainZ = (int)floor(x[2] / brainHz);
-          if ((mappedBrainX >= 0 && mappedBrainX < params->n[0]) &
-                  (mappedBrainY >= 0 && mappedBrainY < params->n[1]) &&
-              (mappedBrainZ >= 0 && mappedBrainZ < params->n[2])) {
-            index = mappedBrainX + (mappedBrainY + mappedBrainZ * params->n[1]) * params->n[0];
+          mX = (int)floor(x[0] / brainHx);
+          mY = (int)floor(x[1] / brainHy);
+          mZ = (int)floor(x[2] / brainHz);
+          if ((mX >= 0 && mX < params->n[0]) &
+                  (mY >= 0 && mY < params->n[1]) &&
+              (mZ >= 0 && mZ < params->n[2])) {
+            index = mX + (mY + mZ * params->n[1]) * params->n[0];
             pGM = params->GM[index];
             pWM = params->WM[index];
             tissue = pWM + pGM;

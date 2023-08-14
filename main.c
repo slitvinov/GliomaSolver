@@ -10,7 +10,7 @@ int main(void) {
   double whenToWrite, whenToWriteOffset, tend, h, t;
   float *d;
   char path[FILENAME_MAX - 9];
-  int nx, ny, nz, step, gpd;
+  int step, gpd;
   int32_t header[6];
   FILE *file;
   struct BrainParams params;
@@ -21,18 +21,13 @@ int main(void) {
   params.ic[2] = 0.3715947899171972;
   params.GM = brain_read("GM.dat", params.n);
   params.WM = brain_read("WM.dat", params.n);
-  params.Dw = 0.0013;
-  params.rho = 0.025;
-  tend = 300;
   gpd = blockSize * params.blocksPerDimension;
   h = 1. / gpd;
+  double L = max(params.n[0], max(params.n[1], params.n[2])) * 0.1;
+  params.Dw = 0.0013 / (L * L);
+  params.rho = 0.025;
+  tend = 300;
   params.dt = 0.99 * h * h / (2. * 3 * params.Dw);
-
-  params.blocksPerDimension = 16;
-  params.n[0] = nx;
-  params.n[1] = ny;
-  params.n[2] = nz;
-
   brain_ini(&params, &brain);
   free(params.GM);
   free(params.WM);
