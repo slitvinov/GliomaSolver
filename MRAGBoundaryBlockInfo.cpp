@@ -9,9 +9,9 @@
 #include <math.h>
 #include <assert.h>
 #include <vector>
-#include "MRAGCommon.h"
-#include "MRAGHuffmanEncoder.h"
-#include "MRAGBoundaryBlockInfo.h"
+#include "MRAG/MRAGcore/MRAGCommon.h"
+#include "MRAG/MRAGcore/MRAGHuffmanEncoder.h"
+#include "MRAG/MRAGcore/MRAGBoundaryBlockInfo.h"
 
 namespace MRAG
 {

@@ -8,8 +8,8 @@
  */
 #include <math.h>
 #include <assert.h>
-#include "MRAGCommon.h"
-#include "MRAGWavelets_Interp2ndOrder.h"
+#include "MRAG/MRAGcore/MRAGCommon.h"
+#include "MRAG/MRAGcore/MRAGWavelets_Interp2ndOrder.h"
 namespace MRAG
 {
 const Real Wavelets_Interp2ndOrder::Ha[1] = {1};
@@ -27,7 +27,7 @@ const Real Wavelets_Interp2ndOrder::PhiAnalysisSupport[2] = {0,1.0};
 const Real Wavelets_Interp2ndOrder::CenteringOffset = 0.0;
 }
 
-#include "MRAGWavelets_Interp4thOrder.h"
+#include "MRAG/MRAGcore/MRAGWavelets_Interp4thOrder.h"
 namespace MRAG
 {
 const Real Wavelets_Interp4thOrder::Ha[1] = {1};
@@ -45,7 +45,7 @@ const Real Wavelets_Interp4thOrder::PhiAnalysisSupport[2] = {0,1};
 const Real Wavelets_Interp4thOrder::CenteringOffset = 0.0;
 }
 
-#include "MRAGWavelets_Haar.h"
+#include "MRAG/MRAGcore/MRAGWavelets_Haar.h"
 namespace MRAG
 {
 const Real Wavelets_Haar::Ha[2] = { +1/2., +1/2. };
@@ -63,7 +63,7 @@ const int Wavelets_Haar::GsSupport[2] = {-1,1};
 const Real Wavelets_Haar::CenteringOffset = 0.5;
 }
 
-#include "MRAGWavelets_AverageInterp3rdOrder.h"
+#include "MRAG/MRAGcore/MRAGWavelets_AverageInterp3rdOrder.h"
 namespace MRAG
 {
 	const Real Wavelets_AverageInterp3rdOrder::Ha[2] = { 1/2., 1/2. };
@@ -79,7 +79,7 @@ namespace MRAG
 	const Real Wavelets_AverageInterp3rdOrder::CenteringOffset = 0.5;
 }
 
-#include "MRAGWavelets_AverageInterp5thOrder.h"
+#include "MRAG/MRAGcore/MRAGWavelets_AverageInterp5thOrder.h"
 namespace MRAG
 {
 	const Real Wavelets_AverageInterp5thOrder::Ha[2] = { 1/2., 1/2. };
