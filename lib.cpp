@@ -229,8 +229,8 @@ int brain_ini(struct BrainParams *params, struct Brain **pbrain) {
     return 1;
   }
   brain = new Brain;
-  brain->grid = new MRAG::Grid<W, B>(blocksPerDimension, blocksPerDimension,
-                                     blocksPerDimension, maxStencil);
+  brain->grid = new MRAG::Grid<W, B>(params->blocksPerDimension, params->blocksPerDimension,
+                                     params->blocksPerDimension, maxStencil);
   brain->blockfwt = new MRAG::BlockFWT<W, B, RD_Projector_Wavelets>;
   brain->blockProcessing = new BlockProcessing;
   brain->refiner = new MRAG::Refiner_SpaceExtension(resJump, maxLevel);
