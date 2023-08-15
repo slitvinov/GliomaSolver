@@ -14,9 +14,9 @@ static PyObject *run(PyObject *self, PyObject *args) {
   struct Brain *brain;
   struct BrainParams params;
 
-  if (!PyArg_ParseTuple(args, "OO(ddd)dddO", &GM, &WM, &params.ic[0],
-                        &params.ic[1], &params.ic[2], &dw, &params.rho, &tend,
-                        &HG))
+  if (!PyArg_ParseTuple(args, "iOO(ddd)dddO", &params.blocksPerDimension, &GM,
+                        &WM, &params.ic[0], &params.ic[1], &params.ic[2], &dw,
+                        &params.rho, &tend, &HG))
     return NULL;
   if (!PyObject_CheckBuffer(GM) || !PyObject_CheckBuffer(WM) ||
       !PyObject_CheckBuffer(HG))
@@ -50,8 +50,7 @@ static PyObject *run(PyObject *self, PyObject *args) {
   params.n[0] = gm_view.shape[0];
   params.n[1] = gm_view.shape[1];
   params.n[2] = gm_view.shape[2];
-  params.blocksPerDimension = 16;
-  printf("%g %g %g\n", params.ic[0], params.ic[1], params.ic[2]);
+  //printf("%g %g %g\n", params.ic[0], params.ic[1], params.ic[2]);
   gpd = (_BLOCKSIZE_)*params.blocksPerDimension;
 
   if (hg_view.shape[0] != gpd || hg_view.shape[1] != gpd ||

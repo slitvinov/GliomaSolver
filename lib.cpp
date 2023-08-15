@@ -207,6 +207,7 @@ struct Brain {
   BlockProcessing *blockProcessing;
   ReactionDiffusionOperator *rhs;
   UpdateTumor *updateTumor;
+  int blocksPerDimension;
 };
 
 int brain_ini(struct BrainParams *params, struct Brain **pbrain) {
@@ -293,6 +294,7 @@ int brain_ini(struct BrainParams *params, struct Brain **pbrain) {
   brain->rhs =
       new ReactionDiffusionOperator(params->Dw, 0.1 * params->Dw, params->rho);
   brain->updateTumor = new UpdateTumor(params->dt);
+  brain->blocksPerDimension = params->blocksPerDimension;
   *pbrain = brain;
   return 0;
 }
@@ -331,8 +333,7 @@ int brain_dump(struct Brain *brain, const char *path) {
 }
 
 int brain_project(struct Brain *brain, float *d) {
-  int blocksPerDimension = 16;
-  int ix, iy, iz, cx, cy, cz, mx, my, mz, gpd = blocksPerDimension * blockSize;
+  int ix, iy, iz, cx, cy, cz, mx, my, mz, gpd = brain->blocksPerDimension * blockSize;
   Real x[3];
   double h, hf = 1. / gpd, eps = hf * 0.5;
   vector<MRAG::BlockInfo> vInfo = brain->grid->getBlocksInfo();

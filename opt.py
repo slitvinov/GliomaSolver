@@ -4,6 +4,7 @@ import glioma_solver
 import numpy as np
 import scipy
 
+
 def unpack(string, file):
     buffer = file.read(struct.calcsize(string))
     return struct.unpack(string, buffer)
@@ -27,20 +28,43 @@ def read(path):
         dtype = np.dtype(type_name)
         return np.ndarray((nx, ny, nz), dtype, mm, seek, order='F')
 
+
 def write(a):
     path = "%dx%dx%dle.raw" % np.shape(a)
     a.tofile(path)
-    print(path)
+    sys.stderr.write("opt.py: write: %s\n" % path)
 
-bpd = 32
+
+def sim(x, HG):
+    ic = x[:3]
+    rho = x[3]
+    glioma_solver.run(bpd, GM, WM, ic, dw, rho, tend, HG)
+
+
+def fun(x):
+    HG = np.empty_like(GM, shape=(8 * bpd, 8 * bpd, 8 * bpd))
+    sim(x, HG)
+    err = np.linalg.norm(HG - PET[::2, ::2, ::2])
+    sys.stderr.write("opt.py: %.4e: %s\n" % (err, str(x)))
+    return err
+
+
+bpd = 16
 GM = read("GM.dat")
 WM = read("WM.dat")
 PET = read("tumPET.dat")
-HG = np.empty_like(GM, shape=(8 * bpd, 8 * bpd, 8 * bpd))
-ic = np.divide(scipy.ndimage.center_of_mass(PET), np.shape(PET))
+ic0 = np.divide(scipy.ndimage.center_of_mass(PET), np.shape(PET))
+rho0 = 0.025
 dw = 0.0013
-rho = 0.025
 tend = 300
-glioma_solver.run(bpd, GM, WM, ic, dw, rho, tend, HG)
-print(np.linalg.norm(HG - PET))
+
+scipy.optimize.differential_evolution(fun, ((0, 1), (0, 1), (0, 1), (0.01, 0.04)),
+                                      updating='deferred',
+                                      x0=(*ic0, rho0),
+                                      disp=True,
+                                      workers=8, maxiter=100)
+
+
+HG = np.empty_like(GM, shape=(8 * bpd, 8 * bpd, 8 * bpd))
+sim(opt.x, HG)
 write(HG)
