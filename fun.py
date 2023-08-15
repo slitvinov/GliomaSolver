@@ -4,7 +4,7 @@ import sys
 import struct
 import glioma_solver
 import numpy as np
-import scipy
+
 
 def unpack(string, file):
     buffer = file.read(struct.calcsize(string))
@@ -29,17 +29,19 @@ def read(path):
         dtype = np.dtype(type_name)
         return np.ndarray((nx, ny, nz), dtype, mm, seek, order='F')
 
+
 def write(a):
     path = "%dx%dx%dle.raw" % np.shape(a)
     a.tofile(path)
     print(path)
+
 
 bpd = 32
 GM = read("GM.dat")
 WM = read("WM.dat")
 PET = read("tumPET.dat")
 HG = np.empty_like(GM, shape=(8 * bpd, 8 * bpd, 8 * bpd))
-ic = np.divide(scipy.ndimage.center_of_mass(PET), np.shape(PET))
+ic = 0.64925073, 0.59093041, 0.37127833
 dw = 0.0013
 rho = 0.025
 tend = 300
