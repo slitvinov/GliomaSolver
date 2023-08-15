@@ -33,7 +33,8 @@ def read(path):
 
 def write(a):
     path = "%dx%dx%dle.raw" % np.shape(a)
-    a.tofile(path)
+    with open(path, "wb") as file:
+        file.write(a.tobytes('F'))
     sys.stderr.write("opt.py: write: %s\n" % path)
 
 
@@ -60,12 +61,13 @@ if __name__ == '__main__':
     dw = 0.0013
     tend = 300
     HG = np.empty_like(GM, shape=(8 * bpd, 8 * bpd, 8 * bpd))
-    scipy.optimize.differential_evolution(fun, ((0, 1), (0, 1), (0, 1),
-                                                (0.01, 0.04)),
-                                          updating='deferred',
-                                          x0=(*ic0, rho0),
-                                          disp=True,
-                                          workers=-1,
-                                          maxiter=2)
+    opt = scipy.optimize.differential_evolution(fun, ((0, 1), (0, 1), (0, 1),
+                                                      (0.01, 0.04)),
+                                                updating='deferred',
+                                                x0=(*ic0, rho0),
+                                                polish=False,
+                                                disp=True,
+                                                workers=-1,
+                                                maxiter=2)
     sim(opt.x)
     write(HG)
