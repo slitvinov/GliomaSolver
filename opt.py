@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import sys
 import struct
 import glioma_solver
@@ -62,7 +64,7 @@ scipy.optimize.differential_evolution(fun, ((0, 1), (0, 1), (0, 1), (0.01, 0.04)
                                       updating='deferred',
                                       x0=(*ic0, rho0),
                                       disp=True,
-                                      workers=8, maxiter=100)
+                                      workers=-1, maxiter=100)
 
 
 HG = np.empty_like(GM, shape=(8 * bpd, 8 * bpd, 8 * bpd))

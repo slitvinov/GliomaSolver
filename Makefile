@@ -19,5 +19,5 @@ brain: $(OBJECTS); $(CXX) $(OBJECTS) -o $@ $(LDFLAGS)
 .c.o:
 	$(CC) $< -o $@ -c $(DEFS) $(CFLAGS)
 clean:; rm -rf $(OBJECTS) brain
-main.o: write.h lib.h
+main.o: lib.h
 lib.o: lib.h
