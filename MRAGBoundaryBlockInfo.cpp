@@ -9,6 +9,8 @@
 #include <math.h>
 #include <assert.h>
 #include <vector>
+#include <cstddef>
+#include <stdlib.h>
 #include "MRAG/MRAGcore/MRAGCommon.h"
 #include "MRAG/MRAGcore/MRAGHuffmanEncoder.h"
 #include "MRAG/MRAGcore/MRAGBoundaryBlockInfo.h"
