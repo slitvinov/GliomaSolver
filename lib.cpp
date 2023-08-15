@@ -8,7 +8,10 @@
 #include "MRAG/MRAGcore/MRAGBlock.h"
 #include "MRAG/MRAGcore/MRAGWavelets_Interp2ndOrder.h"
 using namespace std;
+#include "MRAG/MRAGcore/MRAGGridNode.h"
+#include "MRAG/MRAGcore/MRAGCompressionPlan.h"
 #include "MRAG/MRAGcore/MRAGCompressor.h"
+#include "MRAG/MRAGcore/MRAGHuffmanEncoder.h"
 #include "MRAG/MRAGcore/MRAGBoundaryBlockInfo.h"
 #include "MRAG/MRAGcore/MRAGrid.h"
 #include "MRAG/MRAGcore/MRAGRefiner.h"

@@ -7,18 +7,6 @@
  *
  */
 #pragma once
-#undef min
-#undef max
-#undef min
-#undef max
-#include <map>
-#undef min
-#undef max
-#undef min
-#undef max
-
-#include "MRAGCommon.h"
-#include "MRAGHuffmanEncoder.h"
 
 namespace MRAG
 {

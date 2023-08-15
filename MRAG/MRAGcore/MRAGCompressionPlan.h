@@ -6,7 +6,6 @@
  *  Copyright 2008 CSE Lab, ETH Zurich. All rights reserved.
  *
  */
-#include "MRAGCommon.h"
 
 #pragma once
 namespace MRAG
