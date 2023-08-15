@@ -7,14 +7,16 @@
 static PyObject *run(PyObject *self, PyObject *args) {
   Py_buffer gm_view, wm_view, hg_view;
   Py_ssize_t indices[3] = {0, 0, 0};
-  double whenToWrite, whenToWriteOffset, tend, h, t, L;
+  double dw, tend, h, t, L;
   int step, gpd;
   PyObject *GM, *WM, *HG;
   float *hg;
   struct Brain *brain;
   struct BrainParams params;
 
-  if (!PyArg_ParseTuple(args, "OOO", &GM, &WM, &HG))
+  if (!PyArg_ParseTuple(args, "OO(ddd)dddO", &GM, &WM, &params.ic[0],
+                        &params.ic[1], &params.ic[2], &dw, &params.rho, &tend,
+                        &HG))
     return NULL;
   if (!PyObject_CheckBuffer(GM) || !PyObject_CheckBuffer(WM) ||
       !PyObject_CheckBuffer(HG))
@@ -48,15 +50,8 @@ static PyObject *run(PyObject *self, PyObject *args) {
   params.n[0] = gm_view.shape[0];
   params.n[1] = gm_view.shape[1];
   params.n[2] = gm_view.shape[2];
-
-  fprintf(stderr, "%d %d %d\n", params.n[0], params.n[1], params.n[2]);
-  fprintf(stderr, "params.GM: %g %g\n", params.GM[0],
-          params.GM[256 * 256 * 256 - 1]);
-
   params.blocksPerDimension = 16;
-  params.ic[0] = 0.6497946102507519;
-  params.ic[1] = 0.5908331665234543;
-  params.ic[2] = 0.3715947899171972;
+  printf("%g %g %g\n", params.ic[0], params.ic[1], params.ic[2]);
   gpd = (_BLOCKSIZE_)*params.blocksPerDimension;
 
   if (hg_view.shape[0] != gpd || hg_view.shape[1] != gpd ||
@@ -69,9 +64,7 @@ static PyObject *run(PyObject *self, PyObject *args) {
 
   h = 1. / gpd;
   L = max(params.n[0], max(params.n[1], params.n[2])) * 0.1;
-  params.Dw = 0.0013 / (L * L);
-  params.rho = 0.025;
-  tend = 300;
+  params.Dw = dw / (L * L);
   params.dt = 0.99 * h * h / (2. * 3 * params.Dw);
   brain_ini(&params, &brain);
   t = 0.0;

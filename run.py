@@ -27,9 +27,21 @@ def read(path):
         dtype = np.dtype(type_name)
         return np.ndarray((nx, ny, nz), dtype, mm, seek, order='F')
 
+def write(a):
+    path = "%dx%dx%dle.raw" % np.shape(a)
+    a.tofile(path)
+    print(path)
 
 GM = read("GM.dat")
 WM = read("WM.dat")
 HG = np.empty_like(GM, shape=(128, 128, 128))
+ic = 0.6497946102507519, 0.5908331665234543, 0.3715947899171972
+dw = 0.0013
+rho = 0.025
+tend = 300
 
-glioma_solver.run(GM, WM, HG)
+glioma_solver.run(GM, WM, ic, dw, rho, tend, HG)
+
+
+write(HG)
+
