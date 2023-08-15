@@ -37,36 +37,34 @@ def write(a):
     sys.stderr.write("opt.py: write: %s\n" % path)
 
 
-def sim(x, HG):
+def sim(x):
     ic = x[:3]
     rho = x[3]
     glioma_solver.run(bpd, GM, WM, ic, dw, rho, tend, HG)
 
 
 def fun(x):
-    HG = np.empty_like(GM, shape=(8 * bpd, 8 * bpd, 8 * bpd))
-    sim(x, HG)
+    sim(x)
     err = np.linalg.norm(HG - PET[::2, ::2, ::2])
     sys.stderr.write("opt.py: %.4e: %s\n" % (err, str(x)))
     return err
 
 
-bpd = 16
-GM = read("GM.dat")
-WM = read("WM.dat")
-PET = read("tumPET.dat")
-ic0 = np.divide(scipy.ndimage.center_of_mass(PET), np.shape(PET))
-rho0 = 0.025
-dw = 0.0013
-tend = 300
-
-scipy.optimize.differential_evolution(fun, ((0, 1), (0, 1), (0, 1), (0.01, 0.04)),
-                                      updating='deferred',
-                                      x0=(*ic0, rho0),
-                                      disp=True,
-                                      workers=-1, maxiter=100)
-
-
-HG = np.empty_like(GM, shape=(8 * bpd, 8 * bpd, 8 * bpd))
-sim(opt.x, HG)
-write(HG)
+if __name__ == '__main__':
+    bpd = 16
+    GM = read("GM.dat")
+    WM = read("WM.dat")
+    PET = read("tumPET.dat")
+    ic0 = np.divide(scipy.ndimage.center_of_mass(PET), np.shape(PET))
+    rho0 = 0.025
+    dw = 0.0013
+    tend = 300
+    HG = np.empty_like(GM, shape=(8 * bpd, 8 * bpd, 8 * bpd))
+    scipy.optimize.differential_evolution(fun, ((0, 1), (0, 1), (0, 1),
+                                                (0.01, 0.04)),
+                                          updating='deferred',
+                                          x0=(*ic0, rho0),
+                                          disp=True,
+                                          workers=-1)
+    sim(opt.x)
+    write(HG)
