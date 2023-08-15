@@ -3,9 +3,11 @@ import struct
 import glioma_solver
 import numpy as np
 
+
 def unpack(string, file):
     buffer = file.read(struct.calcsize(string))
     return struct.unpack(string, buffer)
+
 
 def read(path):
     with open(path, "rb") as inp:
@@ -25,6 +27,9 @@ def read(path):
         dtype = np.dtype(type_name)
         return np.ndarray((nx, ny, nz), dtype, mm, seek, order='F')
 
+
 GM = read("GM.dat")
 WM = read("WM.dat")
-glioma_solver.run(GM, WM)
+HG = np.empty_like(GM, shape=(128, 128, 128))
+
+glioma_solver.run(GM, WM, HG)
