@@ -65,6 +65,7 @@ if __name__ == '__main__':
                                           updating='deferred',
                                           x0=(*ic0, rho0),
                                           disp=True,
-                                          workers=-1)
+                                          workers=-1,
+                                          maxiter=2)
     sim(opt.x)
     write(HG)

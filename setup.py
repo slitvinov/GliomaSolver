@@ -7,7 +7,7 @@ module = Extension(
         "glioma_solver.c", "lib.cpp", "MRAGBoundaryBlockInfo.cpp",
         "MRAGWavelets_StaticData.cpp"
     ],
-    extra_compile_args=["-D_BLOCKSIZE_=8"],
+    extra_compile_args=["-D_BLOCKSIZE_=8", "-std=c++11"],
 )
 setup(
     name="glioma_solver",

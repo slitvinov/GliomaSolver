@@ -45,7 +45,13 @@
   <dd>PETsigma2, PETscale, T1uc, T2uc, slope</dd>
 </dl>
 
-# Refernces
+# Install
+
+```
+python -m pip install -e .
+```
+
+## Refernces
 
 1. <http://tdo.sk/~janka/GliomaWebsite/index.html>
 
