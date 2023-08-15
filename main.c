@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-const int blockSize = _BLOCKSIZE_;
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
 int main(void) {
@@ -21,7 +20,7 @@ int main(void) {
   params.ic[2] = 0.3715947899171972;
   params.GM = brain_read("GM.dat", params.n);
   params.WM = brain_read("WM.dat", params.n);
-  gpd = blockSize * params.blocksPerDimension;
+  gpd = (_BLOCKSIZE_) * params.blocksPerDimension;
   h = 1. / gpd;
   L = max(params.n[0], max(params.n[1], params.n[2])) * 0.1;
   params.Dw = 0.0013 / (L * L);
