@@ -2,13 +2,29 @@
   <Domain>
     <Grid>
       <Geometry>
-        <DataItem Dimensions="128304 3" Format="HDF">a.h5:Data0</DataItem>
+        <DataItem
+	    Dimensions="128304 3"
+	    Format="HDF">
+	  a.h5:Data0
+	</DataItem>
       </Geometry>
-      <Topology Dimensions="90112" Type="Mixed">
-        <DataItem DataType="Int" Dimensions="811008" Format="HDF" Precision="8">a.h5:Data1</DataItem>
+      <Topology
+	  Dimensions="90112"
+	  Type="Mixed">
+        <DataItem
+	    DataType="Int"
+	    Dimensions="811008"
+	    Format="HDF"
+	    Precision="8">
+	  a.h5:Data1
+	</DataItem>
       </Topology>
       <Attribute>
-        <DataItem Dimensions="128304" Format="HDF">a.h5:Data2</DataItem>
+        <DataItem
+	    Dimensions="128304"
+	    Format="HDF">
+	  a.h5:Data2
+	</DataItem>
       </Attribute>
     </Grid>
   </Domain>
