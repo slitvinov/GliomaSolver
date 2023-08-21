@@ -11,6 +11,12 @@
 #include <vector>
 #include <cstddef>
 #include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <map>
+#include <stack>
+#include <queue>
+#include <algorithm>
 #include "MRAG/MRAGcore/MRAGCommon.h"
 #include "MRAG/MRAGcore/MRAGHuffmanEncoder.h"
 #include "MRAG/MRAGcore/MRAGBoundaryBlockInfo.h"

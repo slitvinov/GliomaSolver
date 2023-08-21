@@ -4,6 +4,11 @@
 #include <assert.h>
 #include <vector>
 #include <set>
+#include <map>
+#include <stack>
+#include <queue>
+#include <algorithm>
+#include <string.h>
 #include "MRAG/MRAGcore/MRAGCommon.h"
 #include "MRAG/MRAGcore/MRAGBlock.h"
 #include "MRAG/MRAGcore/MRAGWavelets_Interp2ndOrder.h"
