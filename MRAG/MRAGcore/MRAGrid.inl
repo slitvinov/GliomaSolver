@@ -874,9 +874,9 @@ namespace MRAG
 				};
 				
 				const int finest_end[3] = {
-					m_vProcessingDirections[0] ? ((node.index[0]+1<<level_difference)) : 1, 
-					m_vProcessingDirections[1] ? ((node.index[1]+1<<level_difference)) : 1, 
-					m_vProcessingDirections[2] ? ((node.index[2]+1<<level_difference)) : 1
+					m_vProcessingDirections[0] ? (((node.index[0]+1)<<level_difference)) : 1, 
+					m_vProcessingDirections[1] ? (((node.index[1]+1)<<level_difference)) : 1, 
+					m_vProcessingDirections[2] ? (((node.index[2]+1)<<level_difference)) : 1
 				};
 				
 				const FlattenedBlock * block = new FlattenedBlock(finest_start, finest_end, &node);
@@ -1033,9 +1033,9 @@ namespace MRAG
 								};
 								
 								const int finest_end[3] = {
-									m_vProcessingDirections[0] ? ((g.index[0]+1<<level_difference)) : 1, 
-									m_vProcessingDirections[1] ? ((g.index[1]+1<<level_difference)) : 1, 
-									m_vProcessingDirections[2] ? ((g.index[2]+1<<level_difference)) : 1
+									m_vProcessingDirections[0] ? (((g.index[0]+1)<<level_difference)) : 1, 
+									m_vProcessingDirections[1] ? (((g.index[1]+1)<<level_difference)) : 1, 
+									m_vProcessingDirections[2] ? (((g.index[2]+1)<<level_difference)) : 1
 								};
 								
 								

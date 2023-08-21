@@ -291,7 +291,7 @@ namespace MRAG
 		for(int i=0; i<3; i++)
 		{
 			assert((result->index[i] << level_diff_gridnode)*block_size[i] <= (index[i]<<level_difference)  + (refCenterNode->index[i]<<level_diff_centernode)*block_size[i] || block_size[i]==1);
-			assert((result->index[i]+1 << level_diff_gridnode)*block_size[i] > (index[i]<<level_difference) + (refCenterNode->index[i]<<level_diff_centernode)*block_size[i] || block_size[i]==1);
+			assert(((result->index[i]+1) << level_diff_gridnode)*block_size[i] > (index[i]<<level_difference) + (refCenterNode->index[i]<<level_diff_centernode)*block_size[i] || block_size[i]==1);
 		}
 		
 		return result;
