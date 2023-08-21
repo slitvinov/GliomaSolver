@@ -81,7 +81,7 @@ namespace MRAG
 		//compute  substart
 		int nTotalElements = 0;
 		{
-			const int length = (1<< maxLevel - b.level);
+		        const int length = (1<< (maxLevel - b.level));
 			
 			for(int code=0; code<27; code++)
 			{
@@ -106,7 +106,7 @@ namespace MRAG
 		
 		//creation of the neighborhood
 		{
-			const int length = (1<< maxLevel - b.level);
+		        const int length = (1<< (maxLevel - b.level));
 			
 			nNeighborhoodSize = 
 					(block_size[0]>1 ? length+2 : 1)*(block_size[1]>1 ? length+2 : 1)*(block_size[2]>1 ? length+2 : 1) - 
@@ -120,9 +120,9 @@ namespace MRAG
 				vNeighborhood[i] = NULL;
 
 			const int s_b_finest[3] = {
-				block_size[0]>1? (b.index[0] << maxLevel - b.level) : 0,
-				block_size[1]>1? (b.index[1] << maxLevel - b.level) : 0,
-				block_size[2]>1? (b.index[2] << maxLevel - b.level) : 0,
+			        block_size[0]>1? (b.index[0] << (maxLevel - b.level)) : 0,
+				block_size[1]>1? (b.index[1] << (maxLevel - b.level)) : 0,
+				block_size[2]>1? (b.index[2] << (maxLevel - b.level)) : 0,
 			};			
 						
 			for(int i=0; i<neighbors.size(); i++)
@@ -134,15 +134,15 @@ namespace MRAG
 				GridNode& n = *neighbors[i];
 				
 				const int s_n_finest[3] = {
-					block_size[0]>1? (n.index[0] << maxLevel - n.level) - s_b_finest[0] : 0,
-					block_size[1]>1? (n.index[1] << maxLevel - n.level) - s_b_finest[1] : 0,
-					block_size[2]>1? (n.index[2] << maxLevel - n.level) - s_b_finest[2] : 0
+				  block_size[0]>1? (n.index[0] << (maxLevel - n.level)) - s_b_finest[0] : 0,
+				  block_size[1]>1? (n.index[1] << (maxLevel - n.level)) - s_b_finest[1] : 0,
+				  block_size[2]>1? (n.index[2] << (maxLevel - n.level)) - s_b_finest[2] : 0
 				};
 				
 				const int e_n_finest[3] = {
-					block_size[0]>1? s_n_finest[0] + (1 << maxLevel - n.level) : 1,
-					block_size[1]>1? s_n_finest[1] + (1 << maxLevel - n.level) : 1,
-					block_size[2]>1? s_n_finest[2] + (1 << maxLevel - n.level) : 1
+				  block_size[0]>1? s_n_finest[0] + (1 << (maxLevel - n.level)) : 1,
+				  block_size[1]>1? s_n_finest[1] + (1 << (maxLevel - n.level)) : 1,
+				  block_size[2]>1? s_n_finest[2] + (1 << (maxLevel - n.level)) : 1
 				};
 				
 				const int s_intersection[3] = {
@@ -201,7 +201,7 @@ namespace MRAG
 		
 		for(int c=0; c<27; c++)
 		{
-			const int length = (1<< maxLevel - b.level);
+		        const int length = (1<< (maxLevel - b.level));
 			const int dir[3] = {
 				(c%3) - 1, (c/3 %3) - 1, (c/9 %3) - 1
 			};
@@ -233,7 +233,7 @@ namespace MRAG
 		//4. otherwise look in the lut neighborhood
 		
 		const int level_difference = maxLevel - level;
-		const int length = 1<< maxLevel - refCenterNode->level;
+		const int length = 1<< (maxLevel - refCenterNode->level);
 		
 		//1.
 		const int candidate_i[3] = {

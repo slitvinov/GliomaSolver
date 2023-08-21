@@ -94,7 +94,7 @@ namespace MRAG
 			const unsigned int s1 = bit_index; 
 			const unsigned int e1 = std::min((unsigned int)32, bit_index+nof_bits);
 			const unsigned int L1 = e1 - s1;
-			const unsigned int m1 = ((0xFFFFFFFF << 32-e1) >> 32-L1) << s1;
+			const unsigned int m1 = ((0xFFFFFFFF << (32-e1)) >> (32-L1)) << s1;
 			const unsigned int w1 = (bits[word_index] & m1) >> s1;
 			
 			const unsigned int e2 = nof_bits - L1;
@@ -125,7 +125,7 @@ namespace MRAG
 	private:
 		inline void _CopyToTheEnd(unsigned int& ob, unsigned int nb, unsigned int be)
 		{
-			ob &= (be? (0xFFFFFFFF>>32-be):0x00000000);
+		        ob &= (be? (0xFFFFFFFF>>(32-be)):0x00000000);
 			ob |= nb<<be;
 		}
 		
