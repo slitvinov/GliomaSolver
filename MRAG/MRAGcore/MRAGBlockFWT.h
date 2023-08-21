@@ -7,16 +7,7 @@
  *
  */
 
-#include "MRAGHelperMacros.h"
 #pragma once
-#include "MRAGCommon.h"
-
-#include "MRAGrid.h"
-#include "MRAGBlockCollection.h"
-#include "MRAGMatrix3D.h"
-#include "MRAGBlockLab.h"
-#undef max
-#undef min
 
 /*
 static bool compute_pos__DEBUG(int _bL, int _bX, int _bY, int &gX, int& gY, bool bChange=false, int iX=-1, int iY=-1)

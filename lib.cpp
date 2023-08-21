@@ -16,6 +16,7 @@ using namespace std;
 #include "MRAG/MRAGcore/MRAGrid.h"
 #include "MRAG/MRAGcore/MRAGRefiner.h"
 #include "MRAG/MRAGcore/MRAGBlockLab.h"
+#include "MRAG/MRAGcore/MRAGHelperMacros.h"
 #include "MRAG/MRAGcore/MRAGBlockFWT.h"
 #include "MRAG/MRAGscience/MRAGScienceCore.h"
 #include "MRAG/MRAGcore/MRAGCommon.h"

@@ -8,8 +8,6 @@
  */
 #pragma once
 
-#include <cstring>
-
 namespace MRAG
 {
 	struct BitStream
