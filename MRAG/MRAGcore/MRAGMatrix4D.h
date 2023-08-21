@@ -7,7 +7,7 @@
  *
  */
 
-#include <assert.h>
+
 #pragma once
 using namespace std;
 namespace MRAG

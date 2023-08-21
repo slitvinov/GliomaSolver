@@ -10,8 +10,8 @@
 
 #include "MRAGGridNode.h"
 
-#include <list>
-#include <map>
+
+
 using namespace std;
 
 namespace MRAG

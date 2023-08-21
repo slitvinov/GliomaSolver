@@ -6,7 +6,7 @@
  *  Copyright 2006 __MyCompanyName__. All rights reserved.
  *
  */
-#include <assert.h>
+
 #pragma once
 namespace MRAG
 {

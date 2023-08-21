@@ -8,9 +8,9 @@
  */
 #undef min
 #undef max
-#include <set>
-#include <assert.h>
-#include <math.h>
+
+
+
 
 namespace MRAG
 {

@@ -8,7 +8,7 @@
  */
 #pragma once
 
-#include <map>
+
 using namespace std;
 
 #include "MRAGRefinementPlan.h"
