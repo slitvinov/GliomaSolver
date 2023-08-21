@@ -11,7 +11,7 @@
        proliferation rate [1/day] (rho) <br>
        final simulation time [day] (tend)
   </dd>
-  
+
   <dt>TumorIC.txt</dt>
   <dd>tumor initial location (icx, icy, icz)</dd>
 </dl>
@@ -45,11 +45,19 @@
   <dd>PETsigma2, PETscale, T1uc, T2uc, slope</dd>
 </dl>
 
-# Install
+## Install and run
 
 ```
-python -m pip install -e .
+$ python -m pip install -e .
 ```
+
+## Run
+
+```
+$ ./fun.py
+62.115444
+256x256x256le.raw
+``
 
 ## Refernces
 
