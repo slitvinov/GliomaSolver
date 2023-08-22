@@ -314,5 +314,3 @@ public:
 };
 
 }
-
-#include "MRAG_BBInfoCreator.inl"

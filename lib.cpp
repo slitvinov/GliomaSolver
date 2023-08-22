@@ -28,6 +28,7 @@ using namespace std;
 #include "MRAG/MRAGcore/MRAGBlockCollapser.h"
 #include "MRAG/MRAGcore/MRAGrid.h"
 #include "MRAG/MRAGcore/MRAG_BBInfoCreator.h"
+#include "MRAG/MRAGcore/MRAG_BBInfoCreator.inl"
 #include "MRAG/MRAGcore/MRAGRefiner.h"
 #include "MRAG/MRAGcore/MRAGridHelpers.h"
 #include "MRAG/MRAGcore/MRAGrid.inl"
