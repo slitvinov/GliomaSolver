@@ -1,7 +1,3 @@
-
-#include "MRAGrid.h"
-#include "MRAGMatrix3D.h"
-
 namespace MRAG
 {
 	namespace MRAGridHelpers
