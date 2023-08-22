@@ -7,10 +7,6 @@
  *
  */
 
-#include "../MRAGcore/MRAGCommon.h"
-#include "../MRAGcore/MRAGRefiner.h"
-#include "../MRAGcore/MRAGBlockFWT.h"
-
 namespace MRAG
 {
 	

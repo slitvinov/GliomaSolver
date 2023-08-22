@@ -10,10 +10,6 @@
 #pragma once
 using namespace std;
 
-#include "../MRAGcore/MRAGCommon.h"
-#include "../MRAGcore/MRAGrid.h"
-
-
 namespace MRAG
 {
     /**
