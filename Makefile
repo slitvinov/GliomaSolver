@@ -9,8 +9,9 @@ CFLAGS = -O3
 DEFS = -D_BLOCKSIZE_=8
 
 OBJECTS =\
+lib_c.o\
+lib_cpp.o\
 main.o\
-lib.o\
 MRAGBoundaryBlockInfo.o\
 MRAGWavelets_StaticData.o\
 

@@ -4,8 +4,8 @@ from setuptools import setup
 module = Extension(
     "glioma_solver",
     sources=[
-        "glioma_solver.c", "lib.cpp", "MRAGBoundaryBlockInfo.cpp",
-        "MRAGWavelets_StaticData.cpp"
+        "glioma_solver.c", "lib_cpp.cpp", "lib_c.c",
+        "MRAGBoundaryBlockInfo.cpp", "MRAGWavelets_StaticData.cpp"
     ],
     extra_compile_args=["-D_BLOCKSIZE_=8", "-std=c++11"],
 )
