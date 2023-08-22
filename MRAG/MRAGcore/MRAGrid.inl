@@ -1,8 +1,3 @@
-#include "MRAGMatrix3D.h"
-#include "MRAGridHelpers.h"
-#include "MRAG_BBInfoCreator.h"
-#include "MRAGRefiner.h"
-
 namespace MRAG
 {
 	
