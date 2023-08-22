@@ -1,8 +1,5 @@
-
-#include "MRAGrid.h"
 #include "MRAGMatrix3D.h"
 #include "MRAGridHelpers.h"
-//#include "MRAGBoundaryBlockHelpers.h"
 #include "MRAG_BBInfoCreator.h"
 #include "MRAGRefiner.h"
 
