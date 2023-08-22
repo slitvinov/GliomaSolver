@@ -8,10 +8,6 @@
  */
 #pragma once
 
-#include "MRAGGridNode.h"
-
-
-
 using namespace std;
 
 namespace MRAG

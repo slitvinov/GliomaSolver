@@ -9,7 +9,6 @@
 #pragma once
 #ifndef _MRAGHelperMacros_
 #define _MRAGHelperMacros_
-#include "MRAGCommon.h"
 namespace MRAG
 {
     /**

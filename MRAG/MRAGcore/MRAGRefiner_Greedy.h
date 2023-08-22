@@ -8,9 +8,6 @@
  */
 
 #pragma once
-
-#include "MRAGRefiner.h"
-
 namespace MRAG
 {
 
