@@ -9,6 +9,7 @@
 #pragma once
 using namespace std;
 
+#include "MRAGBlockLab.h"
 #include "MRAGBlockCollapser.h"
 #include "MRAGBlockSplitter.h"
 
