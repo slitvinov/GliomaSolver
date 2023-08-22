@@ -20,6 +20,7 @@ using namespace std;
 #include "MRAG/MRAGcore/MRAGEncoder.h"
 #include "MRAG/MRAGcore/MRAGHuffmanEncoder.h"
 #include "MRAG/MRAGcore/MRAGBoundaryBlockInfo.h"
+#include "MRAG/MRAGcore/MRAGBlockCollection.h"
 #include "MRAG/MRAGcore/MRAGrid.h"
 #include "MRAG/MRAGcore/MRAGRefiner.h"
 #include "MRAG/MRAGcore/MRAGBlockLab.h"
