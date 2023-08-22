@@ -8,12 +8,6 @@
  */
 
 #pragma once
-
-
-
-#include "MRAGCommon.h"
-
-
 namespace MRAG
 {
 
