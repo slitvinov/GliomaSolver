@@ -7,7 +7,6 @@
  *
  */  
 #include "MRAGBlockLab.h"
-#include "MRAGCompressionPlan.h"
 #pragma once
 namespace MRAG
 {
