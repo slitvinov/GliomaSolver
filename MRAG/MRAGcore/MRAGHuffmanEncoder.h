@@ -8,15 +8,6 @@
  */
 #pragma once
 
-#include "MRAGEncoder.h"
-
-#undef min
-#undef max
-
-
-
-
-
 using namespace std;
 
 namespace MRAG

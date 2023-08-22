@@ -18,6 +18,8 @@
 #include <queue>
 #include <algorithm>
 #include "MRAG/MRAGcore/MRAGCommon.h"
+#include "MRAG/MRAGcore/MRAGBitStream.h"
+#include "MRAG/MRAGcore/MRAGEncoder.h"
 #include "MRAG/MRAGcore/MRAGHuffmanEncoder.h"
 #include "MRAG/MRAGcore/MRAGBoundaryBlockInfo.h"
 
