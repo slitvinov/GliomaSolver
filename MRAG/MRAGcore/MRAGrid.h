@@ -168,5 +168,3 @@ namespace MRAG
 	};
 }
 
-#include "MRAGrid.inl"
-
