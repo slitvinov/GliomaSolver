@@ -21,6 +21,7 @@ using namespace std;
 #include "MRAG/MRAGcore/MRAGHuffmanEncoder.h"
 #include "MRAG/MRAGcore/MRAGBoundaryBlockInfo.h"
 #include "MRAG/MRAGcore/MRAGBlockCollection.h"
+#include "MRAG/MRAGcore/MRAGBlockCollection.inl"
 #include "MRAG/MRAGcore/MRAGBlockLab.h"
 #include "MRAG/MRAGcore/MRAGRefinementPlan.h"
 #include "MRAG/MRAGcore/MRAGBlockSplitter.h"

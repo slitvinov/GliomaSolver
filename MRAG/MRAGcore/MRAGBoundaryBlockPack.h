@@ -8,8 +8,6 @@
  */
 
 #pragma once
-#include "MRAGCommon.h"
-
 namespace MRAG
 {
 	struct PointerToPoint

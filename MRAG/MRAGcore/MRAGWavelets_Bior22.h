@@ -1,10 +1,4 @@
 #pragma once
-
-
-
-#include "MRAGCommon.h"
-
-
 namespace MRAG
 {
 class Wavelets_Bior22 {

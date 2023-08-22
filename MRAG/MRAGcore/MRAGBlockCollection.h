@@ -153,4 +153,3 @@ private:
 };
 	
 }
-#include "MRAGBlockCollection.inl"

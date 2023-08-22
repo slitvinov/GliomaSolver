@@ -10,10 +10,6 @@
 
 
 using namespace std;
-
-#include "MRAGRefinementPlan.h"
-#include "MRAGGridNode.h"
-
 namespace MRAG
 {
 	class Refiner

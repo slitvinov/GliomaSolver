@@ -6,10 +6,6 @@
  *  Copyright 2008 CSE Lab, ETH Zurich. All rights reserved.
  *
  */
-#include "MRAGGridNode.h"
-#include "MRAGBoundaryBlockInfo.h"
-#include "MRAG_BBInfoCreator.h"
-
 //HELPER
 template <typename W, typename Real, bool bAnalysisFilter>
 inline  const Real  * cookFilter(const int level_difference, const int  * filter_support);
