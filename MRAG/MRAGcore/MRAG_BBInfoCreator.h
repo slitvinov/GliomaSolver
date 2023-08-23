@@ -6,10 +6,6 @@
  *  Copyright 2008 CSE Lab, ETH Zurich. All rights reserved.
  *
  */
-#include "MRAG_SmartBlockFinder.h"
-#include "MRAGMatrix3D.h"
-
-
 using namespace std;
 namespace MRAG
 {
