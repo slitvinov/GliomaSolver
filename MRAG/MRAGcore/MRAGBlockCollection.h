@@ -9,17 +9,7 @@
 #pragma once
 
 using namespace std;
-
-
-#ifdef _MRAG_BLOCKCOLLECTION_ALLOCATOR_HEADER
-#include _MRAG_BLOCKCOLLECTION_ALLOCATOR_HEADER
-#endif
-
 #include "MRAGMatrix3D.h"
-
-#ifndef _MRAG_BLOCKCOLLECTION_ALLOCATOR
-#define _MRAG_BLOCKCOLLECTION_ALLOCATOR std::allocator	
-#endif
 
 namespace MRAG
 {
@@ -139,7 +129,7 @@ protected:
 	Chunk * m_currentChunk;
 	int m_nAvailableBlocksInCurrentChunk;
 	
-	mutable _MRAG_BLOCKCOLLECTION_ALLOCATOR<BlockType_> allocator;
+	mutable std::allocator<BlockType_> allocator;
 	
 private:
 	//forbidden
