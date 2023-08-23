@@ -13,7 +13,7 @@ namespace MRAG
 {
 	struct SmartBlockFinder
 	{
-		template<typename T> inline  static _MRAG_GHOSTSCREATION_ALLOCATOR<T> allocator()  { return _MRAG_GHOSTSCREATION_ALLOCATOR<T>();}
+		template<typename T> inline  static std::allocator<T> allocator()  { return std::allocator<T>();}
 		
 	public:
 		static const bool bVerbose = false;

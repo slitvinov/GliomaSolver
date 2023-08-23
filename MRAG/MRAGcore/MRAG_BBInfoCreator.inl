@@ -316,9 +316,9 @@ namespace MRAG
 			eIteration_nspace[2] - sIteration_nspace[2]
 		};
 			
-		Matrix3D<char, true, _MRAG_GHOSTSCREATION_ALLOCATOR> matNeeded(size_iteration_nspace[0], size_iteration_nspace[1], size_iteration_nspace[2]);
-		Matrix3D<int, true, _MRAG_GHOSTSCREATION_ALLOCATOR> matKey(size_iteration_nspace[0], size_iteration_nspace[1], size_iteration_nspace[2]);
-		Matrix3D<int, true, _MRAG_GHOSTSCREATION_ALLOCATOR> matDest(eEasy_bspace[0] - sEasy_bspace[0], eEasy_bspace[1] - sEasy_bspace[1], eEasy_bspace[2] - sEasy_bspace[2]);
+		Matrix3D<char, true, std::allocator> matNeeded(size_iteration_nspace[0], size_iteration_nspace[1], size_iteration_nspace[2]);
+		Matrix3D<int, true, std::allocator> matKey(size_iteration_nspace[0], size_iteration_nspace[1], size_iteration_nspace[2]);
+		Matrix3D<int, true, std::allocator> matDest(eEasy_bspace[0] - sEasy_bspace[0], eEasy_bspace[1] - sEasy_bspace[1], eEasy_bspace[2] - sEasy_bspace[2]);
 		matNeeded = 0;
 		
 		int currPointsToAdd = 0;
@@ -1063,14 +1063,14 @@ void MRAG_BBInfoCreator<WaveletsType, BlockType>::_resolveBastardGhosts(
 	//9.	free the shit
 	
 	//1.
-	typedef _MRAG_GHOSTSCREATION_ALLOCATOR<BastardGhost *> ABG;
+	typedef std::allocator<BastardGhost *> ABG;
 	typedef vector<BastardGhost *, ABG> GhostVector;
-	typedef _MRAG_GHOSTSCREATION_ALLOCATOR< std::pair<const I3, BastardGhost*> > ABGMap;
+	typedef std::allocator< std::pair<const I3, BastardGhost*> > ABGMap;
 	typedef map<I3, BastardGhost*, std::less<I3>, ABGMap > GhostMap;
-	typedef _MRAG_GHOSTSCREATION_ALLOCATOR<GhostMap> ABGBuffer;
+	typedef std::allocator<GhostMap> ABGBuffer;
 	typedef vector< GhostMap, ABGBuffer > GhostBuffer;
-	typedef set<double, std::less<double>, _MRAG_GHOSTSCREATION_ALLOCATOR<double> > WeightSet;
-	typedef map<double, int, std::less<double>, _MRAG_GHOSTSCREATION_ALLOCATOR<std::pair< const double, int > > > WeightToIndexMap;
+	typedef set<double, std::less<double>, std::allocator<double> > WeightSet;
+	typedef map<double, int, std::less<double>, std::allocator<std::pair< const double, int > > > WeightToIndexMap;
 
     const int start_level = smartFinder.minLevel;
 	
@@ -1249,7 +1249,7 @@ void MRAG_BBInfoCreator<WaveletsType, BlockType>::_resolveBastardGhosts(
 template <typename W, typename Real, bool bAnalysisFilter>
 inline  const Real  * cookFilter(const int level_difference, const int  * filter_support)
 {
-	typedef _MRAG_GHOSTSCREATION_ALLOCATOR<Real> RealAllocator;
+	typedef std::allocator<Real> RealAllocator;
 	
 	const int offset = 0 - filter_support[0];
 	const int start = filter_support[0];

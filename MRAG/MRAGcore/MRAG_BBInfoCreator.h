@@ -6,15 +6,6 @@
  *  Copyright 2008 CSE Lab, ETH Zurich. All rights reserved.
  *
  */
-#pragma once
-#ifdef _MRAG_GHOSTSCREATION_ALLOCATOR_HEADER
-#include _MRAG_GHOSTSCREATION_ALLOCATOR_HEADER
-#endif
-
-#ifndef _MRAG_GHOSTSCREATION_ALLOCATOR
-#define _MRAG_GHOSTSCREATION_ALLOCATOR std::allocator	
-#endif
-
 #include "MRAG_SmartBlockFinder.h"
 #include "MRAGMatrix3D.h"
 
@@ -29,15 +20,15 @@ class MRAG_BBInfoCreator
 	typedef BlockType B;
 	typedef WaveletsType W;
 	
-	template<typename T> inline _MRAG_GHOSTSCREATION_ALLOCATOR<T> allocator() const { return _MRAG_GHOSTSCREATION_ALLOCATOR<T>();}
+	template<typename T> inline std::allocator<T> allocator() const { return std::allocator<T>();}
 	
 	static const bool bVerbose = false;
 	
 	struct BastardGhost
 	{
-		template<typename T> inline _MRAG_GHOSTSCREATION_ALLOCATOR<T> allocator() const { return _MRAG_GHOSTSCREATION_ALLOCATOR<T>();}
+		template<typename T> inline std::allocator<T> allocator() const { return std::allocator<T>();}
 		
-		typedef Matrix3D<BastardGhost *, true, _MRAG_GHOSTSCREATION_ALLOCATOR> MatrixOfRequests;
+		typedef Matrix3D<BastardGhost *, true, std::allocator> MatrixOfRequests;
 		
 		enum BastardGhost_Status {
 			BastardGhost_Unresolved=0,
@@ -48,7 +39,7 @@ class MRAG_BBInfoCreator
 		
 		BastardGhost_Status status, candidate_status;
 		
-		vector<BastardGhost* , _MRAG_GHOSTSCREATION_ALLOCATOR<BastardGhost*> > customers;
+		vector<BastardGhost* , std::allocator<BastardGhost*> > customers;
 		MatrixOfRequests * matRequests;
 		I3 index;
 		short int block_level;
