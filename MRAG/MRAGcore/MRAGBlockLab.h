@@ -7,16 +7,6 @@
  *
  */
 
-#ifdef std::allocator
-#include std::allocator
-#endif
-
-#include "MRAGMatrix3D.h"
-
-#ifndef _MRAG_BLOCKLAB_ALLOCATOR
-#define _MRAG_BLOCKLAB_ALLOCATOR std::allocator	
-#endif
-
 #pragma once
 namespace MRAG
 {
@@ -36,7 +26,7 @@ protected:
 	enum eBlockLab_State {eMRAGBlockLab_Prepared, eMRAGBlockLab_Loaded, eMRAGBlockLab_Uninitialized};
 	
 	eBlockLab_State m_state;
-	Matrix3D<ElementType, true, _MRAG_BLOCKLAB_ALLOCATOR> * m_cacheBlock;
+	Matrix3D<ElementType, true, std::allocator> * m_cacheBlock;
 	Real * m_weightPool;
 	ElementType * m_valuePool;
 	int m_weightPoolSize, m_valuePoolSize;
@@ -44,7 +34,7 @@ protected:
 	const BlockCollection<BlockType>* m_refCollection;
 	const BoundaryInfo* m_refBoundaryInfo;
 
-	template<typename T> inline _MRAG_BLOCKLAB_ALLOCATOR<T> allocator() const { return _MRAG_BLOCKLAB_ALLOCATOR<T>();};
+	template<typename T> inline std::allocator<T> allocator() const { return std::allocator<T>();};
 	
 	template<typename T>
 	void _release(T *& t) 
@@ -128,9 +118,9 @@ public:
 			if (m_cacheBlock != NULL)
 				_release(m_cacheBlock);
 
-			m_cacheBlock = allocator< Matrix3D<ElementType,  true, _MRAG_BLOCKLAB_ALLOCATOR> >().allocate(1);
+			m_cacheBlock = allocator< Matrix3D<ElementType,  true, std::allocator> >().allocate(1);
 			
-			allocator< Matrix3D<ElementType,  true, _MRAG_BLOCKLAB_ALLOCATOR> >().construct(m_cacheBlock, Matrix3D<ElementType,  true, _MRAG_BLOCKLAB_ALLOCATOR> ());
+			allocator< Matrix3D<ElementType,  true, std::allocator> >().construct(m_cacheBlock, Matrix3D<ElementType,  true, std::allocator> ());
 			
 			m_cacheBlock->_Setup(BlockType::sizeX + m_stencilEnd[0] - m_stencilStart[0] -1,
 								 BlockType::sizeY + m_stencilEnd[1] - m_stencilStart[1] -1,
