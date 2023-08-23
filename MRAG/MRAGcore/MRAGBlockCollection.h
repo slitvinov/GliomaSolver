@@ -9,8 +9,6 @@
 #pragma once
 
 using namespace std;
-#include "MRAGMatrix3D.h"
-
 namespace MRAG
 {
     

@@ -7,8 +7,8 @@
  *
  */
 
-#ifdef _MRAG_BLOCKLAB_ALLOCATOR_HEADER
-#include _MRAG_BLOCKLAB_ALLOCATOR_HEADER
+#ifdef std::allocator
+#include std::allocator
 #endif
 
 #include "MRAGMatrix3D.h"
