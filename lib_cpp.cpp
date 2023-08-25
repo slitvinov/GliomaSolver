@@ -36,7 +36,6 @@
 #include "MRAG/MRAGcore/MRAGHelperMacros.h"
 #include "MRAG/MRAGcore/MRAGBlockFWT.h"
 #include "MRAG/MRAGscience/MRAGScienceCore.h"
-#include "MRAG/MRAGscience/MRAGAutomaticRefiner.h"
 #include "MRAG/MRAGscience/MRAGSpaceTimeSorter.h"
 #include "MRAG/MRAGscience/MRAGRefiner_SpaceExtension.h"
 #include "MRAG/MRAGmultithreading/MRAGBlockProcessing_SingleCPU.h"
