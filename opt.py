@@ -41,7 +41,8 @@ def write(a):
 def sim(x):
     ic = x[:3]
     rho = x[3]
-    glioma_solver.run(bpd, GM, WM, ic, dw, rho, tend, HG)
+    period = 0
+    glioma_solver.run(bpd, GM, WM, ic, dw, rho, tend, period, HG)
 
 
 def fun(x):
