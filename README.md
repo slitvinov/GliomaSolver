@@ -59,6 +59,15 @@ $ ./fun.py
 256x256x256le.raw
 ``
 
+## Hacking
+
+Coverage report
+```
+$ make -B 'CXXFLAGS = -fprofile-arcs -ftest-coverage' 'CFLAGS = -fprofile-arcs -ftest-coverage' 'LDFLAGS = -lgcov' 'LDDFLAGS = -lgcov'
+$ ./brain
+$ gcovr --html-details index.html
+```
+
 ## Refernces
 
 1. <http://tdo.sk/~janka/GliomaWebsite/index.html>
