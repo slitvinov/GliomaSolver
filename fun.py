@@ -39,12 +39,23 @@ def write(a):
 bpd = 32
 GM = read("GM.dat")
 WM = read("WM.dat")
-PET = read("tumPET.dat")
 HG = np.empty_like(GM, shape=(8 * bpd, 8 * bpd, 8 * bpd))
 ic = 0.64925073, 0.59093041, 0.37127833
 dw = 0.0013
 rho = 0.025
 tend = 300
 glioma_solver.run(bpd, GM, WM, ic, dw, rho, tend, HG)
-print(np.linalg.norm(HG - PET))
+
+PET = read("tumPET.dat")
+T1c = read("tumT1c.dat")
+FLAIR = read("tumFLAIR.dat")
+
+PETsigma2 = 0.000361
+PETscale = 0.85
+T1uc = 0.7
+T2uc = 0.25
+slope = 2
+ans = glioma_solver.likelihood(HG, PET, T1c, FLAIR, PETsigma2, PETscale, slope,
+                               T1uc, T2uc)
+print("%.16e" % ans)
 write(HG)

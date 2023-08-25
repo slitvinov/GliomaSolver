@@ -4,6 +4,71 @@
 
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
+static PyObject *likelihood(PyObject *self, PyObject *args) {
+  Py_ssize_t indices[3] = {0, 0, 0};
+  float *model;
+  PyObject *MODEL, *PET, *T1c, *FLAIR;
+  Py_buffer model_view, pet_view, t1c_view, flair_view;
+  struct LikelihoodParams params;
+  double ans;
+
+  if (!PyArg_ParseTuple(args, "OOOOddddd", &MODEL, &PET, &T1c, &FLAIR,
+                        &params.PETsigma2, &params.PETscale, &params.slope,
+                        &params.T1uc, &params.T2uc))
+    return NULL;
+  if (!PyObject_CheckBuffer(MODEL) || !PyObject_CheckBuffer(PET) ||
+      !PyObject_CheckBuffer(T1c) || !PyObject_CheckBuffer(FLAIR))
+    return NULL;
+  if (PyObject_GetBuffer(MODEL, &model_view, PyBUF_F_CONTIGUOUS) == -1 ||
+      PyObject_GetBuffer(PET, &pet_view, PyBUF_F_CONTIGUOUS) == -1 ||
+      PyObject_GetBuffer(T1c, &t1c_view, PyBUF_F_CONTIGUOUS) == -1 ||
+      PyObject_GetBuffer(FLAIR, &flair_view, PyBUF_F_CONTIGUOUS) == -1)
+    return NULL;
+  if (model_view.ndim != 3 || pet_view.ndim != 3 || t1c_view.ndim != 3 ||
+      flair_view.ndim != 3) {
+    PyErr_SetString(PyExc_ValueError, "MODEL, PET, T1c, or FLAIR: ndim != 3");
+    return NULL;
+  }
+  if (model_view.shape[0] != pet_view.shape[0] ||
+      model_view.shape[1] != pet_view.shape[1] ||
+      model_view.shape[2] != pet_view.shape[2]) {
+    PyErr_SetString(PyExc_ValueError, "MODEL, PET: dimensions do not match");
+    return NULL;
+  }
+  if (model_view.shape[0] != t1c_view.shape[0] ||
+      model_view.shape[1] != t1c_view.shape[1] ||
+      model_view.shape[2] != t1c_view.shape[2]) {
+    PyErr_SetString(PyExc_ValueError, "MODEL, T1c: dimensions do not match");
+    return NULL;
+  }
+  if (model_view.shape[0] != flair_view.shape[0] ||
+      model_view.shape[1] != flair_view.shape[1] ||
+      model_view.shape[2] != flair_view.shape[2]) {
+    PyErr_SetString(PyExc_ValueError, "MODEL, FLAIR: dimensions do not match");
+    return NULL;
+  }
+  if (model_view.itemsize != sizeof(float) ||
+      pet_view.itemsize != sizeof(float) ||
+      t1c_view.itemsize != sizeof(float) ||
+      flair_view.itemsize != sizeof(float)) {
+    PyErr_SetString(PyExc_ValueError, "MODEL, PET, T1c, FLAIR: wrong type");
+    return NULL;
+  }
+  params.PET = PyBuffer_GetPointer(&pet_view, indices);
+  params.T1c = PyBuffer_GetPointer(&t1c_view, indices);
+  params.FLAIR = PyBuffer_GetPointer(&flair_view, indices);
+  params.n[0] = model_view.shape[0];
+  params.n[1] = model_view.shape[1];
+  params.n[2] = model_view.shape[2];
+
+  model = PyBuffer_GetPointer(&model_view, indices);
+  params.PET = PyBuffer_GetPointer(&pet_view, indices);
+  params.T1c = PyBuffer_GetPointer(&t1c_view, indices);
+  params.FLAIR = PyBuffer_GetPointer(&flair_view, indices);
+  brain_likelihood(&params, model, &ans);
+  return PyFloat_FromDouble(ans);
+}
+
 static PyObject *run(PyObject *self, PyObject *args) {
   Py_buffer gm_view, wm_view, hg_view;
   Py_ssize_t indices[3] = {0, 0, 0};
@@ -78,11 +143,12 @@ static PyObject *run(PyObject *self, PyObject *args) {
   hg = PyBuffer_GetPointer(&hg_view, indices);
   brain_project(brain, hg);
   brain_fin(brain);
-  return PyFloat_FromDouble(0.0);
+  Py_RETURN_NONE;
 }
 
 static PyMethodDef Glioma_SolverMethods[] = {
     {"run", run, METH_VARARGS, PyDoc_STR("Run simulations")},
+    {"likelihood", likelihood, METH_VARARGS, PyDoc_STR("Run simulations")},
     {NULL, NULL, 0, NULL},
 };
 

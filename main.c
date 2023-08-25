@@ -6,11 +6,12 @@
 #define max(a, b) ((a) > (b) ? (a) : (b))
 int main(void) {
   struct Brain *brain;
-  double whenToWrite, whenToWriteOffset, tend, h, t, L;
+  double whenToWrite, whenToWriteOffset, tend, h, t, L, ans;
   float *model;
   char path[FILENAME_MAX - 9];
-  int step, gpd;
+  int step, gpd, n[3];
   struct BrainParams params;
+  struct LikelihoodParams lparams;
 
   params.blocksPerDimension = 32;
   params.ic[0] = 0.6497946102507519;
@@ -46,9 +47,6 @@ int main(void) {
   brain_project(brain, model);
   brain_fin(brain);
 
-  double ans;
-  struct LikelihoodParams lparams;
-  int n[3];
   lparams.PET = brain_read("tumPET.dat", n);
   lparams.T1c = brain_read("tumT1c.dat", n);
   lparams.FLAIR = brain_read("tumFLAIR.dat", n);
