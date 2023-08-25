@@ -1,4 +1,3 @@
-#pragma once
 namespace MRAG {
 struct Wavelets_Interp2ndOrder {
 private:

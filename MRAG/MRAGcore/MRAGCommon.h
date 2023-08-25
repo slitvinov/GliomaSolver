@@ -3,9 +3,6 @@
 #endif
 
 typedef _MRAG_REAL_ Real;
-
-#pragma once
-
 /**
  * Shall we perform debug checks?
  */

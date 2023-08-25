@@ -1,6 +1,3 @@
-#pragma once
-#ifndef _MRAGHelperMacros_
-#define _MRAGHelperMacros_
 namespace MRAG {
 /**
  * Creates a Projector class that provides a static function Real Project(const
@@ -30,4 +27,3 @@ template <typename T, int i> inline Real dummy_projector_impl(const T &t) {
 make_projector(dummy_projector, dummy_projector_impl);
 #endif
 } // namespace MRAG
-#endif // MRAGHelperMacros

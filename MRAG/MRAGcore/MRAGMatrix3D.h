@@ -1,4 +1,3 @@
-#pragma once
 namespace MRAG {
 
 template <class DataType, bool bPrimitiveType = false,
