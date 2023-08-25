@@ -58,7 +58,7 @@ struct SimpleInterval {
  */
 // Gery-Note: Constructors work redundantly -> x(x_) and then x = x??
 struct I4 {
-  short int l, x, y, z;
+  short int x, y, z, l;
 
   I4(int x_, int y_, int z_, int l_) : x(x_), y(y_), z(z_), l(l_) {}
 
@@ -92,9 +92,9 @@ struct WTDataType {
 
 struct BlockInfo {
   int blockID;
-  void *ptrBlock;
   short int index[3];
   short int level;
+  void *ptrBlock;
 
   /** Origin of this block in all dimensions. */
   Real origin[3];

@@ -1,8 +1,8 @@
 namespace MRAG {
 struct BitStream {
   unsigned int *bits;
-  unsigned int word32_index;
   unsigned int words32;
+  unsigned int word32_index;
   unsigned int bits_end;
 
   BitStream() : bits(NULL), words32(0), word32_index(0), bits_end(0) {}
