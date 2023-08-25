@@ -55,7 +55,7 @@ $ python -m pip install -e .
 
 ```
 $ ./fun.py
-62.115444
+2.3475835715578407e+07
 256x256x256le.raw
 ``
 

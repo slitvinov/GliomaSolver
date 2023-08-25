@@ -2,7 +2,9 @@
 #include "lib.h"
 #include <Python.h>
 
-#define max(a, b) ((a) > (b) ? (a) : (b))
+static int max(int a, int b) {
+  return a > b ? a : b;
+}
 
 static PyObject *likelihood(PyObject *self, PyObject *args) {
   Py_ssize_t indices[3] = {0, 0, 0};
@@ -73,15 +75,16 @@ static PyObject *run(PyObject *self, PyObject *args) {
   Py_buffer gm_view, wm_view, hg_view;
   Py_ssize_t indices[3] = {0, 0, 0};
   double dw, tend, h, t, L;
-  int step, gpd;
+  int step, gpd, period;
   PyObject *GM, *WM, *HG;
   float *hg;
   struct Brain *brain;
   struct BrainParams params;
+  char path[FILENAME_MAX - 9];
 
-  if (!PyArg_ParseTuple(args, "iOO(ddd)dddO", &params.blocksPerDimension, &GM,
+  if (!PyArg_ParseTuple(args, "iOO(ddd)dddiO", &params.blocksPerDimension, &GM,
                         &WM, &params.ic[0], &params.ic[1], &params.ic[2], &dw,
-                        &params.rho, &tend, &HG))
+                        &params.rho, &tend, &period, &HG))
     return NULL;
   if (!PyObject_CheckBuffer(GM) || !PyObject_CheckBuffer(WM) ||
       !PyObject_CheckBuffer(HG))
@@ -115,7 +118,6 @@ static PyObject *run(PyObject *self, PyObject *args) {
   params.n[0] = gm_view.shape[0];
   params.n[1] = gm_view.shape[1];
   params.n[2] = gm_view.shape[2];
-  // printf("%g %g %g\n", params.ic[0], params.ic[1], params.ic[2]);
   gpd = (_BLOCKSIZE_)*params.blocksPerDimension;
 
   if (hg_view.shape[0] != gpd || hg_view.shape[1] != gpd ||
@@ -136,6 +138,10 @@ static PyObject *run(PyObject *self, PyObject *args) {
   while (t <= tend) {
     if (PyErr_CheckSignals() != 0)
       break;
+    if (period != 0 && step % period == 0) {
+      sprintf(path, "a.%09d", step);
+      brain_dump(brain, path);
+    }
     brain_step(brain);
     t += params.dt;
     step++;

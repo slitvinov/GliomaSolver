@@ -48,6 +48,7 @@ int main(int argc, const char **argv) {
   float *model, *PETdata, *tumT1c, *tumFLAIR;
   int N, i;
   long double sum, p1, p2, Lt1, Lt2;
+  double ans;
 
   PETsigma2 = 0.000361;
   PETscale = 0.85;
@@ -70,5 +71,6 @@ int main(int argc, const char **argv) {
   p2 = -0.5 * (1. / PETsigma2) * sum;
   Lt1 = TiLogLikelihood(model, tumT1c, T1uc);
   Lt2 = TiLogLikelihood(model, tumFLAIR, T2uc);
-  printf("%.16Le\n", -(p1 + p2 + Lt1 + Lt2));
+  ans = -(p1 + p2 + Lt1 + Lt2);
+  printf("%.16le\n", ans);
 };
