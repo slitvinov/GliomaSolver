@@ -292,37 +292,37 @@ void MRAG_BBInfoCreator<WaveletsType, BlockType>::_computeEasyGhosts_Synthesis(
   // 6.
   const int sEasy_nspace[3] = {
       B::shouldProcessDirectionX
-          ? ((b.index[0] * B::sizeX + sEasy_bspace[0] - filter_support[1] >>
+          ? (((b.index[0] * B::sizeX + sEasy_bspace[0] - filter_support[1]) >>
               inv_level_difference) +
              1 - n.index[0] * B::sizeX)
           : 0,
       B::shouldProcessDirectionY
-          ? ((b.index[1] * B::sizeY + sEasy_bspace[1] - filter_support[1] >>
+          ? (((b.index[1] * B::sizeY + sEasy_bspace[1] - filter_support[1]) >>
               inv_level_difference) +
              1 - n.index[1] * B::sizeY)
           : 0,
       B::shouldProcessDirectionZ
-          ? ((b.index[2] * B::sizeZ + sEasy_bspace[2] - filter_support[1] >>
+          ? (((b.index[2] * B::sizeZ + sEasy_bspace[2] - filter_support[1]) >>
               inv_level_difference) +
              1 - n.index[2] * B::sizeZ)
           : 0};
 
   const int eEasy_nspace[3] = {
-      B::shouldProcessDirectionX
-          ? ((b.index[0] * B::sizeX + eEasy_bspace[0] - filter_support[0] - 1 >>
-              inv_level_difference) -
-             n.index[0] * B::sizeX + 1)
-          : 1,
-      B::shouldProcessDirectionY
-          ? ((b.index[1] * B::sizeX + eEasy_bspace[1] - filter_support[0] - 1 >>
-              inv_level_difference) -
-             n.index[1] * B::sizeX + 1)
-          : 1,
-      B::shouldProcessDirectionZ
-          ? ((b.index[2] * B::sizeX + eEasy_bspace[2] - filter_support[0] - 1 >>
-              inv_level_difference) -
-             n.index[2] * B::sizeX + 1)
-          : 1};
+      B::shouldProcessDirectionX ? (((b.index[0] * B::sizeX + eEasy_bspace[0] -
+                                      filter_support[0] - 1) >>
+                                     inv_level_difference) -
+                                    n.index[0] * B::sizeX + 1)
+                                 : 1,
+      B::shouldProcessDirectionY ? (((b.index[1] * B::sizeX + eEasy_bspace[1] -
+                                      filter_support[0] - 1) >>
+                                     inv_level_difference) -
+                                    n.index[1] * B::sizeX + 1)
+                                 : 1,
+      B::shouldProcessDirectionZ ? (((b.index[2] * B::sizeX + eEasy_bspace[2] -
+                                      filter_support[0] - 1) >>
+                                     inv_level_difference) -
+                                    n.index[2] * B::sizeX + 1)
+                                 : 1};
 
   const int sIteration_nspace[3] = {
       std::max(0, sEasy_nspace[0]),
@@ -711,30 +711,30 @@ void MRAG_BBInfoCreator<WaveletsType, BlockType>::_computeEasyGhosts_Analysis(
   {
     const int entire_bspace_start[3] = {
         B::shouldProcessDirectionX
-            ? ((n.index[0] * B::sizeX - 1 >> level_difference) + 1 -
+            ? (((n.index[0] * B::sizeX - 1) >> level_difference) + 1 -
                b.index[0] * B::sizeX)
             : 0,
         B::shouldProcessDirectionY
-            ? ((n.index[1] * B::sizeY - 1 >> level_difference) + 1 -
+            ? (((n.index[1] * B::sizeY - 1) >> level_difference) + 1 -
                b.index[1] * B::sizeY)
             : 0,
         B::shouldProcessDirectionZ
-            ? ((n.index[2] * B::sizeZ - 1 >> level_difference) + 1 -
+            ? (((n.index[2] * B::sizeZ - 1) >> level_difference) + 1 -
                b.index[2] * B::sizeZ)
             : 0,
     };
 
     const int entire_bspace_end[3] = {
         B::shouldProcessDirectionX
-            ? (((n.index[0] + 1) * B::sizeX - 1 >> level_difference) + 1 -
+            ? ((((n.index[0] + 1) * B::sizeX - 1) >> level_difference) + 1 -
                b.index[0] * B::sizeX)
             : 1,
         B::shouldProcessDirectionY
-            ? (((n.index[1] + 1) * B::sizeY - 1 >> level_difference) + 1 -
+            ? ((((n.index[1] + 1) * B::sizeY - 1) >> level_difference) + 1 -
                b.index[1] * B::sizeY)
             : 1,
         B::shouldProcessDirectionZ
-            ? (((n.index[2] + 1) * B::sizeZ - 1 >> level_difference) + 1 -
+            ? ((((n.index[2] + 1) * B::sizeZ - 1) >> level_difference) + 1 -
                b.index[2] * B::sizeZ)
             : 1,
     };
