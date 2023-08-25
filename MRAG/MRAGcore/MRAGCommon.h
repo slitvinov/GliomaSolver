@@ -1,17 +1,3 @@
-/*
- *  MRAGCommon.h
- *  MRAG
- *
- *  Created by Diego Rossinelli on 4/23/08.
- *  Copyright 2008 CSE Lab, ETH Zurich. All rights reserved.
- *
- */
-#pragma once
-
-/**
- * Define a default representation for real numbers.
- */
-
 #ifndef _MRAG_REAL_
 #define _MRAG_REAL_ float
 #endif

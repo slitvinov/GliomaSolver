@@ -1,11 +1,3 @@
-/*
- *  MRAGMacros.h
- *  MRAG
- *
- *  Created by Diego Rossinelli on 9/3/08.
- *  Copyright 2008 CSE Lab, ETH Zurich. All rights reserved.
- *
- */
 #pragma once
 #ifndef _MRAGHelperMacros_
 #define _MRAGHelperMacros_

@@ -1,14 +1,3 @@
-/*
- *  MRAGRefiner_SpaceExtension.h
- *  MRAG
- *
- *  Created by Diego Rossinelli on 9/9/08.
- *  Copyright 2008 CSE Lab, ETH Zurich. All rights reserved.
- *
- */
-
-#pragma once
-
 namespace MRAG {
 class Refiner_SpaceExtension : public Refiner {
   int m_nMaxLevel;

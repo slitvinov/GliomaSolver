@@ -1,13 +1,3 @@
-/*
- *  MRAGBitStream.h
- *  MRAG
- *
- *  Created by Diego Rossinelli on 1/10/09.
- *  Copyright 2009 CSE Lab, ETH Zurich. All rights reserved.
- *
- */
-#pragma once
-
 namespace MRAG {
 struct BitStream {
   unsigned int *bits;

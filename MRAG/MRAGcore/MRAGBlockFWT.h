@@ -1,38 +1,3 @@
-/*
- *  MRAGBlockFWT.h
- *  MRAG
- *
- *  Created by Diego Rossinelli on 7/1/08.
- *  Copyright 2008 CSE Lab, ETH Zurich. All rights reserved.
- *
- */
-
-#pragma once
-
-/*
-static bool compute_pos__DEBUG(int _bL, int _bX, int _bY, int &gX, int& gY, bool
-bChange=false, int iX=-1, int iY=-1)
-{
-        static int bX = -1;
-        static int bY = -1;
-        static int bL = -1;
-
-        if (bChange)
-        {
-                bX = _bX;
-                bY = _bY;
-                bL = _bL;
-                return false;
-        }
-        else
-        {
-                gX = 8*bX + iX;
-                gY = 8*bY + iY;
-
-                return (bL==1);
-        }
-}
-*/
 namespace MRAG {
 
 template <int nChannels = 1> class FWTReport {

@@ -1,13 +1,3 @@
-/*
- *  MRAGHuffmanEncoder.h
- *  MRAG
- *
- *  Created by Diego Rossinelli on 1/9/09.
- *  Copyright 2009 CSE Lab, ETH Zurich. All rights reserved.
- *
- */
-#pragma once
-
 using namespace std;
 
 namespace MRAG {

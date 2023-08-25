@@ -1,14 +1,3 @@
-/*
- *  MRAGBlockSplitter.h
- *  MRAG
- *
- *  Created by Diego Rossinelli on 5/27/08.
- *  Copyright 2008 CSE Lab, ETH Zurich. All rights reserved.
- *
- */
-
-#pragma once
-
 namespace MRAG {
 template <typename WaveletsType, typename BlockCollectionType>
 class BlockSplitter {

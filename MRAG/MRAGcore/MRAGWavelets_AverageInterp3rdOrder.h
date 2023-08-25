@@ -1,12 +1,3 @@
-/*
- *  MRAGWavelets_AverageInterp3rdOrder.h
- *  MRAG
- *
- *  Created by Diego Rossinelli on 12/9/08.
- *  Copyright 2008 CSE Lab, ETH Zurich. All rights reserved.
- *
- */
-
 namespace MRAG {
 struct Wavelets_AverageInterp3rdOrder {
 private:

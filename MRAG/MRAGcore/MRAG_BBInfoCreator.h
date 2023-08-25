@@ -1,11 +1,3 @@
-/*
- *  MRAG_BBInfoCreator.h
- *  MRAG
- *
- *  Created by Diego Rossinelli on 7/25/08.
- *  Copyright 2008 CSE Lab, ETH Zurich. All rights reserved.
- *
- */
 using namespace std;
 namespace MRAG {
 

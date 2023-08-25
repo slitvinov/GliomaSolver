@@ -1,12 +1,3 @@
-/*
- *  MRAGrid.h
- *  MRAG
- *
- *  Created by Diego Rossinelli on 4/23/08.
- *  Copyright 2008 CSE Lab, ETH Zurich. All rights reserved.
- *
- */
-#pragma once
 using namespace std;
 
 namespace MRAG {

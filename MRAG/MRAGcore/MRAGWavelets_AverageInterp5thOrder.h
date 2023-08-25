@@ -1,12 +1,3 @@
-/*
- *  MRAGWavelets_AverageInterp5thOrder.h
- *  MRAG
- *
- *  Created by Diego Rossinelli on 12/10/08.
- *  Copyright 2008 CSE Lab, ETH Zurich. All rights reserved.
- *
- */
-
 namespace MRAG {
 struct Wavelets_AverageInterp5thOrder {
 private:

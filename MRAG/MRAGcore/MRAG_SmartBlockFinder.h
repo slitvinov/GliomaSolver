@@ -1,14 +1,3 @@
-/*
- *  MRAG_SmartBlockFinder.h
- *  MRAG
- *
- *  Created by Diego Rossinelli on 8/19/08.
- *  Copyright 2008 CSE Lab, ETH Zurich. All rights reserved.
- *
- */
-
-#pragma once
-
 namespace MRAG {
 struct SmartBlockFinder {
   template <typename T> inline static std::allocator<T> allocator() {

@@ -1,14 +1,3 @@
-/*
- *  MRAGBlockProcessing_SingleCPU.h
- *  MRAG
- *
- *  Created by Diego Rossinelli on 9/13/08.
- *  Copyright 2008 CSE Lab, ETH Zurich. All rights reserved.
- *
- */
-
-#pragma once
-
 namespace MRAG {
 namespace Multithreading {
 /**

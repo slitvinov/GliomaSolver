@@ -1,13 +1,3 @@
-/*
- *  MRAGCompressionPlan.h
- *  MRAG
- *
- *  Created by Diego Rossinelli on 5/20/08.
- *  Copyright 2008 CSE Lab, ETH Zurich. All rights reserved.
- *
- */
-
-#pragma once
 namespace MRAG {
 struct CompressionPlan {
   struct Collapse {

@@ -1,13 +1,3 @@
-/*
- *  MRAGWavelets_Interp4thOrder.h
- *  MRAG
- *
- *  Created by Diego Rossinelli on 7/15/08.
- *  Copyright 2008 CSE Lab, ETH Zurich. All rights reserved.
- *
- */
-
-#pragma once
 namespace MRAG {
 struct Wavelets_Interp4thOrder {
 private:

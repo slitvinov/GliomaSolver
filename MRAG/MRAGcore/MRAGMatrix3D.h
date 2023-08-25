@@ -1,12 +1,3 @@
-/*
- *  Matrix3D.h
- *  ReactionDiffusion
- *
- *  Created by Diego Rossinelli on 10/19/06.
- *  Copyright 2006 __MyCompanyName__. All rights reserved.
- *
- */
-
 #pragma once
 namespace MRAG {
 

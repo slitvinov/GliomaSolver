@@ -1,13 +1,3 @@
-/*
- *  MRAGEncoder.h
- *  MRAG
- *
- *  Created by Diego Rossinelli on 1/10/09.
- *  Copyright 2009 CSE Lab, ETH Zurich. All rights reserved.
- *
- */
-#pragma once
-
 #ifndef log2
 #define log2(x) (log((double)(x)) / (double)log(2.))
 #endif

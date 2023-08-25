@@ -1,12 +1,3 @@
-/*
- *  MRAG_BBInfoCreator.cpp
- *  MRAG
- *
- *  Created by Diego Rossinelli on 7/25/08.
- *  Copyright 2008 CSE Lab, ETH Zurich. All rights reserved.
- *
- */
-// HELPER
 template <typename W, typename Real, bool bAnalysisFilter>
 inline const Real *cookFilter(const int level_difference,
                               const int *filter_support);
