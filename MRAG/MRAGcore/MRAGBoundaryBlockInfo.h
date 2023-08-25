@@ -110,7 +110,7 @@ public:
   float getMemorySize() const;
 
   BoundaryInfoBlock(const int block_size_[3])
-      : indexPool(), weightsPool(), ghosts(), dependentBlockIDs(),
+    : 
         state(BBIState_Initialized), nLocks(1), encodedInstructionSizes(),
         encodedInstructionItemsWs(), encodedInstructionItemsPts(),
         vBlockID_encodedPointIndices3D(), vBlockID_Points(),

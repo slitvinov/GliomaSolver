@@ -74,7 +74,7 @@ public:
   bool hasFailed() const { return bFailed; }
 
   RefinementResult(const bool bFailed_ = false)
-      : nChildrenBlocks(0), nCollapsedParentBlocks(0), bFailed(bFailed_) {}
+    : bFailed(bFailed_), nChildrenBlocks(0), nCollapsedParentBlocks(0) {}
 
   RefinementResult operator+=(const RefinementResult &r) {
     nChildrenBlocks += r.nChildrenBlocks;
