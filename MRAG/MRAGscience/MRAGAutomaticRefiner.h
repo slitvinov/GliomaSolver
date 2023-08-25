@@ -35,7 +35,7 @@ public:
   virtual RefinementPlan *createPlan(const HierarchyType &hierarchy,
                                      const NeighborhoodType &neighborhood,
                                      const bool vProcessingDirections[3],
-                                     vector<NodeToRefine> &vRefinements) {
+                                     std::vector<NodeToRefine> &vRefinements) {
     RefinementPlan *plan = m_refRefiner->createPlan(
         hierarchy, neighborhood, vProcessingDirections, vRefinements);
 

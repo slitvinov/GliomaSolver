@@ -1,4 +1,3 @@
-using namespace std;
 namespace MRAG {
 
 /**
@@ -21,7 +20,7 @@ public:
    * @param nNumberOfBlocks   Number of blocks to have in this collection.
    * @return Vector of IDs to access the blocks.
    */
-  vector<int> create(const int nNumberOfBlocks = 1);
+  std::vector<int> create(const int nNumberOfBlocks = 1);
   /** Remove a certain block. */
   void erase(const int ID);
   /** Resets collection to an empty one. */
@@ -34,21 +33,21 @@ public:
 
   virtual void release(const int blockID, const bool bWriteBack = true) const {}
 
-  virtual void lock(const vector<int> &blockIDs,
-                    vector<BlockType *> *output = NULL) const {
+  virtual void lock(const std::vector<int> &blockIDs,
+                    std::vector<BlockType *> *output = NULL) const {
     if (output != NULL) {
       output->resize(blockIDs.size());
 
       for (int i = 0; i < blockIDs.size(); i++)
         (*output)[i] = &lock(blockIDs[i]);
     } else
-      for (vector<int>::const_iterator it = blockIDs.begin();
+      for (std::vector<int>::const_iterator it = blockIDs.begin();
            it != blockIDs.end(); it++)
         lock(*it);
   }
 
-  void release(const vector<int> &blockIDs, bool bWriteBack = true) const {
-    for (vector<int>::const_iterator it = blockIDs.begin();
+  void release(const std::vector<int> &blockIDs, bool bWriteBack = true) const {
+    for (std::vector<int>::const_iterator it = blockIDs.begin();
          it != blockIDs.end(); it++)
       release(*it);
   }
@@ -96,23 +95,23 @@ protected:
 
   static int _createIDs(int n = 1);
 
-  vector<int>
+  std::vector<int>
   _allocateBlockInChunk(int &inoutRequestedBlocks, Chunk *chunk,
                         int &inoutAvailableBlocksInCurrentChunk) const;
-  vector<int> _allocateChunks(int &inoutRequestedBlocks,
+  std::vector<int> _allocateChunks(int &inoutRequestedBlocks,
                               set<Chunk *> &inoutChunks,
-                              map<int, BlockType *> &inoutIDToBlockPointers,
-                              map<int, Chunk *> &inoutBlockIDToChunck,
-                              vector<Chunk *> &inoutRecycledChunks,
+                              std::map<int, BlockType *> &inoutIDToBlockPointers,
+                              std::map<int, Chunk *> &inoutBlockIDToChunck,
+                              std::vector<Chunk *> &inoutRecycledChunks,
                               Chunk *&outCurrentChunk,
                               int &outAvailableBlocksInCurrentChunk) const;
   void _emptyTrash(int nChunks = -1);
   void _trash();
 
-  map<int, BlockType *> m_blockIDToBlockPointers;
-  map<int, Chunk *> m_blockIDToChunck;
+  std::map<int, BlockType *> m_blockIDToBlockPointers;
+  std::map<int, Chunk *> m_blockIDToChunck;
   set<Chunk *> m_setChunks;
-  vector<Chunk *> m_trash;
+  std::vector<Chunk *> m_trash;
 
   Chunk *m_currentChunk;
   int m_nAvailableBlocksInCurrentChunk;

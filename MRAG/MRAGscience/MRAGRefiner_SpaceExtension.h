@@ -9,7 +9,7 @@ public:
   virtual RefinementPlan *createPlan(const HierarchyType &hierarchy,
                                      const NeighborhoodType &neighborhood,
                                      const bool vProcessingDirections[3],
-                                     vector<NodeToRefine> &vRefinements) {
+                                     std::vector<NodeToRefine> &vRefinements) {
     // this isessentially a wrapper
     // 1. iterate over the blocks
     // 2. if a block should be refined, check its neighbor blocks
@@ -22,9 +22,9 @@ public:
          itS != neighborhood.end(); itS++) {
       // 2.
 
-      const vector<GridNode *> &n = itS->second;
+      const std::vector<GridNode *> &n = itS->second;
 
-      for (vector<GridNode *>::const_iterator itD = n.begin(); itD != n.end();
+      for (std::vector<GridNode *>::const_iterator itD = n.begin(); itD != n.end();
            itD++) {
         // 3.
         if (neighborhood.find(*itD) !=

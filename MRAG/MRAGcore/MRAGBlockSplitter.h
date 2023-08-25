@@ -10,8 +10,8 @@ protected:
   template <typename BlockLabType>
   void _splitBlocks(BlockLabType &lab, BlockInfo &info,
                     const BoundaryInfoBlock &bbinfo, const BlockType &source,
-                    vector<BlockType *> &dest,
-                    vector<RefinementPlanNode *> refinementinfo) {
+                    std::vector<BlockType *> &dest,
+                    std::vector<RefinementPlanNode *> refinementinfo) {
     lab.load(info);
 
     const int nX = BlockType::sizeX;
@@ -116,7 +116,7 @@ public:
   virtual RefinementResult split(BlockCollectionType &collection,
                                  BoundaryInfo &boundaryInfo,
                                  const RefinementPlan &refinementPlan,
-                                 vector<RefinementReport> &vNewIDs) {
+                                 std::vector<RefinementReport> &vNewIDs) {
     return _split(m_blockLab, collection, boundaryInfo, refinementPlan,
                   vNewIDs);
   }
@@ -125,7 +125,7 @@ public:
   RefinementResult _split(BlockLabType &lab, BlockCollectionType &collection,
                           BoundaryInfo &boundaryInfo,
                           const RefinementPlan &refinementPlan,
-                          vector<RefinementReport> &vNewIDs) {
+                          std::vector<RefinementReport> &vNewIDs) {
     // 0. setup
     // 1. allocate the new blocks
     // 2. fill them
@@ -156,9 +156,9 @@ public:
     }
 
     // 1.
-    // vector<int> vIDs;
+    // std::vector<int> vIDs;
     // vIDs.reserve(refinementPlan.nNewBlocks);
-    vector<int> vIDs = collection.create(refinementPlan.nNewBlocks);
+    std::vector<int> vIDs = collection.create(refinementPlan.nNewBlocks);
 
     // 2.
     int iCurrentBlock = 0;
@@ -171,13 +171,13 @@ public:
                               .blockID); // collection[refinement.blockID];
 
       //{
-      //	vector<int> vLocalIDs =
+      //	std::vector<int> vLocalIDs =
       // collection.create(refinement.children.size()); 	for(int i=0;
       // i<vLocalIDs.size(); i++) 		vIDs.push_back(vLocalIDs[i]);
       //}
 
-      vector<BlockType *> destinations;
-      vector<int> lockedChildren;
+      std::vector<BlockType *> destinations;
+      std::vector<int> lockedChildren;
       lockedChildren.reserve(refinement.children.size());
 
       for (int d = 0; d < refinement.children.size(); d++, iCurrentBlock++) {
@@ -199,7 +199,7 @@ public:
                    destinations, refinement.children);
 
       collection.release(refinement.block_info_source.blockID);
-      for (vector<int>::const_iterator it = lockedChildren.begin();
+      for (std::vector<int>::const_iterator it = lockedChildren.begin();
            it != lockedChildren.end(); it++)
         collection.release(*it);
     }
@@ -249,7 +249,7 @@ public:
   RefinementResult split(BlockCollectionType &collection,
                          BoundaryInfo &boundaryInfo,
                          const RefinementPlan &refinementPlan,
-                         vector<RefinementReport> &vNewIDs) {
+                         std::vector<RefinementReport> &vNewIDs) {
     return _split(m_myGenericLab, collection, boundaryInfo, refinementPlan,
                   vNewIDs);
   }

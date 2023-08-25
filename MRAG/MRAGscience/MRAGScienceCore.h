@@ -1,4 +1,3 @@
-using namespace std;
 namespace MRAG {
 namespace Science {
 /**
@@ -36,8 +35,8 @@ int AutomaticRefinement(Grid &g, BlockFWT &fwt, const double dAbsoluteTolerance,
   int nRefinedBlocks = 0;
 
   do {
-    vector<BlockInfo> vInfo = g.getBlocksInfo(), vBlocksToFWT;
-    for (vector<BlockInfo>::const_iterator it = vInfo.begin();
+    std::vector<BlockInfo> vInfo = g.getBlocksInfo(), vBlocksToFWT;
+    for (std::vector<BlockInfo>::const_iterator it = vInfo.begin();
          it != vInfo.end(); it++) {
       if (iMaxLevel >= 0 && iMaxLevel <= it->level)
         continue;
@@ -53,7 +52,7 @@ int AutomaticRefinement(Grid &g, BlockFWT &fwt, const double dAbsoluteTolerance,
     if (vBlocksToFWT.size() == 0)
       break;
 
-    vector<FWTReport<iLastChannel - iFirstChannel + 1>> vReports =
+    std::vector<FWTReport<iLastChannel - iFirstChannel + 1>> vReports =
         BlockFWT::template multichannel_fwt<iFirstChannel, iLastChannel>(
             vBlocksToFWT, g.getBlockCollection(), g.getBoundaryInfo());
     set<int> shouldBeRefined;
@@ -117,8 +116,8 @@ int AutomaticCompression(Grid &g, BlockFWT &fwt,
   int nSkippedBlocks = 0, loopCounter = 0, nTotalCollapsed = 0;
 
   do {
-    vector<BlockInfo> vInfo = g.getBlocksInfo(), vBlocksToFWT;
-    for (vector<BlockInfo>::const_iterator it = vInfo.begin();
+    std::vector<BlockInfo> vInfo = g.getBlocksInfo(), vBlocksToFWT;
+    for (std::vector<BlockInfo>::const_iterator it = vInfo.begin();
          it != vInfo.end(); it++)
       if (niceGuys.find(it->blockID) ==
           niceGuys.end()) // maybe not really a nice guy
@@ -126,7 +125,7 @@ int AutomaticCompression(Grid &g, BlockFWT &fwt,
       else
         nSkippedBlocks++;
 
-    vector<FWTReport<iLastChannel - iFirstChannel + 1>> vReports =
+    std::vector<FWTReport<iLastChannel - iFirstChannel + 1>> vReports =
         BlockFWT::template multichannel_fwt<iFirstChannel, iLastChannel>(
             vBlocksToFWT, g.getBlockCollection(), g.getBoundaryInfo());
 
@@ -182,8 +181,8 @@ int AutomaticCompressionForLevelsets(Grid &g, BlockFWT &fwt,
   do {
     fwt.prepare(g.getBlockCollection(), g.getBoundaryInfo());
 
-    vector<BlockInfo> vInfo = g.getBlocksInfo(), vBlocksToFWT;
-    for (vector<BlockInfo>::const_iterator it = vInfo.begin();
+    std::vector<BlockInfo> vInfo = g.getBlocksInfo(), vBlocksToFWT;
+    for (std::vector<BlockInfo>::const_iterator it = vInfo.begin();
          it != vInfo.end(); it++)
       if (niceGuys.find(it->blockID) ==
           niceGuys.end()) // maybe not really a nice guy
@@ -192,7 +191,7 @@ int AutomaticCompressionForLevelsets(Grid &g, BlockFWT &fwt,
         nSkippedBlocks++;
 
     set<int> shouldBeCompressed;
-    for (vector<BlockInfo>::iterator it = vBlocksToFWT.begin();
+    for (std::vector<BlockInfo>::iterator it = vBlocksToFWT.begin();
          it != vBlocksToFWT.end(); it++) {
       g.getBlockCollection().lock(it->blockID).setH(it->h[0]);
 
@@ -228,8 +227,8 @@ int AutomaticCompressionForLevelsets(Grid &g, BlockFWT &fwt,
   } while (true);
 
   if (bKeepHUpdated) {
-    vector<BlockInfo> vInfo = g.getBlocksInfo();
-    for (vector<BlockInfo>::const_iterator it = vInfo.begin();
+    std::vector<BlockInfo> vInfo = g.getBlocksInfo();
+    for (std::vector<BlockInfo>::const_iterator it = vInfo.begin();
          it != vInfo.end(); it++) {
       typedef typename Grid::GridBlockType B;
       B &b = g.getBlockCollection().lock(it->blockID);
@@ -238,8 +237,8 @@ int AutomaticCompressionForLevelsets(Grid &g, BlockFWT &fwt,
       g.getBlockCollection().release(it->blockID);
     }
   } else {
-    vector<BlockInfo> vInfo = g.getBlocksInfo();
-    for (vector<BlockInfo>::const_iterator it = vInfo.begin();
+    std::vector<BlockInfo> vInfo = g.getBlocksInfo();
+    for (std::vector<BlockInfo>::const_iterator it = vInfo.begin();
          it != vInfo.end(); it++) {
       g.getBlockCollection().lock(it->blockID).bHIsSet = false;
       g.getBlockCollection().release(it->blockID);
@@ -271,8 +270,8 @@ RefinementResult AutomaticRefinementForLevelsets(
   do {
     fwt.prepare(g.getBlockCollection(), g.getBoundaryInfo());
 
-    vector<BlockInfo> vInfo = g.getBlocksInfo(), vBlocksToFWT;
-    for (vector<BlockInfo>::const_iterator it = vInfo.begin();
+    std::vector<BlockInfo> vInfo = g.getBlocksInfo(), vBlocksToFWT;
+    for (std::vector<BlockInfo>::const_iterator it = vInfo.begin();
          it != vInfo.end(); it++) {
       if (iMaxLevel >= 0 && iMaxLevel <= it->level)
         continue;
@@ -288,7 +287,7 @@ RefinementResult AutomaticRefinementForLevelsets(
       break;
     set<int> shouldBeRefined;
     // printf("Blocks to FWT (levelset): %d\n", vBlocksToFWT.size());
-    for (vector<BlockInfo>::iterator it = vBlocksToFWT.begin();
+    for (std::vector<BlockInfo>::iterator it = vBlocksToFWT.begin();
          it != vBlocksToFWT.end(); it++) {
       g.getBlockCollection().lock(it->blockID).setH(it->h[0]);
 
@@ -327,8 +326,8 @@ RefinementResult AutomaticRefinementForLevelsets(
   if (dMaxDetailAlive != NULL) {
     double maxVal = dAbsoluteTolerance;
 
-    vector<BlockInfo> vInfo = g.getBlocksInfo();
-    for (vector<BlockInfo>::const_iterator it = vInfo.begin();
+    std::vector<BlockInfo> vInfo = g.getBlocksInfo();
+    for (std::vector<BlockInfo>::const_iterator it = vInfo.begin();
          it != vInfo.end(); it++)
       if (niceGuys.find(it->blockID) == niceGuys.end()) {
         g.getBlockCollection().lock(it->blockID).setH(it->h[0]);
@@ -344,8 +343,8 @@ RefinementResult AutomaticRefinementForLevelsets(
   }
 
   if (bKeepHUpdated) {
-    vector<BlockInfo> vInfo = g.getBlocksInfo();
-    for (vector<BlockInfo>::const_iterator it = vInfo.begin();
+    std::vector<BlockInfo> vInfo = g.getBlocksInfo();
+    for (std::vector<BlockInfo>::const_iterator it = vInfo.begin();
          it != vInfo.end(); it++) {
       typedef typename Grid::GridBlockType B;
       B &b = g.getBlockCollection().lock(it->blockID);
@@ -354,8 +353,8 @@ RefinementResult AutomaticRefinementForLevelsets(
       g.getBlockCollection().release(it->blockID);
     }
   } else {
-    vector<BlockInfo> vInfo = g.getBlocksInfo();
-    for (vector<BlockInfo>::const_iterator it = vInfo.begin();
+    std::vector<BlockInfo> vInfo = g.getBlocksInfo();
+    for (std::vector<BlockInfo>::const_iterator it = vInfo.begin();
          it != vInfo.end(); it++) {
       g.getBlockCollection().lock(it->blockID).bHIsSet = false;
       g.getBlockCollection().release(it->blockID);

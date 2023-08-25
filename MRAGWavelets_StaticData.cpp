@@ -1,16 +1,8 @@
-/*
- *  MRAGWavelets_StaticData.cpp
- *  MRAG
- *
- *  Created by Diego Rossinelli on 10/28/08.
- *  Copyright 2008 CSE Lab, ETH Zurich. All rights reserved.
- *
- */
-#include "MRAG/MRAGcore/MRAGCommon.h"
-#include "MRAG/MRAGcore/MRAGWavelets_Interp2ndOrder.h"
 #include <algorithm>
 #include <assert.h>
 #include <math.h>
+#include "MRAG/MRAGcore/MRAGCommon.h"
+#include "MRAG/MRAGcore/MRAGWavelets_Interp2ndOrder.h"
 namespace MRAG {
 const Real Wavelets_Interp2ndOrder::Ha[1] = {1};
 const Real Wavelets_Interp2ndOrder::Ga[3] = {-0.5, 1., -0.5};

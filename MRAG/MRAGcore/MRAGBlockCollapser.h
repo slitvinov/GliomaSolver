@@ -45,7 +45,7 @@ protected:
   template <typename BlockLabType>
   void _collapseBlocks(BlockLabType &lab,
                        CompressionPlan::Collapse &collapseInfo,
-                       vector<BlockType *> &source, BlockType &dest) {
+                       std::vector<BlockType *> &source, BlockType &dest) {
     const int nSourceX = BlockType::sizeX / 2;
     const int nSourceY =
         !BlockType::shouldProcessDirectionY ? 1 : BlockType::sizeY / 2;
@@ -80,7 +80,7 @@ public:
   virtual CompressionResult collapse(BlockCollection<BlockType> &collection,
                                      BoundaryInfo &boundaryInfo,
                                      const CompressionPlan &compressionPlan,
-                                     vector<BlockCollapseInfo> &vNewIDs) {
+                                     std::vector<BlockCollapseInfo> &vNewIDs) {
     return _collapse(m_blockLab, collection, boundaryInfo, compressionPlan,
                      vNewIDs);
   }
@@ -89,7 +89,7 @@ public:
   CompressionResult
   _collapse(BlockLabType &lab, BlockCollection<BlockType> &collection,
             BoundaryInfo &boundaryInfo, const CompressionPlan &compressionPlan,
-            vector<BlockCollapseInfo> &vNewIDs) {
+            std::vector<BlockCollapseInfo> &vNewIDs) {
     // 0. setup
     // 1. allocate the new blocks
     // 2. fill them
@@ -116,7 +116,7 @@ public:
     }
 
     // 1.
-    vector<int> vIDs = collection.create(compressionPlan.nCollapses);
+    std::vector<int> vIDs = collection.create(compressionPlan.nCollapses);
 
     // 2.
     int nCollapsed = 0;
@@ -124,7 +124,7 @@ public:
       CompressionPlan::Collapse &collapseInfo =
           compressionPlan.vCollapseArray[c];
 
-      vector<BlockType *> source;
+      std::vector<BlockType *> source;
       for (int s = 0; s < collapseInfo.nSources; s++)
         source.push_back(&collection.lock(collapseInfo.source_blockIDs[s]));
 
@@ -174,7 +174,7 @@ public:
   CompressionResult collapse(BlockCollectionType &collection,
                              BoundaryInfo &boundaryInfo,
                              const CompressionPlan &compressionPlan,
-                             vector<BlockCollapseInfo> &vNewIDs) {
+                             std::vector<BlockCollapseInfo> &vNewIDs) {
     return _collapse(m_myGenericLab, collection, boundaryInfo, compressionPlan,
                      vNewIDs);
   }

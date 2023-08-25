@@ -1,5 +1,3 @@
-using namespace std;
-
 namespace MRAG {
 /**
  * Takes care of smaller timesteps in finer grids.
@@ -36,7 +34,7 @@ protected:
   stack<StackItem> m_stackRecursions;
 
   // not owner
-  const vector<vector<BlockInfo>> *m_refBlockAtLevel;
+  const std::vector<std::vector<BlockInfo>> *m_refBlockAtLevel;
 
   template <typename B, typename W> friend class Grid;
   friend class SpaceTimeSorter_Tester;
@@ -109,7 +107,7 @@ public:
   }
 
   virtual bool getBlocks(int &level, double &timeStep, double &currentTime,
-                         vector<BlockInfo> &blocksInfo,
+                         std::vector<BlockInfo> &blocksInfo,
                          ETimeInterval &typeInterval) {
     // 1. check status
     // 2. retrieve next set of blocks with the correct dt

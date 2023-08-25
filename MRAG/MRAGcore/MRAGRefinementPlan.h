@@ -1,5 +1,3 @@
-using namespace std;
-
 namespace MRAG {
 struct RefinementPlanNode {
   int index[3];
@@ -10,14 +8,14 @@ struct RefinementPlanNode {
 struct RefinementReport {
   RefinementReport() : blockID(0), childrenIDs() {}
   int blockID;
-  vector<int> childrenIDs;
+  std::vector<int> childrenIDs;
 };
 
 struct SingleRefinement {
   // int blockID;
   BlockInfo block_info_source;
-  vector<RefinementPlanNode *> children;
-  // vector<int> vBlockIDsToRemove;
+  std::vector<RefinementPlanNode *> children;
+  // std::vector<int> vBlockIDsToRemove;
 
   SingleRefinement() : block_info_source(), children() {}
 
@@ -45,7 +43,7 @@ struct SingleRefinement {
 };
 
 struct RefinementPlan {
-  vector<SingleRefinement *> refinements;
+  std::vector<SingleRefinement *> refinements;
 
   int nNewBlocks;
 

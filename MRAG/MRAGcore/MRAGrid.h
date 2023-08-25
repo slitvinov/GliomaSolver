@@ -1,9 +1,7 @@
-using namespace std;
-
 namespace MRAG {
 class Refiner;
-typedef map<GridNode *, vector<GridNode *>> HierarchyType;
-typedef map<GridNode *, vector<GridNode *>> NeighborhoodType;
+typedef std::map<GridNode *, std::vector<GridNode *>> HierarchyType;
+typedef std::map<GridNode *, std::vector<GridNode *>> NeighborhoodType;
 
 /**
  * The grid.
@@ -54,7 +52,7 @@ public:
   int getCurrentMaxLevel() const { return _computeMaxLevel(m_hierarchy); }
   int getCurrentMinLevel() const { return _computeMinLevel(m_blockAtLevel); }
   /** Return info on all blocks in the grid. @see MRAG::BlockInfo */
-  vector<BlockInfo> getBlocksInfo() const;
+  std::vector<BlockInfo> getBlocksInfo() const;
   /** Return the collection of block defining all blocks in the grid. @see
    * MRAG::BlockCollection */
   const BlockCollection<BlockType> &getBlockCollection() {
@@ -86,17 +84,17 @@ protected:
 
   // TASK - const
   int _computeMaxLevel(const HierarchyType &hierarchy) const;
-  int _computeMinLevel(const vector<vector<BlockInfo>> &blockAtLevel) const;
+  int _computeMinLevel(const std::vector<std::vector<BlockInfo>> &blockAtLevel) const;
   void
   _computeNeighborhood(const HierarchyType &hierarchy,
                        NeighborhoodType &neighborhood,
-                       map<GridNode *, map<int, GridNode *>> &ghostNodes) const;
+                       std::map<GridNode *, std::map<int, GridNode *>> &ghostNodes) const;
   void _computeBlockAtLevel(const HierarchyType &hierarchy,
-                            vector<vector<BlockInfo>> &blockAtLevel) const;
+                            std::vector<std::vector<BlockInfo>> &blockAtLevel) const;
   void _computeBoundaryInfo(BoundaryInfo &binfo,
                             const int requested_stencil_start[3],
                             const int requested_stencil_end[3],
-                            vector<GridNode *> &vNodesToCompute) const;
+                            std::vector<GridNode *> &vNodesToCompute) const;
   void _computeMaxStencilUsed(int start[3], int end[3]) const;
   void _checkResolutionJumpCondition(int maxJump,
                                      const int *stencil_start = NULL,
@@ -109,11 +107,11 @@ protected:
     _computeNeighborhood(m_hierarchy, m_neighborhood, m_ghostNodes);
 
     m_mapGhost2Node.clear();
-    for (map<GridNode *, map<int, GridNode *>>::const_iterator itGridNode =
+    for (std::map<GridNode *, std::map<int, GridNode *>>::const_iterator itGridNode =
              m_ghostNodes.begin();
          itGridNode != m_ghostNodes.end(); itGridNode++) {
-      const map<int, GridNode *> &currentGhosts = itGridNode->second;
-      for (map<int, GridNode *>::const_iterator itGhostNode =
+      const std::map<int, GridNode *> &currentGhosts = itGridNode->second;
+      for (std::map<int, GridNode *>::const_iterator itGhostNode =
                currentGhosts.begin();
            itGhostNode != currentGhosts.end(); itGhostNode++)
         m_mapGhost2Node[itGhostNode->second] = itGridNode->first;
@@ -135,15 +133,15 @@ protected:
   void _dispose();
 
   // blocks info
-  vector<vector<BlockInfo>> m_blockAtLevel;
+  std::vector<std::vector<BlockInfo>> m_blockAtLevel;
   BlockCollection<BlockType> &m_blockCollection;
   bool m_bCollectionOwner;
 
   // node info
   HierarchyType m_hierarchy;
   NeighborhoodType m_neighborhood;
-  map<GridNode *, map<int, GridNode *>> m_ghostNodes;
-  map<GridNode *, GridNode *> m_mapGhost2Node;
+  std::map<GridNode *, std::map<int, GridNode *>> m_ghostNodes;
+  std::map<GridNode *, GridNode *> m_mapGhost2Node;
 
   // boundary info
   int m_maxStencil[2][3];

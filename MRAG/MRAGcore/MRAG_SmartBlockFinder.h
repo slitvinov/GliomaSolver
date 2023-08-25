@@ -16,7 +16,7 @@ public:
   const GridNode *refCenterNode;
   PointIndex *result;
 
-  SmartBlockFinder(const GridNode &b, const vector<GridNode *> &neighbors,
+  SmartBlockFinder(const GridNode &b, const std::vector<GridNode *> &neighbors,
                    const int stencil_start[3], const int stencil_end[3],
                    const int block_size[3]);
 
@@ -47,7 +47,7 @@ private:
 };
 
 inline SmartBlockFinder::SmartBlockFinder(const GridNode &b,
-                                          const vector<GridNode *> &neighbors,
+                                          const std::vector<GridNode *> &neighbors,
                                           const int stencil_start[3],
                                           const int stencil_end[3],
                                           const int block_size[3])

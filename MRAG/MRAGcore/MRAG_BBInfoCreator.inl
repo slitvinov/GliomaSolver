@@ -20,7 +20,7 @@ inline int _computeNeighborCode(const GridNode &b, const GridNode &n) {
 template <typename WaveletsType, typename BlockType>
 void MRAG_BBInfoCreator<WaveletsType, BlockType>::_computeEasyGhosts_SameLevel(
     BoundaryInfoBlock &bb, const GridNode &b, const GridNode &n, int code,
-    vector<BastardGhost *> &bastards, int &nFoundEasyGhosts) const {
+    std::vector<BastardGhost *> &bastards, int &nFoundEasyGhosts) const {
   // 1. find the intersection
   // 2. put the real points in the index pool
   // 3. copy the info in the right ghosts
@@ -55,7 +55,7 @@ void MRAG_BBInfoCreator<WaveletsType, BlockType>::_computeEasyGhosts_SameLevel(
   if (nFoundEasyGhosts == 0)
     return;
 
-  vector<PointIndex> &poolIndex = bb.indexPool;
+  std::vector<PointIndex> &poolIndex = bb.indexPool;
   const int iIndexStart = poolIndex.size();
   const int nNewPoints = nFoundEasyGhosts;
 
@@ -106,7 +106,7 @@ void MRAG_BBInfoCreator<WaveletsType, BlockType>::_computeEasyGhosts_SameLevel(
     for (dst[2] = iS_bspace[2]; dst[2] < iE_bspace[2]; dst[2]++)
       for (dst[1] = iS_bspace[1]; dst[1] < iE_bspace[1]; dst[1]++)
         for (dst[0] = iS_bspace[0]; dst[0] < iE_bspace[0]; dst[0]++) {
-          vector<IndexWP> &ghost =
+          std::vector<IndexWP> &ghost =
               bb.ghosts[iGhostStart + dst[0] - ghosts_start[0] +
                         (dst[1] - ghosts_start[1]) * ghosts_size[0] +
                         (dst[2] - ghosts_start[2]) * ghosts_size[0] *
@@ -128,7 +128,7 @@ void MRAG_BBInfoCreator<WaveletsType, BlockType>::_computeEasyGhosts_SameLevel(
 template <typename WaveletsType, typename BlockType>
 void MRAG_BBInfoCreator<WaveletsType, BlockType>::_computeEasyGhosts_Synthesis(
     BoundaryInfoBlock &bb, const GridNode &b, const GridNode &n, int code,
-    vector<BastardGhost *> &bastards, int &nFoundEasyGhosts) const {
+    std::vector<BastardGhost *> &bastards, int &nFoundEasyGhosts) const {
   // 1. find the "reconstructable" area in n-space into the b-space
   // 2. find the intersection between 2. and the ghosts
   // 3. allocate the bastards (complement of 3.)
@@ -280,7 +280,7 @@ void MRAG_BBInfoCreator<WaveletsType, BlockType>::_computeEasyGhosts_Synthesis(
   const Real *weights = cookFilter<W, Real, false>(inv_level_difference,
                                                    (const int *)filter_support);
 
-  vector<double> &wPool = bb.weightsPool;
+  std::vector<double> &wPool = bb.weightsPool;
   const int iWStart = bb.weightsPool.size();
   const int iWeightsToAdd = filter_support[1] - filter_support[0];
 
@@ -419,7 +419,7 @@ void MRAG_BBInfoCreator<WaveletsType, BlockType>::_computeEasyGhosts_Synthesis(
         }
   }
 
-  vector<PointIndex> &indexPool = bb.indexPool;
+  std::vector<PointIndex> &indexPool = bb.indexPool;
 
   const int nPointsToAdd = currPointsToAdd;
   const int iStartI = indexPool.size();
@@ -621,7 +621,7 @@ void MRAG_BBInfoCreator<WaveletsType, BlockType>::_computeEasyGhosts_Synthesis(
 template <typename WaveletsType, typename BlockType>
 void MRAG_BBInfoCreator<WaveletsType, BlockType>::_computeEasyGhosts_Analysis(
     BoundaryInfoBlock &bb, const GridNode &b, const GridNode &n, int code,
-    vector<BastardGhost *> &bastards, int &nFoundEasyGhosts) const {
+    std::vector<BastardGhost *> &bastards, int &nFoundEasyGhosts) const {
   // 1. compute the filter width to used to do a level_difference-analysis
   // filter
   // 2. compute the range of the ghosts that can be easily computed
@@ -790,7 +790,7 @@ void MRAG_BBInfoCreator<WaveletsType, BlockType>::_computeEasyGhosts_Analysis(
         level_difference, (const int *)filter_support);
 
     // B.
-    vector<double> &wPool = bb.weightsPool;
+    std::vector<double> &wPool = bb.weightsPool;
 
     const int nFilterSize = filter_support[1] - filter_support[0];
     const int iStartW = wPool.size();
@@ -912,7 +912,7 @@ void MRAG_BBInfoCreator<WaveletsType, BlockType>::_computeEasyGhosts_Analysis(
             assert(counter > 0);
           }
 
-      vector<PointIndex> &poolIndex = bb.indexPool;
+      std::vector<PointIndex> &poolIndex = bb.indexPool;
       const int iIndexStart = poolIndex.size();
 
       // C-2. compute how many source points are needed
@@ -978,7 +978,7 @@ void MRAG_BBInfoCreator<WaveletsType, BlockType>::_computeEasyGhosts_Analysis(
       for (d[2] = easy_range_start[2]; d[2] < easy_range_end[2]; d[2]++)
         for (d[1] = easy_range_start[1]; d[1] < easy_range_end[1]; d[1]++)
           for (d[0] = easy_range_start[0]; d[0] < easy_range_end[0]; d[0]++) {
-            vector<IndexWP> &ghost =
+            std::vector<IndexWP> &ghost =
                 bb.ghosts[iGhostStart + d[0] - ghosts_start[0] +
                           (d[1] - ghosts_start[1]) * ghosts_size[0] +
                           (d[2] - ghosts_start[2]) * ghosts_size[0] *
@@ -1082,7 +1082,7 @@ MRAG_BBInfoCreator<WaveletsType, BlockType>::MRAG_BBInfoCreator(
 template <typename WaveletsType, typename BlockType>
 BoundaryInfoBlock *
 MRAG_BBInfoCreator<WaveletsType, BlockType>::createBoundaryInfoBlock(
-    const GridNode &b, const vector<GridNode *> &neighbors) const {
+    const GridNode &b, const std::vector<GridNode *> &neighbors) const {
   // 1. allocate BoundaryInfoBlock, fill dependentBlockIDs
   // 2. allocate the ghosts needed
   // 3. put 1.0 in the wpool
@@ -1139,7 +1139,7 @@ MRAG_BBInfoCreator<WaveletsType, BlockType>::createBoundaryInfoBlock(
   bbinfo->weightsPool.push_back(1.0);
 
   // 4.
-  vector<BastardGhost *> bastards;
+  std::vector<BastardGhost *> bastards;
 
   set<int> coveredCodes;
   for (int i = 0; i < 27; i++)
@@ -1147,7 +1147,7 @@ MRAG_BBInfoCreator<WaveletsType, BlockType>::createBoundaryInfoBlock(
 
   int nEasyOnes = 0;
 
-  for (vector<GridNode *>::const_iterator itNeighbor = neighbors.begin();
+  for (std::vector<GridNode *>::const_iterator itNeighbor = neighbors.begin();
        itNeighbor != neighbors.end(); itNeighbor++) {
     const GridNode &n = **itNeighbor;
 
@@ -1204,7 +1204,7 @@ MRAG_BBInfoCreator<WaveletsType, BlockType>::createBoundaryInfoBlock(
     printf("Weights: %d, Points:%d\n", (int)bbinfo->weightsPool.size(),
            (int)bbinfo->indexPool.size());
 
-  for (typename vector<BastardGhost *>::iterator it = bastards.begin();
+  for (typename std::vector<BastardGhost *>::iterator it = bastards.begin();
        it != bastards.end(); it++) {
     allocator<BastardGhost>().destroy(*it);
     allocator<BastardGhost>().deallocate(*it, 1);
@@ -1242,8 +1242,8 @@ MRAG_BBInfoCreator<WaveletsType, BlockType>::createBoundaryInfoBlock(
 template <typename WaveletsType, typename BlockType>
 void MRAG_BBInfoCreator<WaveletsType, BlockType>::_resolveBastardGhosts(
     SmartBlockFinder &smartFinder, BoundaryInfoBlock &bb, const GridNode &b,
-    const vector<GridNode *> &neighbors,
-    const vector<BastardGhost *> &bastards) const {
+    const std::vector<GridNode *> &neighbors,
+    const std::vector<BastardGhost *> &bastards) const {
   // 1. setup
   // 2. if the new front is empty exit
   // 3.	pop a ghost from the old front:
@@ -1258,13 +1258,13 @@ void MRAG_BBInfoCreator<WaveletsType, BlockType>::_resolveBastardGhosts(
 
   // 1.
   typedef std::allocator<BastardGhost *> ABG;
-  typedef vector<BastardGhost *, ABG> GhostVector;
+  typedef std::vector<BastardGhost *, ABG> GhostVector;
   typedef std::allocator<std::pair<const I3, BastardGhost *>> ABGMap;
-  typedef map<I3, BastardGhost *, std::less<I3>, ABGMap> GhostMap;
+  typedef std::map<I3, BastardGhost *, std::less<I3>, ABGMap> GhostMap;
   typedef std::allocator<GhostMap> ABGBuffer;
-  typedef vector<GhostMap, ABGBuffer> GhostBuffer;
+  typedef std::vector<GhostMap, ABGBuffer> GhostBuffer;
   typedef set<double, std::less<double>, std::allocator<double>> WeightSet;
-  typedef map<double, int, std::less<double>,
+  typedef std::map<double, int, std::less<double>,
               std::allocator<std::pair<const double, int>>>
       WeightToIndexMap;
 
@@ -1284,7 +1284,7 @@ void MRAG_BBInfoCreator<WaveletsType, BlockType>::_resolveBastardGhosts(
   GhostVector resolvedBastards;
   tmp.reserve(4 * bastards.size());
 
-  vector<PointIndex> &indexPool = bb.indexPool;
+  std::vector<PointIndex> &indexPool = bb.indexPool;
 
   const int iBastardStart = indexPool.size();
 
@@ -1361,7 +1361,7 @@ void MRAG_BBInfoCreator<WaveletsType, BlockType>::_resolveBastardGhosts(
 
   WeightSet wSet;
   WeightToIndexMap mapW2I;
-  vector<double> &weightsPool = bb.weightsPool;
+  std::vector<double> &weightsPool = bb.weightsPool;
 
   // 8.
   for (int iPass = 0; iPass < 2; iPass++) {
@@ -1424,7 +1424,7 @@ void MRAG_BBInfoCreator<WaveletsType, BlockType>::_resolveBastardGhosts(
       // 2.
       c = iStart + nNewWeights - 1;
       int counter = 0;
-      for (vector<double>::const_reverse_iterator it = weightsPool.rbegin();
+      for (std::vector<double>::const_reverse_iterator it = weightsPool.rbegin();
            counter < nNewWeights; counter++, it++)
         mapW2I[*it] = c--;
     }

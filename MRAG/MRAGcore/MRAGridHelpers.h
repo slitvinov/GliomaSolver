@@ -78,7 +78,7 @@ struct FlattenedBlock {
     return (dX <= 0 && dY <= 0 && dZ <= 0);
   }
 
-  static bool find(const GridNode *target, vector<GridNode *> &v) {
+  static bool find(const GridNode *target, std::vector<GridNode *> &v) {
     const int n = v.size();
 
     for (int i = 0; i < n; i++)

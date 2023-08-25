@@ -1,4 +1,3 @@
-using namespace std;
 namespace MRAG {
 class Refiner {
 protected:
@@ -18,7 +17,7 @@ public:
   virtual RefinementPlan *createPlan(const HierarchyType &hierarchy,
                                      const NeighborhoodType &neighborhood,
                                      const bool vProcessingDirections[3],
-                                     vector<NodeToRefine> &vRefinements) {
+                                     std::vector<NodeToRefine> &vRefinements) {
     // 1. create a fresh plan
     // 2. iterate over the leafs: if a leaf should be refined put it in a victim
     // list.
@@ -52,7 +51,7 @@ public:
       VictimSet tmp1, tmp2;
       VictimSet &new_victims = tmp1;
       VictimSet &old_victims = tmp2;
-      vector<const GridNode *> ghost_nodes;
+      std::vector<const GridNode *> ghost_nodes;
 
       for (VictimSet::iterator victim = victims.begin();
            victim != victims.end(); victim++)
@@ -72,7 +71,7 @@ public:
                 neighborhood.find(const_cast<GridNode *>(*victim));
             const bool bFound = (itNode != neighborhood.end());
 
-            const vector<GridNode *> *pneighbors = NULL;
+            const std::vector<GridNode *> *pneighbors = NULL;
 
             if (!bFound) // it's a ghost
             {
@@ -84,7 +83,7 @@ public:
 
               assert(itParent != hierarchy.end());
 
-              vector<GridNode *> children = itParent->second;
+              std::vector<GridNode *> children = itParent->second;
 
               int iChild;
               for (iChild = 0; iChild < children.size(); iChild++)
@@ -103,9 +102,9 @@ public:
             } else
               pneighbors = &itNode->second;
 
-            const vector<GridNode *> &neighbors = *pneighbors;
+            const std::vector<GridNode *> &neighbors = *pneighbors;
 
-            for (vector<GridNode *>::const_iterator n = neighbors.begin();
+            for (std::vector<GridNode *>::const_iterator n = neighbors.begin();
                  n != neighbors.end(); n++) {
               const GridNode &node = **n;
               const bool bJumpInLevelTooHigh =

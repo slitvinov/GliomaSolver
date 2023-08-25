@@ -1,4 +1,3 @@
-using namespace std;
 namespace MRAG {
 
 template <typename WaveletsType, typename BlockType> class MRAG_BBInfoCreator {
@@ -27,7 +26,7 @@ template <typename WaveletsType, typename BlockType> class MRAG_BBInfoCreator {
 
     BastardGhost_Status status, candidate_status;
 
-    vector<BastardGhost *, std::allocator<BastardGhost *>> customers;
+    std::vector<BastardGhost *, std::allocator<BastardGhost *>> customers;
     MatrixOfRequests *matRequests;
     I3 index;
     short int block_level;
@@ -187,8 +186,8 @@ template <typename WaveletsType, typename BlockType> class MRAG_BBInfoCreator {
     }
 
     template <int iPass, typename WeightsSet, typename MappingW2I>
-    void collect(WeightsSet &wSet, MappingW2I &mapW2I, vector<IndexWP> &info,
-                 vector<double> &weightsPool, double wX = 1, double wY = 1,
+    void collect(WeightsSet &wSet, MappingW2I &mapW2I, std::vector<IndexWP> &info,
+                 std::vector<double> &weightsPool, double wX = 1, double wY = 1,
                  double wZ = 1, bool bVerbose = false) {
       if (matRequests == NULL) // leaf
       {
@@ -293,21 +292,21 @@ private:
 
   void _computeEasyGhosts_Analysis(BoundaryInfoBlock &bb, const GridNode &b,
                                    const GridNode &n, int code,
-                                   vector<BastardGhost *> &bastards,
+                                   std::vector<BastardGhost *> &bastards,
                                    int &nFoundEasyGhosts) const;
   void _computeEasyGhosts_Synthesis(BoundaryInfoBlock &bb, const GridNode &b,
                                     const GridNode &n, int code,
-                                    vector<BastardGhost *> &bastards,
+                                    std::vector<BastardGhost *> &bastards,
                                     int &nFoundEasyGhosts) const;
   void _computeEasyGhosts_SameLevel(BoundaryInfoBlock &bb, const GridNode &b,
                                     const GridNode &n, int code,
-                                    vector<BastardGhost *> &bastards,
+                                    std::vector<BastardGhost *> &bastards,
                                     int &nFoundEasyGhosts) const;
 
   void _resolveBastardGhosts(SmartBlockFinder &smartGuy, BoundaryInfoBlock &bb,
                              const GridNode &b,
-                             const vector<GridNode *> &neighbors,
-                             const vector<BastardGhost *> &bastards) const;
+                             const std::vector<GridNode *> &neighbors,
+                             const std::vector<BastardGhost *> &bastards) const;
 
 public:
   MRAG_BBInfoCreator(const int stencil_start[3], const int stencil_end[3],
@@ -315,7 +314,7 @@ public:
 
   BoundaryInfoBlock *
   createBoundaryInfoBlock(const GridNode &b,
-                          const vector<GridNode *> &neighbors) const;
+                          const std::vector<GridNode *> &neighbors) const;
 };
 
 } // namespace MRAG

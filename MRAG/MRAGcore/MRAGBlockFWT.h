@@ -387,12 +387,12 @@ public:
   }
 
   template <int iFirstChannel, int iLastChannel> struct MultiChannelFWT_Body {
-    const vector<MRAG::BlockInfo> &vInput;
-    vector<FWTReport<nChannels> *> vOutput;
+    const std::vector<MRAG::BlockInfo> &vInput;
+    std::vector<FWTReport<nChannels> *> vOutput;
     const BlockCollection<Block> &collection;
     BoundaryInfo &boundaryInfo;
 
-    MultiChannelFWT_Body(const vector<MRAG::BlockInfo> &vInfo,
+    MultiChannelFWT_Body(const std::vector<MRAG::BlockInfo> &vInfo,
                          const BlockCollection<Block> &collection_,
                          BoundaryInfo &boundaryInfo_)
         : vInput(vInfo), vOutput(vInfo.size()), boundaryInfo(boundaryInfo_),
@@ -415,8 +415,8 @@ public:
   };
 
   template <int iFirstChannel, int iLastChannel>
-  static vector<FWTReport<nChannels>>
-  multichannel_fwt(const vector<MRAG::BlockInfo> &vInfos,
+  static std::vector<FWTReport<nChannels>>
+  multichannel_fwt(const std::vector<MRAG::BlockInfo> &vInfos,
                    const BlockCollection<Block> &collection,
                    BoundaryInfo &boundaryInfo) {
     const int n = vInfos.size();
@@ -429,7 +429,7 @@ public:
           new FWTReport<nChannels>(nReportSizeX, nReportSizeY, nReportSizeZ);
 
     body(SimpleInterval(0, n));
-    vector<FWTReport<nChannels>> vResult;
+    std::vector<FWTReport<nChannels>> vResult;
 
     for (int i = 0; i < n; i++) {
       vResult.push_back(*body.vOutput[i]);

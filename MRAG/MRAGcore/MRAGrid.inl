@@ -149,10 +149,10 @@ void Grid<WaveletType, BlockType>::_dispose() {
   }
 
   // 3.
-  for (map<GridNode *, map<int, GridNode *>>::iterator it =
+  for (std::map<GridNode *, std::map<int, GridNode *>>::iterator it =
            m_ghostNodes.begin();
        it != m_ghostNodes.end(); it++)
-    for (map<int, GridNode *>::iterator itGhosts = it->second.begin();
+    for (std::map<int, GridNode *>::iterator itGhosts = it->second.begin();
          itGhosts != it->second.end(); itGhosts++)
       delete itGhosts->second;
 
@@ -188,8 +188,8 @@ float Grid<WaveletType, BlockType>::getMemorySize() const {
 }
 
 template <typename WaveletType, typename BlockType>
-vector<BlockInfo> Grid<WaveletType, BlockType>::getBlocksInfo() const {
-  vector<BlockInfo> result;
+std::vector<BlockInfo> Grid<WaveletType, BlockType>::getBlocksInfo() const {
+  std::vector<BlockInfo> result;
 
   for (typename HierarchyType::const_iterator it = m_hierarchy.begin();
        it != m_hierarchy.end(); it++) {
@@ -271,27 +271,27 @@ Grid<WaveletType, BlockType>::refine(const set<int> &blocksToRefine) {
   }
 
   // 2.
-  vector<NodeToRefine> vToRefine;
+  std::vector<NodeToRefine> vToRefine;
   RefinementPlan *plan = m_refRefiner->createPlan(
       m_hierarchy, m_neighborhood, m_vProcessingDirections, vToRefine);
   if (plan == NULL)
     return RefinementResult(true);
 
   // 3.
-  vector<RefinementReport> vRefinementReport;
+  std::vector<RefinementReport> vRefinementReport;
   RefinementResult result = m_blockSplitter->split(
       m_blockCollection, getBoundaryInfo(), *plan, vRefinementReport);
   // printf("vRefinementReport size: %d\n", vRefinementReport.size());
 
   // 4.
-  vector<GridNode *> newNodes;
+  std::vector<GridNode *> newNodes;
   {
     const int nRefinements = plan->refinements.size();
     for (int i = 0; i < nRefinements; i++) {
       GridNode *parent = const_cast<GridNode *>(vToRefine[i].node);
 
-      vector<RefinementPlanNode *> &vNodes = plan->refinements[i]->children;
-      vector<int> &blockIDs = vRefinementReport[i].childrenIDs;
+      std::vector<RefinementPlanNode *> &vNodes = plan->refinements[i]->children;
+      std::vector<int> &blockIDs = vRefinementReport[i].childrenIDs;
 
       int nChildren = vNodes.size();
 
@@ -301,7 +301,7 @@ Grid<WaveletType, BlockType>::refine(const set<int> &blocksToRefine) {
                                       vNodes[c]->index[2], vNodes[c]->level);
 
         m_hierarchy[parent].push_back(node);
-        m_hierarchy[node] = vector<GridNode *>();
+        m_hierarchy[node] = std::vector<GridNode *>();
 
         newNodes.push_back(node);
       }
@@ -319,7 +319,7 @@ Grid<WaveletType, BlockType>::refine(const set<int> &blocksToRefine) {
 
   // 5.
   set<int> blockToErase;
-  for (vector<GridNode *>::const_iterator itNewNode = newNodes.begin();
+  for (std::vector<GridNode *>::const_iterator itNewNode = newNodes.begin();
        itNewNode != newNodes.end(); itNewNode++) {
     m_setInvalidBBInfo.insert(*itNewNode);
 
@@ -328,9 +328,9 @@ Grid<WaveletType, BlockType>::refine(const set<int> &blocksToRefine) {
 
     assert(itNeighbors != m_neighborhood.end());
 
-    const vector<GridNode *> &neighbors = itNeighbors->second;
+    const std::vector<GridNode *> &neighbors = itNeighbors->second;
 
-    for (vector<GridNode *>::const_iterator it = neighbors.begin();
+    for (std::vector<GridNode *>::const_iterator it = neighbors.begin();
          it != neighbors.end(); it++) {
       GridNode *node = NULL;
 
@@ -339,7 +339,7 @@ Grid<WaveletType, BlockType>::refine(const set<int> &blocksToRefine) {
       if (itN != m_neighborhood.end())
         node = itN->first;
       else {
-        map<GridNode *, GridNode *>::const_iterator itG =
+        std::map<GridNode *, GridNode *>::const_iterator itG =
             m_mapGhost2Node.find(*it);
 
         assert(itG != m_mapGhost2Node.end());
@@ -406,28 +406,28 @@ Grid<WaveletType, BlockType>::compress(const set<int> &blocksToCompress,
 
   // 2.
   assert(m_refCompressor != NULL);
-  vector<GridNodeCollapseInfo> vToCollapse;
+  std::vector<GridNodeCollapseInfo> vToCollapse;
   CompressionPlan *plan =
       m_refCompressor->createPlan(m_hierarchy, m_neighborhood, vToCollapse);
 
   // 3.
-  vector<BlockCollapseInfo> vBlockCollapseInfo;
+  std::vector<BlockCollapseInfo> vBlockCollapseInfo;
   CompressionResult result = m_blockCollapser->collapse(
       m_blockCollection, getBoundaryInfo(), *plan, vBlockCollapseInfo);
 
   // 4
-  map<int, int> mapCollapseIDBlockID;
+  std::map<int, int> mapCollapseIDBlockID;
   for (int i = 0; i < vBlockCollapseInfo.size(); i++)
     mapCollapseIDBlockID[vBlockCollapseInfo[i].collapseID] =
         vBlockCollapseInfo[i].newBlockID;
 
   // 5.
-  vector<GridNode *> newNodes;
+  std::vector<GridNode *> newNodes;
   newNodes.reserve(vToCollapse.size());
   for (int i = 0; i < vToCollapse.size(); i++) {
-    vector<GridNode *> &v = m_hierarchy[vToCollapse[i].node];
+    std::vector<GridNode *> &v = m_hierarchy[vToCollapse[i].node];
 
-    for (vector<GridNode *>::iterator it = v.begin(); it != v.end(); it++) {
+    for (std::vector<GridNode *>::iterator it = v.begin(); it != v.end(); it++) {
       m_boundaryInfo.erase((*it)->blockID);
       (*it)->blockID = -1;
     }
@@ -444,16 +444,16 @@ Grid<WaveletType, BlockType>::compress(const set<int> &blocksToCompress,
   // 7.
   _refresh();
 
-  /*for(vector<GridNode *>::const_iterator itNewNode= newNodes.begin();
+  /*for(std::vector<GridNode *>::const_iterator itNewNode= newNodes.begin();
   itNewNode!=newNodes.end(); itNewNode++)
   {
-          vector<GridNode*>& neighbors = m_neighborhood[*itNewNode];
+          std::vector<GridNode*>& neighbors = m_neighborhood[*itNewNode];
 
           m_setInvalidBBInfo.insert(*itNewNode);
           m_setInvalidBBInfo.insert(neighbors.begin(), neighbors.end());
   }*/
   set<int> blockToErase;
-  for (vector<GridNode *>::const_iterator itNewNode = newNodes.begin();
+  for (std::vector<GridNode *>::const_iterator itNewNode = newNodes.begin();
        itNewNode != newNodes.end(); itNewNode++) {
     m_setInvalidBBInfo.insert(*itNewNode);
 
@@ -462,9 +462,9 @@ Grid<WaveletType, BlockType>::compress(const set<int> &blocksToCompress,
 
     assert(itNeighbors != m_neighborhood.end());
 
-    const vector<GridNode *> &neighbors = itNeighbors->second;
+    const std::vector<GridNode *> &neighbors = itNeighbors->second;
 
-    for (vector<GridNode *>::const_iterator it = neighbors.begin();
+    for (std::vector<GridNode *>::const_iterator it = neighbors.begin();
          it != neighbors.end(); it++) {
       GridNode *node = NULL;
 
@@ -473,7 +473,7 @@ Grid<WaveletType, BlockType>::compress(const set<int> &blocksToCompress,
       if (itN != m_neighborhood.end())
         node = itN->first;
       else {
-        map<GridNode *, GridNode *>::const_iterator itG =
+        std::map<GridNode *, GridNode *>::const_iterator itG =
             m_mapGhost2Node.find(*it);
 
         assert(itG != m_mapGhost2Node.end());
@@ -499,7 +499,7 @@ template <typename WaveletType, typename BlockType>
 void Grid<WaveletType, BlockType>::_collapse(HierarchyType &hierarchy,
                                              GridNode *parent,
                                              int newBlockID) const {
-  vector<GridNode *> &children = hierarchy[parent];
+  std::vector<GridNode *> &children = hierarchy[parent];
 
   for (int i = 0; i < children.size(); i++) {
     assert(children[i]->shouldBeCompressed == true &&
@@ -557,7 +557,7 @@ Grid<WaveletType, BlockType>::getBoundaryInfo(int *output_stencil_start,
   // printf("Found %d invalid blocks\n", m_setInvalidBBInfo.size() );
 
   // 4.
-  vector<GridNode *> vNodes(m_setInvalidBBInfo.size());
+  std::vector<GridNode *> vNodes(m_setInvalidBBInfo.size());
   copy(m_setInvalidBBInfo.begin(), m_setInvalidBBInfo.end(), vNodes.begin());
 
   _computeBoundaryInfo(m_boundaryInfo, stencil_start, stencil_end, vNodes);
@@ -576,8 +576,8 @@ BoundaryInfo *Grid<WaveletType, BlockType>::createBoundaryInfo(
 
   BoundaryInfo *binfo = new BoundaryInfo;
 
-  vector<GridNode *> vNodes(m_neighborhood.size());
-  vector<GridNode *>::iterator itVector = vNodes.begin();
+  std::vector<GridNode *> vNodes(m_neighborhood.size());
+  std::vector<GridNode *>::iterator itVector = vNodes.begin();
 
   for (HierarchyType::const_iterator it = m_hierarchy.begin();
        it != m_hierarchy.end(); it++) {
@@ -598,14 +598,14 @@ template <typename WaveletType, typename BlockType>
 struct Body_CreateBoundaryInfo {
   struct ParallelItem {
     const GridNode *node;
-    const vector<GridNode *> &neighbors;
+    const std::vector<GridNode *> &neighbors;
     BoundaryInfoBlock *bbi;
 
-    ParallelItem(GridNode *node_, const vector<GridNode *> &neighbors_)
+    ParallelItem(GridNode *node_, const std::vector<GridNode *> &neighbors_)
         : node(node_), neighbors(neighbors_), bbi(NULL) {}
   };
 
-  vector<ParallelItem *> vWorkingList;
+  std::vector<ParallelItem *> vWorkingList;
   BoundaryInfo &m_binfo;
   const int (&requested_stencil_start)[3];
   const int (&requested_stencil_end)[3];
@@ -614,14 +614,14 @@ struct Body_CreateBoundaryInfo {
                           BoundaryInfo &binfo,
                           const int requested_stencil_start_[3],
                           const int requested_stencil_end_[3],
-                          vector<GridNode *> &vNodesToCompute)
+                          std::vector<GridNode *> &vNodesToCompute)
       : m_binfo(binfo), vWorkingList(),
         requested_stencil_start((const int (&)[3])requested_stencil_start_),
         requested_stencil_end((const int (&)[3])requested_stencil_end_) {
 
     vWorkingList.reserve(vNodesToCompute.size());
 
-    for (vector<GridNode *>::const_iterator it = vNodesToCompute.begin();
+    for (std::vector<GridNode *>::const_iterator it = vNodesToCompute.begin();
          it != vNodesToCompute.end(); it++) {
       GridNode *node = *it;
 
@@ -629,7 +629,7 @@ struct Body_CreateBoundaryInfo {
 
       assert(itNeighbors != neighborhood.end());
 
-      map<int, BoundaryInfoBlock *>::iterator itBBI =
+      std::map<int, BoundaryInfoBlock *>::iterator itBBI =
           binfo.boundaryInfoOfBlock.find(node->blockID);
 
       if (itBBI != binfo.boundaryInfoOfBlock.end())
@@ -660,12 +660,12 @@ struct Body_CreateBoundaryInfo {
   }
 
   void collect() {
-    for (typename vector<ParallelItem *>::const_iterator it =
+    for (typename std::vector<ParallelItem *>::const_iterator it =
              vWorkingList.begin();
          it != vWorkingList.end(); it++) {
       const int blockID = (*it)->node->blockID;
 
-      map<int, BoundaryInfoBlock *>::iterator itBBI =
+      std::map<int, BoundaryInfoBlock *>::iterator itBBI =
           m_binfo.boundaryInfoOfBlock.find(blockID);
 
       if (itBBI == m_binfo.boundaryInfoOfBlock.end())
@@ -674,7 +674,7 @@ struct Body_CreateBoundaryInfo {
         itBBI->second = (*it)->bbi;
     }
 
-    for (typename vector<ParallelItem *>::iterator it = vWorkingList.begin();
+    for (typename std::vector<ParallelItem *>::iterator it = vWorkingList.begin();
          it != vWorkingList.end(); it++) {
       delete *it;
       *it = NULL;
@@ -686,7 +686,7 @@ template <typename WaveletType, typename BlockType>
 void Grid<WaveletType, BlockType>::_computeBoundaryInfo(
     BoundaryInfo &binfo, const int requested_stencil_start[3],
     const int requested_stencil_end[3],
-    vector<GridNode *> &vNodesToCompute) const {
+    std::vector<GridNode *> &vNodesToCompute) const {
   binfo.stencil_start[0] = requested_stencil_start[0];
   binfo.stencil_start[1] = requested_stencil_start[1];
   binfo.stencil_start[2] = requested_stencil_start[2];
@@ -718,7 +718,7 @@ int Grid<WaveletType, BlockType>::_computeMaxLevel(
 
 template <typename WaveletType, typename BlockType>
 int Grid<WaveletType, BlockType>::_computeMinLevel(
-    const vector<vector<BlockInfo>> &blockAtLevel) const {
+    const std::vector<std::vector<BlockInfo>> &blockAtLevel) const {
   int l;
 
   for (l = 0; l < blockAtLevel.size(); l++)
@@ -735,9 +735,9 @@ int Grid<WaveletType, BlockType>::_computeMaxLevelJump() const {
   int jump = 0;
   for (NeighborhoodType::const_iterator it = m_neighborhood.begin();
        it != m_neighborhood.end(); it++) {
-    const vector<GridNode *> &neighbors = it->second;
+    const std::vector<GridNode *> &neighbors = it->second;
 
-    for (vector<GridNode *>::const_iterator n = neighbors.begin();
+    for (std::vector<GridNode *>::const_iterator n = neighbors.begin();
          n != neighbors.end(); n++)
       jump = std::max(jump, abs(it->first->level - (*n)->level));
   }
@@ -748,8 +748,8 @@ int Grid<WaveletType, BlockType>::_computeMaxLevelJump() const {
 template <typename WaveletType, typename BlockType>
 void Grid<WaveletType, BlockType>::_computeBlockAtLevel(
     const HierarchyType &hierarchy,
-    vector<vector<BlockInfo>> &blockAtLevel) const {
-  vector<BlockInfo> blocks = getBlocksInfo();
+    std::vector<std::vector<BlockInfo>> &blockAtLevel) const {
+  std::vector<BlockInfo> blocks = getBlocksInfo();
 
   blockAtLevel.clear();
 
@@ -757,7 +757,7 @@ void Grid<WaveletType, BlockType>::_computeBlockAtLevel(
 
   blockAtLevel.resize(levels);
 
-  for (vector<BlockInfo>::const_iterator it = blocks.begin();
+  for (std::vector<BlockInfo>::const_iterator it = blocks.begin();
        it != blocks.end(); it++)
     blockAtLevel[it->level].push_back(*it);
 }
@@ -854,7 +854,7 @@ void Grid<WaveletType, BlockType>::_checkResolutionJumpCondition(
 template <typename WaveletType, typename BlockType>
 void Grid<WaveletType, BlockType>::_computeNeighborhood(
     const HierarchyType &hierarchy, NeighborhoodType &neighborhood,
-    map<GridNode *, map<int, GridNode *>> &ghostNodes) const {
+    std::map<GridNode *, std::map<int, GridNode *>> &ghostNodes) const {
   // 0. create a suitable data-structure for the bucket list
   // 1. generate bucket list of nodes depending on their locations
   // 2. use it to generate the neighborhood
@@ -862,11 +862,11 @@ void Grid<WaveletType, BlockType>::_computeNeighborhood(
 
   // 0.
   {
-    for (map<GridNode *, map<int, GridNode *>>::iterator it1 =
+    for (std::map<GridNode *, std::map<int, GridNode *>>::iterator it1 =
              ghostNodes.begin();
          it1 != ghostNodes.end(); it1++) {
-      map<int, GridNode *> &m = (it1->second);
-      for (map<int, GridNode *>::iterator it2 = m.begin(); it2 != m.end();
+      std::map<int, GridNode *> &m = (it1->second);
+      for (std::map<int, GridNode *>::iterator it2 = m.begin(); it2 != m.end();
            it2++)
         delete it2->second;
     }
@@ -881,7 +881,7 @@ void Grid<WaveletType, BlockType>::_computeNeighborhood(
   }
 
   typedef MRAG::MRAGridHelpers::FlattenedBlock FlattenedBlock;
-  typedef vector<const FlattenedBlock *> B;
+  typedef std::vector<const FlattenedBlock *> B;
 
   // 1.
   const int max_level = _computeMaxLevel(hierarchy);
@@ -1045,7 +1045,7 @@ void Grid<WaveletType, BlockType>::_computeNeighborhood(
                 idx[2] < 0 || idx[2] >= nZ)
               continue;
 
-            vector<const FlattenedBlock *> &v =
+            std::vector<const FlattenedBlock *> &v =
                 bucket.Access(idx[0], idx[1], idx[2]);
 
             const int nElements = v.size();
@@ -1179,11 +1179,11 @@ void Grid<WaveletType, BlockType>::_computeNeighborhood(
 
   // 3.
   {
-    for (map<GridNode *, map<int, GridNode *>>::const_iterator itGridNode =
+    for (std::map<GridNode *, std::map<int, GridNode *>>::const_iterator itGridNode =
              ghostNodes.begin();
          itGridNode != ghostNodes.end(); itGridNode++) {
-      const map<int, GridNode *> &currentGhosts = itGridNode->second;
-      for (map<int, GridNode *>::const_iterator itGhostNode =
+      const std::map<int, GridNode *> &currentGhosts = itGridNode->second;
+      for (std::map<int, GridNode *>::const_iterator itGhostNode =
                currentGhosts.begin();
            itGhostNode != currentGhosts.end(); itGhostNode++)
         neighborhood.erase(itGhostNode->second);

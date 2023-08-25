@@ -39,16 +39,16 @@ private:
   BBIState state;
   int nLocks;
   int block_size[3];
-  vector<PointIndex> indexPool;
+  std::vector<PointIndex> indexPool;
 
-  typedef vector<IndexWP> ReconstructionInfo;
-  vector<ReconstructionInfo> ghosts;
+  typedef std::vector<IndexWP> ReconstructionInfo;
+  std::vector<ReconstructionInfo> ghosts;
 
   HuffmanEncoder<unsigned short> encodedInstructionSizes;
   Encoder<unsigned char> encodedInstructionItemsWs;
   Encoder<unsigned short> encodedInstructionItemsPts;
   Encoder<unsigned char> vBlockID_encodedPointIndices3D;
-  vector<pair<int, int>> vBlockID_Points;
+  std::vector<std::pair<int, int>> vBlockID_Points;
   bool bCompressed;
 
   void _compress();
@@ -57,8 +57,8 @@ private:
 
 public:
   BlockOfGhosts boundary[27];
-  vector<int> dependentBlockIDs;
-  vector<double> weightsPool;
+  std::vector<int> dependentBlockIDs;
+  std::vector<double> weightsPool;
 
   void lock() {
     if (state == BBIState_Unlocked)
@@ -71,12 +71,12 @@ public:
     state = BBIState_Locked;
   }
 
-  inline const vector<PointIndex> &getIndexPool() const {
+  inline const std::vector<PointIndex> &getIndexPool() const {
     assert(state == BBIState_Initialized || state == BBIState_Locked);
     return indexPool;
   }
 
-  const vector<ReconstructionInfo> &getGhosts() const {
+  const std::vector<ReconstructionInfo> &getGhosts() const {
     assert(state == BBIState_Initialized || state == BBIState_Locked);
     return ghosts;
   }
@@ -136,7 +136,7 @@ public:
 
 struct BoundaryInfo {
   char stencil_start[3], stencil_end[3];
-  map<int, BoundaryInfoBlock *> boundaryInfoOfBlock;
+  std::map<int, BoundaryInfoBlock *> boundaryInfoOfBlock;
 
   // set<int> invalidBlocks;
 

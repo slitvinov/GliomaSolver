@@ -1,11 +1,9 @@
-using namespace std;
-
 namespace MRAG {
 template <typename DataType> class HuffmanEncoder : public Encoder<DataType> {
   static const bool bDebug = false;
   static const bool bCheat = false;
   static const bool bQComprWhenCheating = true;
-  vector<DataType> m_vCheat;
+  std::vector<DataType> m_vCheat;
 
   bool m_bPathologicCase;
   DataType *m_PathologicSymbol;
@@ -13,12 +11,12 @@ template <typename DataType> class HuffmanEncoder : public Encoder<DataType> {
   int m_maxDigitEncodingLength;
 
   Encoder<DataType> m_encodedTable_Symbols;
-  vector<BitStream> m_encodedTable_Encodings;
+  std::vector<BitStream> m_encodedTable_Encodings;
   BitStream m_encodedStream;
 
   template <typename Stream>
   void _computeFrequencies(const Stream &stream,
-                           map<DataType, float> &mapFrequencies,
+                           std::map<DataType, float> &mapFrequencies,
                            double &approxEntropy) const {
     // 1. fill the freq map
     // 2. normalize it, computing the probability approximations
@@ -37,10 +35,10 @@ template <typename DataType> class HuffmanEncoder : public Encoder<DataType> {
       double H = 0;
       const double factor = 1. / (stream.size() * 0.01);
 
-      const typename map<DataType, float>::iterator itEnd =
+      const typename std::map<DataType, float>::iterator itEnd =
           mapFrequencies.end();
 
-      for (typename map<DataType, float>::iterator it = mapFrequencies.begin();
+      for (typename std::map<DataType, float>::iterator it = mapFrequencies.begin();
            it != itEnd; it++) {
         float &freq = it->second;
 
@@ -53,7 +51,7 @@ template <typename DataType> class HuffmanEncoder : public Encoder<DataType> {
       approxEntropy = H;
 
       if (bDebug)
-        for (typename map<DataType, float>::iterator it =
+        for (typename std::map<DataType, float>::iterator it =
                  mapFrequencies.begin();
              it != itEnd; it++)
           printf("p[%d] = %f\n", (unsigned int)it->first, it->second);
@@ -62,7 +60,7 @@ template <typename DataType> class HuffmanEncoder : public Encoder<DataType> {
 
   struct TranslationItem {
     float p;
-    stack<char> encoding;
+    std::stack<char> encoding;
     const DataType *symbol;
 
     TranslationItem() : p(0.), encoding(), symbol() {}
@@ -78,16 +76,16 @@ template <typename DataType> class HuffmanEncoder : public Encoder<DataType> {
 
   struct PQitem {
     float p;
-    vector<TranslationItem *> symbolsAndPrefixes;
+    std::vector<TranslationItem *> symbolsAndPrefixes;
 
     inline bool operator<(const PQitem &item) const { return (p > item.p); }
 
     void add_bit(const int bit) const {
       assert(bit == 0 || bit == 1);
 
-      const typename vector<TranslationItem *>::const_iterator itEnd =
+      const typename std::vector<TranslationItem *>::const_iterator itEnd =
           symbolsAndPrefixes.end();
-      for (typename vector<TranslationItem *>::const_iterator it =
+      for (typename std::vector<TranslationItem *>::const_iterator it =
                symbolsAndPrefixes.begin();
            it != itEnd; it++)
         (*it)->encoding.push(bit);
@@ -116,8 +114,8 @@ template <typename DataType> class HuffmanEncoder : public Encoder<DataType> {
     }
   };
 
-  void _computeTranslationTable(const map<DataType, float> &mapFrequencies,
-                                map<DataType, BitStream> &mapTable,
+  void _computeTranslationTable(const std::map<DataType, float> &mapFrequencies,
+                                std::map<DataType, BitStream> &mapTable,
                                 int &maxLength) const {
     // 1. initialize the translation items
     // 2. put them in the priority queue
@@ -125,28 +123,28 @@ template <typename DataType> class HuffmanEncoder : public Encoder<DataType> {
     // 4. extract the encoding for every symbol
 
     assert(mapTable.size() == 0);
-    vector<TranslationItem> translations(mapFrequencies.size());
+    std::vector<TranslationItem> translations(mapFrequencies.size());
 
     // 1.
     {
-      typename map<DataType, float>::const_iterator itSource =
+      typename std::map<DataType, float>::const_iterator itSource =
           mapFrequencies.begin();
-      const typename vector<TranslationItem>::iterator itEnd =
+      const typename std::vector<TranslationItem>::iterator itEnd =
           translations.end();
-      for (typename vector<TranslationItem>::iterator it = translations.begin();
+      for (typename std::vector<TranslationItem>::iterator it = translations.begin();
            it != itEnd; it++, itSource++) {
         it->symbol = &itSource->first;
         it->p = itSource->second;
       }
     }
 
-    priority_queue<PQitem> mypq;
+    std::priority_queue<PQitem> mypq;
 
     // 2.
     {
-      const typename vector<TranslationItem>::iterator itEnd =
+      const typename std::vector<TranslationItem>::iterator itEnd =
           translations.end();
-      for (typename vector<TranslationItem>::iterator it = translations.begin();
+      for (typename std::vector<TranslationItem>::iterator it = translations.begin();
            it != itEnd; it++)
         mypq.push(PQitem(it->p, *it));
     }
@@ -164,18 +162,18 @@ template <typename DataType> class HuffmanEncoder : public Encoder<DataType> {
     // 4.
     {
       int maxL = 0;
-      const typename vector<TranslationItem>::iterator itEnd =
+      const typename std::vector<TranslationItem>::iterator itEnd =
           translations.end();
-      for (typename vector<TranslationItem>::iterator it = translations.begin();
+      for (typename std::vector<TranslationItem>::iterator it = translations.begin();
            it != itEnd; it++) {
         TranslationItem &translation = *it;
-        stack<char> &encoding = translation.encoding;
+        std::stack<char> &encoding = translation.encoding;
 
         BitStream &bits = mapTable[*translation.symbol];
         assert(bits.bits == NULL);
 
         bits.setup(encoding.size());
-        maxL = max(maxL, (int)encoding.size());
+        maxL = std::max(maxL, (int)encoding.size());
 
         while (encoding.size() > 0) {
           bits.append_bits(encoding.top(), 1);
@@ -186,7 +184,7 @@ template <typename DataType> class HuffmanEncoder : public Encoder<DataType> {
       maxLength = maxL;
 
       if (bDebug)
-        for (typename vector<TranslationItem>::iterator it =
+        for (typename std::vector<TranslationItem>::iterator it =
                  translations.begin();
              it != itEnd; it++) {
           TranslationItem &translation = *it;
@@ -198,9 +196,9 @@ template <typename DataType> class HuffmanEncoder : public Encoder<DataType> {
     }
   }
 
-  void _encodeTranslationTable(const map<DataType, BitStream> &mapTable,
+  void _encodeTranslationTable(const std::map<DataType, BitStream> &mapTable,
                                Encoder<DataType> &encodedSymbols,
-                               vector<BitStream> &vEncodings) const {
+                               std::vector<BitStream> &vEncodings) const {
     // 0. checks & setup
     // 1. fill a vector of symbols, fill the encodings vector
     // 2. quantize-encode the vector of symbols
@@ -210,15 +208,15 @@ template <typename DataType> class HuffmanEncoder : public Encoder<DataType> {
 
     const int nSymbols = mapTable.size();
     vEncodings.resize(nSymbols);
-    vector<DataType> vSymbols(nSymbols);
+    std::vector<DataType> vSymbols(nSymbols);
 
     // 1.
     {
-      vector<BitStream>::iterator itDestEncoding = vEncodings.begin();
-      typename vector<DataType>::iterator itDestSymbol = vSymbols.begin();
-      const typename map<DataType, BitStream>::const_iterator itEnd =
+      std::vector<BitStream>::iterator itDestEncoding = vEncodings.begin();
+      typename std::vector<DataType>::iterator itDestSymbol = vSymbols.begin();
+      const typename std::map<DataType, BitStream>::const_iterator itEnd =
           mapTable.end();
-      for (typename map<DataType, BitStream>::const_iterator it =
+      for (typename std::map<DataType, BitStream>::const_iterator it =
                mapTable.begin();
            it != itEnd; it++, itDestSymbol++, itDestEncoding++) {
         *itDestSymbol = it->first;
@@ -228,10 +226,10 @@ template <typename DataType> class HuffmanEncoder : public Encoder<DataType> {
 
     // 2.
     {
-      typename vector<DataType>::const_iterator itSymbol = vSymbols.begin();
+      typename std::vector<DataType>::const_iterator itSymbol = vSymbols.begin();
       unsigned int maxVal = 0;
       for (int i = 0; i < nSymbols; i++, itSymbol++)
-        maxVal = max(maxVal, (unsigned int)(*itSymbol));
+        maxVal = std::max(maxVal, (unsigned int)(*itSymbol));
 
       if (Encoder<DataType>::bVerbose)
         printf("ENCODING TABLE\n");
@@ -240,8 +238,8 @@ template <typename DataType> class HuffmanEncoder : public Encoder<DataType> {
   }
 
   void _decodeTranslationTable(const Encoder<DataType> &encodedSymbols,
-                               const vector<BitStream> &vEncodings,
-                               map<DataType, BitStream> &mapTable) const {
+                               const std::vector<BitStream> &vEncodings,
+                               std::map<DataType, BitStream> &mapTable) const {
     // 0. checks, setups
     // 1. unpack encodedSymbols into a vector of symbols
     // 2. fill the map
@@ -249,7 +247,7 @@ template <typename DataType> class HuffmanEncoder : public Encoder<DataType> {
     // 0.
     assert(mapTable.size() == 0);
     const int nSymbols = vEncodings.size();
-    vector<DataType> vSymbols;
+    std::vector<DataType> vSymbols;
 
     // 1.
     {
@@ -259,8 +257,8 @@ template <typename DataType> class HuffmanEncoder : public Encoder<DataType> {
 
     // 2.
     {
-      vector<BitStream>::const_iterator itEncoding = vEncodings.begin();
-      typename vector<DataType>::const_iterator itSymbol = vSymbols.begin();
+      std::vector<BitStream>::const_iterator itEncoding = vEncodings.begin();
+      typename std::vector<DataType>::const_iterator itSymbol = vSymbols.begin();
 
       for (int i = 0; i < nSymbols; i++, itSymbol++, itEncoding++)
         mapTable[*itSymbol] = *itEncoding;
@@ -269,7 +267,7 @@ template <typename DataType> class HuffmanEncoder : public Encoder<DataType> {
 
   template <typename Stream>
   void _translate(const double H, const Stream &stream,
-                  const map<DataType, BitStream> &mapTable,
+                  const std::map<DataType, BitStream> &mapTable,
                   BitStream &encodedStream) const {
     const unsigned int estimated_encoding_bits =
         (unsigned int)ceil(H * stream.size() * 1.25);
@@ -278,7 +276,7 @@ template <typename DataType> class HuffmanEncoder : public Encoder<DataType> {
     const typename Stream::const_iterator itEnd = stream.end();
     for (typename Stream::const_iterator it = stream.begin(); it != itEnd;
          it++) {
-      typename map<DataType, BitStream>::const_iterator itBits =
+      typename std::map<DataType, BitStream>::const_iterator itBits =
           mapTable.find(*it);
       encodedStream.append_bits(itBits->second);
     }
@@ -371,7 +369,7 @@ template <typename DataType> class HuffmanEncoder : public Encoder<DataType> {
 
   template <typename Stream>
   void _translate_back(const BitStream &encodedStream,
-                       const map<DataType, BitStream> &mapTable,
+                       const std::map<DataType, BitStream> &mapTable,
                        Stream &stream) const {
     // 1. build the lookup table system (LUT)
     // 2. use it for decoding each digit
@@ -384,9 +382,9 @@ template <typename DataType> class HuffmanEncoder : public Encoder<DataType> {
       // A. iterate on each (symbol, encoding), building the internal subtrees
       // B. ,, ,, , filling the final leaf
 
-      const typename map<DataType, BitStream>::const_iterator itEnd =
+      const typename std::map<DataType, BitStream>::const_iterator itEnd =
           mapTable.end();
-      for (typename map<DataType, BitStream>::const_iterator it =
+      for (typename std::map<DataType, BitStream>::const_iterator it =
                mapTable.begin();
            it != itEnd; it++) {
         const DataType &symbol = it->first;
@@ -442,7 +440,7 @@ template <typename DataType> class HuffmanEncoder : public Encoder<DataType> {
         assert(curr_start < total_encoding_length);
 
         const unsigned int nof_bits_to_read =
-            min((int)chunk_size, (int)(total_encoding_length - curr_start));
+	  std::min((int)chunk_size, (int)(total_encoding_length - curr_start));
         const unsigned int read_chunk =
             encodedStream.get_bits(curr_start, nof_bits_to_read);
 
@@ -478,9 +476,9 @@ public:
 
     m_PathologicSymbol = NULL;
 
-    const typename vector<BitStream>::iterator itEnd =
+    const typename std::vector<BitStream>::iterator itEnd =
         m_encodedTable_Encodings.end();
-    for (typename vector<BitStream>::iterator it =
+    for (typename std::vector<BitStream>::iterator it =
              m_encodedTable_Encodings.begin();
          it != itEnd; it++)
       it->dispose();
@@ -488,7 +486,7 @@ public:
     m_encodedStream.dispose();
   }
 
-  void encode(const vector<DataType> &stream, const int nSymbols) {
+  void encode(const std::vector<DataType> &stream, const int nSymbols) {
     assert(!this->m_bEncoded);
 
     this->m_nItems = stream.size();
@@ -506,8 +504,8 @@ public:
       return;
     }
 
-    map<DataType, float> mapFrequencies;
-    map<DataType, BitStream> mapTranslationTable;
+    std::map<DataType, float> mapFrequencies;
+    std::map<DataType, BitStream> mapTranslationTable;
 
     _computeFrequencies(stream, mapFrequencies, m_entropyPerDigit);
 
@@ -546,7 +544,7 @@ public:
     this->m_bEncoded = true;
   }
 
-  void decode(vector<DataType> &stream) const {
+  void decode(std::vector<DataType> &stream) const {
     assert(this->m_bEncoded);
     assert(stream.size() == 0);
 
@@ -564,12 +562,12 @@ public:
     stream.resize(this->m_nItems);
 
     if (!m_bPathologicCase) {
-      map<DataType, BitStream> mapTranslationTable;
+      std::map<DataType, BitStream> mapTranslationTable;
       _decodeTranslationTable(m_encodedTable_Symbols, m_encodedTable_Encodings,
                               mapTranslationTable);
       _translate_back(m_encodedStream, mapTranslationTable, stream);
     } else {
-      typename vector<DataType>::iterator itDest = stream.begin();
+      typename std::vector<DataType>::iterator itDest = stream.begin();
 
       const int n = this->m_nItems;
       for (int i = 0; i < n; i++, itDest++)
@@ -586,7 +584,7 @@ public:
       sBytes += (int)ceil(m_encodedStream.getLength() / 8.);
 
       {
-        vector<BitStream>::const_iterator itEncoding =
+        std::vector<BitStream>::const_iterator itEncoding =
             m_encodedTable_Encodings.begin();
         const int nEncodings = m_encodedTable_Encodings.size();
         for (int i = 0; i < nEncodings; i++, itEncoding++)

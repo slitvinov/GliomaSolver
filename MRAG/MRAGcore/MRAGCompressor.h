@@ -27,7 +27,7 @@ class Compressor {
 
       assert(itParent != hierarchy.end());
 
-      vector<GridNode *> children = itParent->second;
+      std::vector<GridNode *> children = itParent->second;
 
       int iChild;
       for (iChild = 0; iChild < children.size(); iChild++)
@@ -48,7 +48,7 @@ public:
   template <typename HierarchyType, typename NeighborhoodType>
   CompressionPlan *createPlan(const HierarchyType &hierarchy,
                               NeighborhoodType &neighborhood,
-                              vector<GridNodeCollapseInfo> &vToCollapse) {
+                              std::vector<GridNodeCollapseInfo> &vToCollapse) {
     // 1. check the nodes whose children are full and ready to be compressed
     // 2. generate a compression plan
 
@@ -61,7 +61,7 @@ public:
           it->second[0]->isEmpty == true)
         continue;
 
-      const vector<GridNode *> &children = it->second;
+      const std::vector<GridNode *> &children = it->second;
       bool bEveryChildrenIsFull = true;
       bool bShouldCompress = true;
 
@@ -79,7 +79,7 @@ public:
         const int iCandidateLevel = it->first->level;
 
         for (int i = 0; i < children.size(); i++) {
-          const vector<GridNode *> &neighbors = neighborhood[children[i]];
+          const std::vector<GridNode *> &neighbors = neighborhood[children[i]];
 
           for (int j = 0; j < neighbors.size(); j++)
             bAccettableLevelJump &=
@@ -108,7 +108,7 @@ public:
           hierarchy.find(vToCollapse[i].node);
       assert(itChildren != hierarchy.end());
 
-      const vector<GridNode *> &children =
+      const std::vector<GridNode *> &children =
           itChildren->second; // hierarchy[vToCollapse[i].node];
 
       collapse.collapseID = i;

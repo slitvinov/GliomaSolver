@@ -59,7 +59,7 @@ void BlockCollection<BlockType_>::_emptyTrash(int nChunks) {
 template <typename BlockType_>
 inline BlockType_ &
 BlockCollection<BlockType_>::operator[](const int blockID) const {
-  typename map<int, BlockType *>::const_iterator it =
+  typename std::map<int, BlockType *>::const_iterator it =
       m_blockIDToBlockPointers.find(blockID);
 
   assert(it != m_blockIDToBlockPointers.end());
@@ -86,7 +86,7 @@ void BlockCollection<BlockType_>::erase(const int ID) {
   // 3. if the chunk is completely empty put it in the trash
 
   // 1.
-  typename map<int, Chunk *>::iterator itChunk = m_blockIDToChunck.find(ID);
+  typename std::map<int, Chunk *>::iterator itChunk = m_blockIDToChunck.find(ID);
   assert(itChunk != m_blockIDToChunck.end());
 
   // 2.
@@ -127,7 +127,7 @@ template <typename BlockType_> void BlockCollection<BlockType_>::clear() {
 }
 
 template <typename BlockType_>
-inline vector<int> BlockCollection<BlockType_>::_allocateBlockInChunk(
+inline std::vector<int> BlockCollection<BlockType_>::_allocateBlockInChunk(
     int &inoutRequestedBlocks, Chunk *chunk,
     int &inoutAvailableBlocksInCurrentChunk) const {
   std::vector<int> vIDs;
@@ -159,11 +159,11 @@ inline vector<int> BlockCollection<BlockType_>::_allocateBlockInChunk(
 }
 
 template <typename BlockType_>
-inline vector<int> BlockCollection<BlockType_>::_allocateChunks(
+inline std::vector<int> BlockCollection<BlockType_>::_allocateChunks(
     int &inoutRequestedBlocks, set<Chunk *> &inoutChunks,
-    map<int, BlockType *> &inoutIDToBlockPointers,
-    map<int, Chunk *> &inoutBlockIDToChunck,
-    vector<Chunk *> &inoutRecycledChunks, Chunk *&outCurrentChunk,
+    std::map<int, BlockType *> &inoutIDToBlockPointers,
+    std::map<int, Chunk *> &inoutBlockIDToChunck,
+    std::vector<Chunk *> &inoutRecycledChunks, Chunk *&outCurrentChunk,
     int &outAvailableBlocksInCurrentChunk) const {
   const int nChunks = (int)ceil(inoutRequestedBlocks / (double)nChunkSize);
   assert(nChunks > 0);
@@ -230,7 +230,7 @@ template <typename BlockType_>
 std::vector<int> BlockCollection<BlockType_>::create(int nNumberOfBlocks) {
   int nRequestedBlocks = nNumberOfBlocks;
 
-  vector<int> vSingleIDs = _allocateBlockInChunk(
+  std::vector<int> vSingleIDs = _allocateBlockInChunk(
       nRequestedBlocks, m_currentChunk, m_nAvailableBlocksInCurrentChunk);
 
   if (m_nAvailableBlocksInCurrentChunk == 0)
@@ -244,7 +244,7 @@ std::vector<int> BlockCollection<BlockType_>::create(int nNumberOfBlocks) {
   if (nRequestedBlocks == 0)
     return vSingleIDs;
 
-  vector<int> vIDs =
+  std::vector<int> vIDs =
       _allocateChunks(nRequestedBlocks, m_setChunks, m_blockIDToBlockPointers,
                       m_blockIDToChunck, m_trash, m_currentChunk,
                       m_nAvailableBlocksInCurrentChunk);

@@ -1,8 +1,6 @@
 #ifndef log2
 #define log2(x) (log((double)(x)) / (double)log(2.))
 #endif
-
-using namespace std;
 namespace MRAG {
 
 template <typename DataType> class Encoder {
@@ -19,11 +17,11 @@ public:
 
   ~Encoder() { m_encodedData.dispose(); }
 
-  virtual void encode(const vector<DataType> &stream, const int nSymbols) {
+  virtual void encode(const std::vector<DataType> &stream, const int nSymbols) {
     assert(m_bEncoded == false);
     assert(nSymbols >= 2);
 
-    m_nQuantization = max((unsigned int)0, (unsigned int)ceil(log2(nSymbols)));
+    m_nQuantization = std::max((unsigned int)0, (unsigned int)ceil(log2(nSymbols)));
     m_nItems = stream.size();
 
     const double uncompressedMB = m_nItems * sizeof(DataType) / 1024. / 1024.;
@@ -35,21 +33,21 @@ public:
 
     m_encodedData.setup(m_nItems * m_nQuantization);
 
-    const typename vector<DataType>::const_iterator itE = stream.end();
-    for (typename vector<DataType>::const_iterator itSource = stream.begin();
+    const typename std::vector<DataType>::const_iterator itE = stream.end();
+    for (typename std::vector<DataType>::const_iterator itSource = stream.begin();
          itSource != itE; itSource++)
       m_encodedData.append_bits((unsigned int)*itSource, m_nQuantization);
 
     m_bEncoded = true;
   }
 
-  virtual void decode(vector<DataType> &stream) const {
+  virtual void decode(std::vector<DataType> &stream) const {
     assert(m_bEncoded == true);
     assert(stream.size() == 0);
 
     stream.resize(m_nItems);
     const int n = m_nItems;
-    typename vector<DataType>::iterator itDest = stream.begin();
+    typename std::vector<DataType>::iterator itDest = stream.begin();
     for (int i = 0; i < n; i++, itDest++)
       *itDest = (DataType)m_encodedData.get_bits(m_nQuantization * i,
                                                  m_nQuantization);

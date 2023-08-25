@@ -148,7 +148,7 @@ public:
         *boundaryInfo.boundaryInfoOfBlock.find(info.blockID)->second;
     bbinfo.lock();
 
-    const vector<vector<IndexWP>> &ghosts = bbinfo.getGhosts();
+    const std::vector<std::vector<IndexWP>> &ghosts = bbinfo.getGhosts();
 
     // 1.
     {
@@ -254,13 +254,13 @@ public:
         for (int iz = s[2]; iz < e[2]; iz++)
           for (int iy = s[1]; iy < e[1]; iy++)
             for (int ix = s[0]; ix < e[0]; ix++, currentghost++) {
-              const vector<IndexWP> &vWP = ghosts[currentghost];
+              const std::vector<IndexWP> &vWP = ghosts[currentghost];
 
-              const vector<IndexWP>::const_iterator start = vWP.begin();
-              const vector<IndexWP>::const_iterator end = vWP.end();
+              const std::vector<IndexWP>::const_iterator start = vWP.begin();
+              const std::vector<IndexWP>::const_iterator end = vWP.end();
 
               ElementType ghost = ElementType();
-              for (vector<IndexWP>::const_iterator it = start; it != end;
+              for (std::vector<IndexWP>::const_iterator it = start; it != end;
                    it++) {
                 const Real w = (m_weightPool[it->weights_index[0]] *
                                 m_weightPool[it->weights_index[1]] *

@@ -3,7 +3,7 @@ namespace Multithreading {
 /**
  * Sample Functor acting on simple blocks without ghosts (in this sample we do
  * nothing). This is just to show what functions should be provided by
- * Processing functors passed to process(vector< BlockInfo > &, Collection &,
+ * Processing functors passed to process(std::vector< BlockInfo > &, Collection &,
  * Processing&, ...) as in MRAG::Multithreading::BlockProcessing_SingleCPU,
  *       MRAG::Multithreading::BlockProcessing_TBB and
  *       MRAG::Multithreading::BlockProcessing_Pipeline_TBB
@@ -71,8 +71,8 @@ public:
 /**
  * Sample Functor acting on extended blocks with ghosts (in this sample we do
  * nothing). This is just to show what functions should be provided by
- * Processing functors passed to process(vector< BlockInfo > &, Collection &,
- * BoundaryInfo &, Processing&, ...) and to pipeline_process(vector< BlockInfo >
+ * Processing functors passed to process(std::vector< BlockInfo > &, Collection &,
+ * BoundaryInfo &, Processing&, ...) and to pipeline_process(std::vector< BlockInfo >
  * &, Collection &, BoundaryInfo &, Processing &) as in
  * MRAG::Multithreading::BlockProcessing_SingleCPU,
  *       MRAG::Multithreading::BlockProcessing_TBB and
@@ -157,11 +157,11 @@ public:
 template <typename BlockType, typename ProcessingMT>
 class BlockProcessingMT_Simple {
   ProcessingMT &processing;
-  vector<BlockInfo> &vInfo;
+  std::vector<BlockInfo> &vInfo;
   BlockType **ptrBlocks;
 
 public:
-  BlockProcessingMT_Simple(vector<BlockInfo> &vInfo_, ProcessingMT &processing_,
+  BlockProcessingMT_Simple(std::vector<BlockInfo> &vInfo_, ProcessingMT &processing_,
                            BlockType **ptrs)
       : processing(processing_), vInfo(vInfo_), ptrBlocks(ptrs) {}
 
@@ -195,14 +195,14 @@ public:
 template <typename BlockType, template <typename BB> class Lab,
           typename Collection, typename ProcessingMT>
 class BlockProcessingMT {
-  vector<BlockInfo> &vInfo;
+  std::vector<BlockInfo> &vInfo;
   Collection &collection;
   BoundaryInfo &boundaryInfo;
   ProcessingMT &processing;
   BlockType **ptrBlocks;
 
 public:
-  BlockProcessingMT(vector<BlockInfo> &vInfo_, Collection &collection_,
+  BlockProcessingMT(std::vector<BlockInfo> &vInfo_, Collection &collection_,
                     BoundaryInfo &boundaryInfo_, ProcessingMT &processing_,
                     BlockType **ptrs)
       : vInfo(vInfo_), collection(collection_), boundaryInfo(boundaryInfo_),
@@ -244,7 +244,7 @@ public:
  */
 template <typename BlockType> class BlockProcessing_SingleCPU {
   template <typename Collection>
-  static BlockType **createBlockPointers(vector<BlockInfo> &vInfo,
+  static BlockType **createBlockPointers(std::vector<BlockInfo> &vInfo,
                                          Collection &collection) {
     BlockType **result = new BlockType *[vInfo.size()];
 
@@ -255,7 +255,7 @@ template <typename BlockType> class BlockProcessing_SingleCPU {
   }
 
   template <typename Collection>
-  static void destroyBlockPointers(BlockType **&ptrs, vector<BlockInfo> &vInfo,
+  static void destroyBlockPointers(BlockType **&ptrs, std::vector<BlockInfo> &vInfo,
                                    Collection &collection) {
     for (int i = 0; i < vInfo.size(); i++)
       collection.release(vInfo[i].blockID);
@@ -278,7 +278,7 @@ public:
    * tbb-versions).
    */
   template <typename Processing, typename Collection>
-  static void process(vector<BlockInfo> &vInfo, Collection &c, Processing &p,
+  static void process(std::vector<BlockInfo> &vInfo, Collection &c, Processing &p,
                       int dummy = -1) {
     BlockType **ptrs = createBlockPointers(vInfo, c);
 
@@ -304,7 +304,7 @@ public:
    */
   template <template <typename Btype> class Lab, typename Processing,
             typename Collection>
-  static void process(vector<BlockInfo> &vInfo, Collection &c, BoundaryInfo &b,
+  static void process(std::vector<BlockInfo> &vInfo, Collection &c, BoundaryInfo &b,
                       Processing &p, int dummy = -1) {
     BlockType **ptrs = createBlockPointers(vInfo, c);
 
@@ -320,7 +320,7 @@ public:
    * @see BlockProcessing_SingleCPU::process()
    */
   template <typename Processing, typename Collection>
-  void pipeline_process(vector<BlockInfo> &vInfo, Collection &c,
+  void pipeline_process(std::vector<BlockInfo> &vInfo, Collection &c,
                         BoundaryInfo &b, Processing &p) {
     process<BlockLab>(vInfo, c, b, p);
   }
