@@ -168,8 +168,8 @@ public:
                                                  iz - m_stencilStart[2]);
           memcpy(ptrDestination, ptrSource, nCopyLength);
           ptrSource += nX;
-          /*					for(int ix=0; ix<nX; ix++, ptrSource++,
-           *ptrDestination++) ptrDestination = *ptrSource;*/
+          /*					for(int ix=0; ix<nX; ix++,
+           *ptrSource++, ptrDestination++) ptrDestination = *ptrSource;*/
         }
 
       collection.release(info.blockID);

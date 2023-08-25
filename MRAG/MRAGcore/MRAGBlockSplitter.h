@@ -172,8 +172,8 @@ public:
 
       //{
       //	vector<int> vLocalIDs =
-      //collection.create(refinement.children.size()); 	for(int i=0;
-      //i<vLocalIDs.size(); i++) 		vIDs.push_back(vLocalIDs[i]);
+      // collection.create(refinement.children.size()); 	for(int i=0;
+      // i<vLocalIDs.size(); i++) 		vIDs.push_back(vLocalIDs[i]);
       //}
 
       vector<BlockType *> destinations;

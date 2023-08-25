@@ -128,7 +128,7 @@ public:
                  "========================================================\n",
                  compression_tolerance);
         //	Science::AutomaticCompressionForLevelsets(m_grid, m_fwt,
-        //compression_tolerance, true, -1, m_refProfiler);
+        // compression_tolerance, true, -1, m_refProfiler);
 
         if (bVerbose)
           printf("NEW TOL =%e\n", candidate_tol);

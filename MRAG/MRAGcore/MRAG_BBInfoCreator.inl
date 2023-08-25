@@ -1247,9 +1247,9 @@ void MRAG_BBInfoCreator<WaveletsType, BlockType>::_resolveBastardGhosts(
   // 1. setup
   // 2. if the new front is empty exit
   // 3.	pop a ghost from the old front:
-  // 4-a.		If the ghost is resolved using the smartFinder, back-track the
-  // solution to the parents in the buffer, go to 3.
-  // 4-b.		The ghost is not found: find the level where the ghost is
+  // 4-a.		If the ghost is resolved using the smartFinder, back-track
+  // the solution to the parents in the buffer, go to 3. 4-b.		The
+  // ghost is not found: find the level where the ghost is
   // lying. 5.		if ghost.level < b.level generate synthesis ghosts
   // otherwise analysis (abort if lying level = block level) 6.		put the
   // generated ghosts in the new front if they not exist already 7.	swap the

@@ -6,8 +6,9 @@ namespace MRAG {
  */
 template <typename BlockType_> class BlockCollection {
 public:
-  static const int nChunkSize = 1; // 2*(BlockType_::shouldProcessDirectionY?2:1)*(BlockType_::shouldProcessDirectionZ?2:1)
-                                   // - 1;
+  static const int nChunkSize =
+      1; // 2*(BlockType_::shouldProcessDirectionY?2:1)*(BlockType_::shouldProcessDirectionZ?2:1)
+         // - 1;
   typedef BlockType_ BlockType;
 
   /** Default constructor creating empty collection. */
