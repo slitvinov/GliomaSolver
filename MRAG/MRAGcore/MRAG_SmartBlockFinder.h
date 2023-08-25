@@ -46,11 +46,10 @@ private:
   }
 };
 
-inline SmartBlockFinder::SmartBlockFinder(const GridNode &b,
-                                          const std::vector<GridNode *> &neighbors,
-                                          const int stencil_start[3],
-                                          const int stencil_end[3],
-                                          const int block_size[3])
+inline SmartBlockFinder::SmartBlockFinder(
+    const GridNode &b, const std::vector<GridNode *> &neighbors,
+    const int stencil_start[3], const int stencil_end[3],
+    const int block_size[3])
     : vNeighborhood(NULL), nNeighborhoodSize(0), minLevel(b.level),
       maxLevel(b.level), referenceLevel(b.level), refCenterNode(&b),
       result(NULL) {

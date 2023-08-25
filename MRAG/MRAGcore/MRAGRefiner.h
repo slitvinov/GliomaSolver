@@ -25,7 +25,7 @@ public:
     // 4. create a plan from the victim list
 
     // 1.
-    typedef set<const GridNode *> VictimSet;
+    typedef std::set<const GridNode *> VictimSet;
     vRefinements.clear();
     RefinementPlan *plan = new RefinementPlan;
 

@@ -12,7 +12,6 @@
 #include "MRAG/MRAGcore/MRAGCommon.h"
 #include "MRAG/MRAGcore/MRAGBlock.h"
 #include "MRAG/MRAGcore/MRAGWavelets_Interp2ndOrder.h"
-using namespace std;
 #include "MRAG/MRAGcore/MRAGGridNode.h"
 #include "MRAG/MRAGcore/MRAGCompressionPlan.h"
 #include "MRAG/MRAGcore/MRAGCompressor.h"
@@ -206,8 +205,8 @@ struct UpdateTumor {
       for (iy = 0; iy < BlockType::sizeY; iy++)
         for (ix = 0; ix < BlockType::sizeX; ix++) {
           o(ix, iy, iz).phi += dt * o(ix, iy, iz).dphidt;
-          o(ix, iy, iz).phi = max((Real)0., o(ix, iy, iz).phi);
-          o(ix, iy, iz).phi = min((Real)1., o(ix, iy, iz).phi);
+          o(ix, iy, iz).phi = std::max((Real)0., o(ix, iy, iz).phi);
+          o(ix, iy, iz).phi = std::min((Real)1., o(ix, iy, iz).phi);
         }
   }
 };
@@ -226,7 +225,7 @@ static int write(MRAG::Grid<TWavelets, TBlock> *inputGrid,
       {1, 0, 0}, {1, 0, 1}, {1, 1, 1}, {1, 1, 0},
   };
   int64_t verts[1 + 8];
-  vector<MRAG::BlockInfo> vInfo = inputGrid->getBlocksInfo();
+  std::vector<MRAG::BlockInfo> vInfo = inputGrid->getBlocksInfo();
   float x[3], y[3];
   FILE *file;
   char xyz_path[FILENAME_MAX], topo_path[FILENAME_MAX], attr_path[FILENAME_MAX], xdmf_path[FILENAME_MAX];
@@ -398,7 +397,7 @@ int brain_ini(struct BrainParams *params, struct Brain **pbrain) {
   smooth_sup = 2.;
   h0 = 1. / 128;
   iw = 1. / (smooth_sup * h0);
-  vector<MRAG::BlockInfo> vInfo = brain->grid->getBlocksInfo();
+  std::vector<MRAG::BlockInfo> vInfo = brain->grid->getBlocksInfo();
   for (i = 0; i < vInfo.size(); i++) {
     MRAG::BlockInfo &info = vInfo[i];
     B &block = brain->grid->getBlockCollection()[info.blockID];
@@ -463,7 +462,7 @@ int brain_step(struct Brain *brain) {
   int maxLevel = 4;
   double refinement_tolerance = 1e-4;
   const MRAG::BlockCollection<B> &collecton = brain->grid->getBlockCollection();
-  vector<MRAG::BlockInfo> vInfo = brain->grid->getBlocksInfo();
+  std::vector<MRAG::BlockInfo> vInfo = brain->grid->getBlocksInfo();
   MRAG::BoundaryInfo *boundaryInfo = &brain->grid->getBoundaryInfo();
   brain->blockProcessing->pipeline_process(vInfo, collecton, *boundaryInfo,
                                            *brain->rhs);
@@ -483,7 +482,7 @@ int brain_project(struct Brain *brain, float *d) {
   int ix, iy, iz, cx, cy, cz, mx, my, mz, gpd = brain->blocksPerDimension * blockSize;
   Real x[3];
   double h, hf = 1. / gpd, eps = hf * 0.5;
-  vector<MRAG::BlockInfo> vInfo = brain->grid->getBlocksInfo();
+  std::vector<MRAG::BlockInfo> vInfo = brain->grid->getBlocksInfo();
   for (int i = 0; i < vInfo.size(); i++) {
     MRAG::BlockInfo &info = vInfo[i];
     B &block = brain->grid->getBlockCollection()[info.blockID];

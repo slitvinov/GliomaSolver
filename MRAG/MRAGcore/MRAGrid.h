@@ -63,11 +63,11 @@ public:
   BoundaryInfo *createBoundaryInfo(const int requested_stencil_start[3],
                                    const int requested_stencil_end[3]) const;
 
-  CompressionResult compress(const set<int> &blocksToCompress,
+  CompressionResult compress(const std::set<int> &blocksToCompress,
                              int &nCollapsedBlocks);
   void setCompressor(Compressor *compressor);
 
-  RefinementResult refine(const set<int> &blocksToRefine);
+  RefinementResult refine(const std::set<int> &blocksToRefine);
   void setRefiner(Refiner *refiner);
 
   void setBlockCollapser(
@@ -84,13 +84,14 @@ protected:
 
   // TASK - const
   int _computeMaxLevel(const HierarchyType &hierarchy) const;
-  int _computeMinLevel(const std::vector<std::vector<BlockInfo>> &blockAtLevel) const;
+  int _computeMinLevel(
+      const std::vector<std::vector<BlockInfo>> &blockAtLevel) const;
+  void _computeNeighborhood(
+      const HierarchyType &hierarchy, NeighborhoodType &neighborhood,
+      std::map<GridNode *, std::map<int, GridNode *>> &ghostNodes) const;
   void
-  _computeNeighborhood(const HierarchyType &hierarchy,
-                       NeighborhoodType &neighborhood,
-                       std::map<GridNode *, std::map<int, GridNode *>> &ghostNodes) const;
-  void _computeBlockAtLevel(const HierarchyType &hierarchy,
-                            std::vector<std::vector<BlockInfo>> &blockAtLevel) const;
+  _computeBlockAtLevel(const HierarchyType &hierarchy,
+                       std::vector<std::vector<BlockInfo>> &blockAtLevel) const;
   void _computeBoundaryInfo(BoundaryInfo &binfo,
                             const int requested_stencil_start[3],
                             const int requested_stencil_end[3],
@@ -107,8 +108,8 @@ protected:
     _computeNeighborhood(m_hierarchy, m_neighborhood, m_ghostNodes);
 
     m_mapGhost2Node.clear();
-    for (std::map<GridNode *, std::map<int, GridNode *>>::const_iterator itGridNode =
-             m_ghostNodes.begin();
+    for (std::map<GridNode *, std::map<int, GridNode *>>::const_iterator
+             itGridNode = m_ghostNodes.begin();
          itGridNode != m_ghostNodes.end(); itGridNode++) {
       const std::map<int, GridNode *> &currentGhosts = itGridNode->second;
       for (std::map<int, GridNode *>::const_iterator itGhostNode =
@@ -146,7 +147,7 @@ protected:
   // boundary info
   int m_maxStencil[2][3];
   bool m_vPeriodicDirection[3];
-  set<GridNode *> m_setInvalidBBInfo;
+  std::set<GridNode *> m_setInvalidBBInfo;
   BoundaryInfo m_boundaryInfo;
 
   // class info

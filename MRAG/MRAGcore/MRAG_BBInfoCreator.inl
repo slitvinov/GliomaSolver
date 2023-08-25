@@ -1093,7 +1093,7 @@ MRAG_BBInfoCreator<WaveletsType, BlockType>::createBoundaryInfoBlock(
   BoundaryInfoBlock *bbinfo = new BoundaryInfoBlock(block_size);
 
   {
-    set<int> s;
+    std::set<int> s;
     for (int i = 0; i < neighbors.size(); i++)
       s.insert(neighbors[i]->blockID);
 
@@ -1141,7 +1141,7 @@ MRAG_BBInfoCreator<WaveletsType, BlockType>::createBoundaryInfoBlock(
   // 4.
   std::vector<BastardGhost *> bastards;
 
-  set<int> coveredCodes;
+  std::set<int> coveredCodes;
   for (int i = 0; i < 27; i++)
     coveredCodes.insert(i);
 
@@ -1163,7 +1163,7 @@ MRAG_BBInfoCreator<WaveletsType, BlockType>::createBoundaryInfoBlock(
     coveredCodes.erase(code);
   }
 
-  for (set<int>::iterator itCode = coveredCodes.begin();
+  for (std::set<int>::iterator itCode = coveredCodes.begin();
        itCode != coveredCodes.end(); itCode++) {
     const int code = *itCode;
 
@@ -1247,9 +1247,9 @@ void MRAG_BBInfoCreator<WaveletsType, BlockType>::_resolveBastardGhosts(
   // 1. setup
   // 2. if the new front is empty exit
   // 3.	pop a ghost from the old front:
-  // 4-a.		If the ghost is resolved using the smartFinder, back-track
-  // the solution to the parents in the buffer, go to 3. 4-b.		The
-  // ghost is not found: find the level where the ghost is
+  // 4-a.		If the ghost is resolved using the smartFinder,
+  // back-track the solution to the parents in the buffer, go to 3. 4-b.
+  // The ghost is not found: find the level where the ghost is
   // lying. 5.		if ghost.level < b.level generate synthesis ghosts
   // otherwise analysis (abort if lying level = block level) 6.		put the
   // generated ghosts in the new front if they not exist already 7.	swap the
@@ -1263,9 +1263,9 @@ void MRAG_BBInfoCreator<WaveletsType, BlockType>::_resolveBastardGhosts(
   typedef std::map<I3, BastardGhost *, std::less<I3>, ABGMap> GhostMap;
   typedef std::allocator<GhostMap> ABGBuffer;
   typedef std::vector<GhostMap, ABGBuffer> GhostBuffer;
-  typedef set<double, std::less<double>, std::allocator<double>> WeightSet;
+  typedef std::set<double, std::less<double>, std::allocator<double>> WeightSet;
   typedef std::map<double, int, std::less<double>,
-              std::allocator<std::pair<const double, int>>>
+                   std::allocator<std::pair<const double, int>>>
       WeightToIndexMap;
 
   const int start_level = smartFinder.minLevel;
@@ -1424,7 +1424,8 @@ void MRAG_BBInfoCreator<WaveletsType, BlockType>::_resolveBastardGhosts(
       // 2.
       c = iStart + nNewWeights - 1;
       int counter = 0;
-      for (std::vector<double>::const_reverse_iterator it = weightsPool.rbegin();
+      for (std::vector<double>::const_reverse_iterator it =
+               weightsPool.rbegin();
            counter < nNewWeights; counter++, it++)
         mapW2I[*it] = c--;
     }

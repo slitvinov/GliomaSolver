@@ -30,7 +30,7 @@ int AutomaticRefinement(Grid &g, BlockFWT &fwt, const double dAbsoluteTolerance,
 
   if (bVerbose)
     printf("AutomaticRefinement\n");
-  set<int> niceGuys;
+  std::set<int> niceGuys;
   int nSkippedBlocks = 0;
   int nRefinedBlocks = 0;
 
@@ -55,7 +55,7 @@ int AutomaticRefinement(Grid &g, BlockFWT &fwt, const double dAbsoluteTolerance,
     std::vector<FWTReport<iLastChannel - iFirstChannel + 1>> vReports =
         BlockFWT::template multichannel_fwt<iFirstChannel, iLastChannel>(
             vBlocksToFWT, g.getBlockCollection(), g.getBoundaryInfo());
-    set<int> shouldBeRefined;
+    std::set<int> shouldBeRefined;
     for (int i = 0; i < vBlocksToFWT.size(); i++) {
       if (bVerbose)
         printf(
@@ -112,7 +112,7 @@ int AutomaticCompression(Grid &g, BlockFWT &fwt,
   if (bVerbose)
     printf("AutomaticCompression\n");
 
-  set<int> niceGuys;
+  std::set<int> niceGuys;
   int nSkippedBlocks = 0, loopCounter = 0, nTotalCollapsed = 0;
 
   do {
@@ -129,7 +129,7 @@ int AutomaticCompression(Grid &g, BlockFWT &fwt,
         BlockFWT::template multichannel_fwt<iFirstChannel, iLastChannel>(
             vBlocksToFWT, g.getBlockCollection(), g.getBoundaryInfo());
 
-    set<int> shouldBeCompressed;
+    std::set<int> shouldBeCompressed;
 
     for (int i = 0; i < vBlocksToFWT.size(); i++)
       if (vReports[i].getOverAll_DetailMaxMag() < dAbsoluteTolerance)
@@ -175,7 +175,7 @@ int AutomaticCompressionForLevelsets(Grid &g, BlockFWT &fwt,
   if (bVerbose)
     printf("AutomaticCompressionForLevelsets\n");
 
-  set<int> niceGuys;
+  std::set<int> niceGuys;
   int nSkippedBlocks = 0, loopCounter = 0, nTotalCollapsed = 0;
 
   do {
@@ -190,7 +190,7 @@ int AutomaticCompressionForLevelsets(Grid &g, BlockFWT &fwt,
       else
         nSkippedBlocks++;
 
-    set<int> shouldBeCompressed;
+    std::set<int> shouldBeCompressed;
     for (std::vector<BlockInfo>::iterator it = vBlocksToFWT.begin();
          it != vBlocksToFWT.end(); it++) {
       g.getBlockCollection().lock(it->blockID).setH(it->h[0]);
@@ -263,7 +263,7 @@ RefinementResult AutomaticRefinementForLevelsets(
 
   if (bVerbose)
     printf("AutomaticRefinement\n");
-  set<int> niceGuys;
+  std::set<int> niceGuys;
   int nSkippedBlocks = 0;
   // int nRefinedBlocks = 0;
 
@@ -285,7 +285,7 @@ RefinementResult AutomaticRefinementForLevelsets(
 
     if (vBlocksToFWT.size() == 0)
       break;
-    set<int> shouldBeRefined;
+    std::set<int> shouldBeRefined;
     // printf("Blocks to FWT (levelset): %d\n", vBlocksToFWT.size());
     for (std::vector<BlockInfo>::iterator it = vBlocksToFWT.begin();
          it != vBlocksToFWT.end(); it++) {

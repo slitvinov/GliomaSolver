@@ -219,9 +219,9 @@ private:
   template <int iChannel> void _fwt(const BlockInfo &info, Block &block) {
     /*int a,b;
     compute_pos__DEBUG(info.level, info.index[0], info.index[1], a, b, true);*/
-    const int nX = max(1, Block::sizeX / 2);
-    const int nY = max(1, Block::sizeY / 2);
-    const int nZ = max(1, Block::sizeZ / 2);
+    const int nX = std::max(1, Block::sizeX / 2);
+    const int nY = std::max(1, Block::sizeY / 2);
+    const int nZ = std::max(1, Block::sizeZ / 2);
     // printf("FST of block %d %d l=%d\n", info.index[0], info.index[1],
     // info.level);
     for (int iz = 0; iz < nZ; iz++)
@@ -317,24 +317,24 @@ public:
     const int stencilStart[3] = {
         !Block::shouldProcessDirectionX
             ? 0
-            : 1 + min(-Wavelets::GaSupport[1], -Wavelets::HaSupport[1]),
+            : 1 + std::min(-Wavelets::GaSupport[1], -Wavelets::HaSupport[1]),
         !Block::shouldProcessDirectionY
             ? 0
-            : 1 + min(-Wavelets::GaSupport[1], -Wavelets::HaSupport[1]),
+            : 1 + std::min(-Wavelets::GaSupport[1], -Wavelets::HaSupport[1]),
         !Block::shouldProcessDirectionZ
             ? 0
-            : 1 + min(-Wavelets::GaSupport[1], -Wavelets::HaSupport[1])};
+            : 1 + std::min(-Wavelets::GaSupport[1], -Wavelets::HaSupport[1])};
 
     const int stencilEnd[3] = {
         !Block::shouldProcessDirectionX
             ? 1
-            : max(-Wavelets::GaSupport[0], -Wavelets::HaSupport[0]),
+            : std::max(-Wavelets::GaSupport[0], -Wavelets::HaSupport[0]),
         !Block::shouldProcessDirectionY
             ? 1
-            : max(-Wavelets::GaSupport[0], -Wavelets::HaSupport[0]),
+            : std::max(-Wavelets::GaSupport[0], -Wavelets::HaSupport[0]),
         !Block::shouldProcessDirectionZ
             ? 1
-            : max(-Wavelets::GaSupport[0], -Wavelets::HaSupport[0])};
+            : std::max(-Wavelets::GaSupport[0], -Wavelets::HaSupport[0])};
 
     m_refCollection = &collection;
 

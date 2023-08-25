@@ -38,7 +38,8 @@ template <typename DataType> class HuffmanEncoder : public Encoder<DataType> {
       const typename std::map<DataType, float>::iterator itEnd =
           mapFrequencies.end();
 
-      for (typename std::map<DataType, float>::iterator it = mapFrequencies.begin();
+      for (typename std::map<DataType, float>::iterator it =
+               mapFrequencies.begin();
            it != itEnd; it++) {
         float &freq = it->second;
 
@@ -131,7 +132,8 @@ template <typename DataType> class HuffmanEncoder : public Encoder<DataType> {
           mapFrequencies.begin();
       const typename std::vector<TranslationItem>::iterator itEnd =
           translations.end();
-      for (typename std::vector<TranslationItem>::iterator it = translations.begin();
+      for (typename std::vector<TranslationItem>::iterator it =
+               translations.begin();
            it != itEnd; it++, itSource++) {
         it->symbol = &itSource->first;
         it->p = itSource->second;
@@ -144,7 +146,8 @@ template <typename DataType> class HuffmanEncoder : public Encoder<DataType> {
     {
       const typename std::vector<TranslationItem>::iterator itEnd =
           translations.end();
-      for (typename std::vector<TranslationItem>::iterator it = translations.begin();
+      for (typename std::vector<TranslationItem>::iterator it =
+               translations.begin();
            it != itEnd; it++)
         mypq.push(PQitem(it->p, *it));
     }
@@ -164,7 +167,8 @@ template <typename DataType> class HuffmanEncoder : public Encoder<DataType> {
       int maxL = 0;
       const typename std::vector<TranslationItem>::iterator itEnd =
           translations.end();
-      for (typename std::vector<TranslationItem>::iterator it = translations.begin();
+      for (typename std::vector<TranslationItem>::iterator it =
+               translations.begin();
            it != itEnd; it++) {
         TranslationItem &translation = *it;
         std::stack<char> &encoding = translation.encoding;
@@ -226,7 +230,8 @@ template <typename DataType> class HuffmanEncoder : public Encoder<DataType> {
 
     // 2.
     {
-      typename std::vector<DataType>::const_iterator itSymbol = vSymbols.begin();
+      typename std::vector<DataType>::const_iterator itSymbol =
+          vSymbols.begin();
       unsigned int maxVal = 0;
       for (int i = 0; i < nSymbols; i++, itSymbol++)
         maxVal = std::max(maxVal, (unsigned int)(*itSymbol));
@@ -258,7 +263,8 @@ template <typename DataType> class HuffmanEncoder : public Encoder<DataType> {
     // 2.
     {
       std::vector<BitStream>::const_iterator itEncoding = vEncodings.begin();
-      typename std::vector<DataType>::const_iterator itSymbol = vSymbols.begin();
+      typename std::vector<DataType>::const_iterator itSymbol =
+          vSymbols.begin();
 
       for (int i = 0; i < nSymbols; i++, itSymbol++, itEncoding++)
         mapTable[*itSymbol] = *itEncoding;
@@ -439,8 +445,8 @@ template <typename DataType> class HuffmanEncoder : public Encoder<DataType> {
       do {
         assert(curr_start < total_encoding_length);
 
-        const unsigned int nof_bits_to_read =
-	  std::min((int)chunk_size, (int)(total_encoding_length - curr_start));
+        const unsigned int nof_bits_to_read = std::min(
+            (int)chunk_size, (int)(total_encoding_length - curr_start));
         const unsigned int read_chunk =
             encodedStream.get_bits(curr_start, nof_bits_to_read);
 

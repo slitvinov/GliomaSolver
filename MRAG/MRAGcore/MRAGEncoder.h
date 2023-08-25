@@ -21,7 +21,8 @@ public:
     assert(m_bEncoded == false);
     assert(nSymbols >= 2);
 
-    m_nQuantization = std::max((unsigned int)0, (unsigned int)ceil(log2(nSymbols)));
+    m_nQuantization =
+        std::max((unsigned int)0, (unsigned int)ceil(log2(nSymbols)));
     m_nItems = stream.size();
 
     const double uncompressedMB = m_nItems * sizeof(DataType) / 1024. / 1024.;
@@ -34,7 +35,8 @@ public:
     m_encodedData.setup(m_nItems * m_nQuantization);
 
     const typename std::vector<DataType>::const_iterator itE = stream.end();
-    for (typename std::vector<DataType>::const_iterator itSource = stream.begin();
+    for (typename std::vector<DataType>::const_iterator itSource =
+             stream.begin();
          itSource != itE; itSource++)
       m_encodedData.append_bits((unsigned int)*itSource, m_nQuantization);
 

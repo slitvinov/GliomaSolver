@@ -245,7 +245,7 @@ void Grid<WaveletType, BlockType>::setRefiner(Refiner *refiner) {
 
 template <typename WaveletType, typename BlockType>
 RefinementResult
-Grid<WaveletType, BlockType>::refine(const set<int> &blocksToRefine) {
+Grid<WaveletType, BlockType>::refine(const std::set<int> &blocksToRefine) {
   if (blocksToRefine.size() == 0)
     return RefinementResult();
 
@@ -290,7 +290,8 @@ Grid<WaveletType, BlockType>::refine(const set<int> &blocksToRefine) {
     for (int i = 0; i < nRefinements; i++) {
       GridNode *parent = const_cast<GridNode *>(vToRefine[i].node);
 
-      std::vector<RefinementPlanNode *> &vNodes = plan->refinements[i]->children;
+      std::vector<RefinementPlanNode *> &vNodes =
+          plan->refinements[i]->children;
       std::vector<int> &blockIDs = vRefinementReport[i].childrenIDs;
 
       int nChildren = vNodes.size();
@@ -318,7 +319,7 @@ Grid<WaveletType, BlockType>::refine(const set<int> &blocksToRefine) {
   _refresh();
 
   // 5.
-  set<int> blockToErase;
+  std::set<int> blockToErase;
   for (std::vector<GridNode *>::const_iterator itNewNode = newNodes.begin();
        itNewNode != newNodes.end(); itNewNode++) {
     m_setInvalidBBInfo.insert(*itNewNode);
@@ -352,7 +353,7 @@ Grid<WaveletType, BlockType>::refine(const set<int> &blocksToRefine) {
     }
   }
 
-  for (set<int>::const_iterator it = blockToErase.begin();
+  for (std::set<int>::const_iterator it = blockToErase.begin();
        it != blockToErase.end(); it++)
     m_boundaryInfo.erase(*it, false);
   // 6.
@@ -383,7 +384,7 @@ void Grid<WaveletType, BlockType>::setCompressor(Compressor *compressor) {
 
 template <typename WaveletType, typename BlockType>
 CompressionResult
-Grid<WaveletType, BlockType>::compress(const set<int> &blocksToCompress,
+Grid<WaveletType, BlockType>::compress(const std::set<int> &blocksToCompress,
                                        int &nCollapsedBlocks) {
   // 1. iterate over full nodes, fill the compress flag
   // 2. create a compression plan
@@ -427,7 +428,8 @@ Grid<WaveletType, BlockType>::compress(const set<int> &blocksToCompress,
   for (int i = 0; i < vToCollapse.size(); i++) {
     std::vector<GridNode *> &v = m_hierarchy[vToCollapse[i].node];
 
-    for (std::vector<GridNode *>::iterator it = v.begin(); it != v.end(); it++) {
+    for (std::vector<GridNode *>::iterator it = v.begin(); it != v.end();
+         it++) {
       m_boundaryInfo.erase((*it)->blockID);
       (*it)->blockID = -1;
     }
@@ -452,7 +454,7 @@ Grid<WaveletType, BlockType>::compress(const set<int> &blocksToCompress,
           m_setInvalidBBInfo.insert(*itNewNode);
           m_setInvalidBBInfo.insert(neighbors.begin(), neighbors.end());
   }*/
-  set<int> blockToErase;
+  std::set<int> blockToErase;
   for (std::vector<GridNode *>::const_iterator itNewNode = newNodes.begin();
        itNewNode != newNodes.end(); itNewNode++) {
     m_setInvalidBBInfo.insert(*itNewNode);
@@ -486,7 +488,7 @@ Grid<WaveletType, BlockType>::compress(const set<int> &blocksToCompress,
     }
   }
 
-  for (set<int>::const_iterator it = blockToErase.begin();
+  for (std::set<int>::const_iterator it = blockToErase.begin();
        it != blockToErase.end(); it++)
     m_boundaryInfo.erase(*it, false);
 
@@ -674,7 +676,8 @@ struct Body_CreateBoundaryInfo {
         itBBI->second = (*it)->bbi;
     }
 
-    for (typename std::vector<ParallelItem *>::iterator it = vWorkingList.begin();
+    for (typename std::vector<ParallelItem *>::iterator it =
+             vWorkingList.begin();
          it != vWorkingList.end(); it++) {
       delete *it;
       *it = NULL;
@@ -766,8 +769,8 @@ template <typename WaveletType, typename BlockType>
 void Grid<WaveletType, BlockType>::_computeMaxStencilUsed(
     int stencil_start[3], int stencil_end[3]) const {
   const int support_needed_fwt[2] = {
-      1 + min(-WaveletType::GaSupport[1], -WaveletType::HaSupport[1]),
-      max(-WaveletType::GaSupport[0], -WaveletType::HaSupport[0])};
+      1 + std::min(-WaveletType::GaSupport[1], -WaveletType::HaSupport[1]),
+      std::max(-WaveletType::GaSupport[0], -WaveletType::HaSupport[0])};
 
   const int support_needed_split[2] = {
       (int)ceil(WaveletType::HsSupport[0] * 0.5),
@@ -1179,8 +1182,8 @@ void Grid<WaveletType, BlockType>::_computeNeighborhood(
 
   // 3.
   {
-    for (std::map<GridNode *, std::map<int, GridNode *>>::const_iterator itGridNode =
-             ghostNodes.begin();
+    for (std::map<GridNode *, std::map<int, GridNode *>>::const_iterator
+             itGridNode = ghostNodes.begin();
          itGridNode != ghostNodes.end(); itGridNode++) {
       const std::map<int, GridNode *> &currentGhosts = itGridNode->second;
       for (std::map<int, GridNode *>::const_iterator itGhostNode =

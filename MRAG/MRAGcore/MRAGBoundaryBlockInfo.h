@@ -138,7 +138,7 @@ struct BoundaryInfo {
   char stencil_start[3], stencil_end[3];
   std::map<int, BoundaryInfoBlock *> boundaryInfoOfBlock;
 
-  // set<int> invalidBlocks;
+  // std::set<int> invalidBlocks;
 
   float getMemorySize() const;
   void clear();

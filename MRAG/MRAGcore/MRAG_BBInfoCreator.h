@@ -186,9 +186,10 @@ template <typename WaveletsType, typename BlockType> class MRAG_BBInfoCreator {
     }
 
     template <int iPass, typename WeightsSet, typename MappingW2I>
-    void collect(WeightsSet &wSet, MappingW2I &mapW2I, std::vector<IndexWP> &info,
-                 std::vector<double> &weightsPool, double wX = 1, double wY = 1,
-                 double wZ = 1, bool bVerbose = false) {
+    void collect(WeightsSet &wSet, MappingW2I &mapW2I,
+                 std::vector<IndexWP> &info, std::vector<double> &weightsPool,
+                 double wX = 1, double wY = 1, double wZ = 1,
+                 bool bVerbose = false) {
       if (matRequests == NULL) // leaf
       {
         if (iPass == 1) {

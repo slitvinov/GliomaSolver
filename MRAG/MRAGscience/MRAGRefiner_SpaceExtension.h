@@ -24,8 +24,8 @@ public:
 
       const std::vector<GridNode *> &n = itS->second;
 
-      for (std::vector<GridNode *>::const_iterator itD = n.begin(); itD != n.end();
-           itD++) {
+      for (std::vector<GridNode *>::const_iterator itD = n.begin();
+           itD != n.end(); itD++) {
         // 3.
         if (neighborhood.find(*itD) !=
             neighborhood.end())                  // neighbor block not a ghost

@@ -31,7 +31,7 @@ protected:
   int m_nRecursions, m_maxLevel, m_startLevel;
   int m_nNofPerformedBlockOperations, m_nNofExpectedBlockOperations;
   double m_dt, m_t0;
-  stack<StackItem> m_stackRecursions;
+  std::stack<StackItem> m_stackRecursions;
 
   // not owner
   const std::vector<std::vector<BlockInfo>> *m_refBlockAtLevel;
@@ -73,7 +73,7 @@ public:
   {
     assert(m_bConnected);
 
-    stack<StackItem> stackRecursions;
+    std::stack<StackItem> stackRecursions;
     stackRecursions.push(StackItem(startLevel, 0, ETimeInterval_Start));
 
     const int maxLevel = m_refBlockAtLevel->size() - 1;
@@ -169,7 +169,7 @@ public:
     m_startLevel = startLevel;
 
     m_nRecursions = nRecursionsPerLevel;
-    m_stackRecursions = stack<StackItem>();
+    m_stackRecursions = std::stack<StackItem>();
     m_stackRecursions.push(StackItem(startLevel, m_t0, ETimeInterval_Start));
 
     m_nNofPerformedBlockOperations = 0;

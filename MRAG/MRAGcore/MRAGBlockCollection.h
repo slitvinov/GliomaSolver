@@ -98,19 +98,19 @@ protected:
   std::vector<int>
   _allocateBlockInChunk(int &inoutRequestedBlocks, Chunk *chunk,
                         int &inoutAvailableBlocksInCurrentChunk) const;
-  std::vector<int> _allocateChunks(int &inoutRequestedBlocks,
-                              set<Chunk *> &inoutChunks,
-                              std::map<int, BlockType *> &inoutIDToBlockPointers,
-                              std::map<int, Chunk *> &inoutBlockIDToChunck,
-                              std::vector<Chunk *> &inoutRecycledChunks,
-                              Chunk *&outCurrentChunk,
-                              int &outAvailableBlocksInCurrentChunk) const;
+  std::vector<int>
+  _allocateChunks(int &inoutRequestedBlocks, std::set<Chunk *> &inoutChunks,
+                  std::map<int, BlockType *> &inoutIDToBlockPointers,
+                  std::map<int, Chunk *> &inoutBlockIDToChunck,
+                  std::vector<Chunk *> &inoutRecycledChunks,
+                  Chunk *&outCurrentChunk,
+                  int &outAvailableBlocksInCurrentChunk) const;
   void _emptyTrash(int nChunks = -1);
   void _trash();
 
   std::map<int, BlockType *> m_blockIDToBlockPointers;
   std::map<int, Chunk *> m_blockIDToChunck;
-  set<Chunk *> m_setChunks;
+  std::set<Chunk *> m_setChunks;
   std::vector<Chunk *> m_trash;
 
   Chunk *m_currentChunk;

@@ -86,7 +86,8 @@ void BlockCollection<BlockType_>::erase(const int ID) {
   // 3. if the chunk is completely empty put it in the trash
 
   // 1.
-  typename std::map<int, Chunk *>::iterator itChunk = m_blockIDToChunck.find(ID);
+  typename std::map<int, Chunk *>::iterator itChunk =
+      m_blockIDToChunck.find(ID);
   assert(itChunk != m_blockIDToChunck.end());
 
   // 2.
@@ -115,7 +116,7 @@ void BlockCollection<BlockType_>::erase(const int ID) {
 }
 
 template <typename BlockType_> void BlockCollection<BlockType_>::clear() {
-  for (typename set<Chunk *>::iterator it = m_setChunks.begin();
+  for (typename std::set<Chunk *>::iterator it = m_setChunks.begin();
        it != m_setChunks.end(); it++)
     m_trash.push_back(*it);
 
@@ -160,7 +161,7 @@ inline std::vector<int> BlockCollection<BlockType_>::_allocateBlockInChunk(
 
 template <typename BlockType_>
 inline std::vector<int> BlockCollection<BlockType_>::_allocateChunks(
-    int &inoutRequestedBlocks, set<Chunk *> &inoutChunks,
+    int &inoutRequestedBlocks, std::set<Chunk *> &inoutChunks,
     std::map<int, BlockType *> &inoutIDToBlockPointers,
     std::map<int, Chunk *> &inoutBlockIDToChunck,
     std::vector<Chunk *> &inoutRecycledChunks, Chunk *&outCurrentChunk,
@@ -265,7 +266,7 @@ float BlockCollection<BlockType_>::getMemorySize(bool bCountTrashAlso) const {
       m_blockIDToBlockPointers.size() * (sizeof(BlockType *) + sizeof(int));
   memsize += m_blockIDToChunck.size() * (sizeof(Chunk *) + sizeof(int));
   // const int r = memsize;
-  for (typename set<Chunk *>::const_iterator it = m_setChunks.begin();
+  for (typename std::set<Chunk *>::const_iterator it = m_setChunks.begin();
        it != m_setChunks.end(); it++)
     memsize += nChunkSize * sizeof(BlockType);
 
