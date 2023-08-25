@@ -6,13 +6,11 @@ struct SmartBlockFinder {
 
 public:
   static const bool bVerbose = false;
-
   int stencil_start[3], stencil_end[3], block_size[3];
-  int minLevel, maxLevel, referenceLevel;
-  int nNeighborhoodSize;
   int nSubStart[27];
-
   GridNode **vNeighborhood;
+  int nNeighborhoodSize;
+  int minLevel, maxLevel, referenceLevel;
   const GridNode *refCenterNode;
   PointIndex *result;
 
