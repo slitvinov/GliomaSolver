@@ -320,7 +320,7 @@ static int write(MRAG::Grid<TWavelets, TBlock> *inputGrid,
           "      Dimensions=\"%d\"\n"
           "      TopologyType=\"Hexahedron\">\n"
           "      <DataItem\n"
-          "          DataType=\"Int\"\n"
+          "          NumberType=\"Int\"\n"
           "          Dimensions=\"%d\"\n"
           "          Format=\"Binary\">\n"
           "        %s\n"
