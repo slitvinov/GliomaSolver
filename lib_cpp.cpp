@@ -217,7 +217,7 @@ make_projector(RD_Projector_Wavelets, RD_projector_impl_wav);
 
 template <typename TWavelets, typename TBlock, typename TLab>
 static int write(MRAG::Grid<TWavelets, TBlock> *inputGrid,
-		 MRAG::BoundaryInfo *bInfo, const char *path) {
+                 MRAG::BoundaryInfo *bInfo, const char *path) {
   int np, nc, i, iz, iy, ix, ixx, iyy, izz, j;
   const int shift[8][3] = {
       {0, 0, 0}, {0, 0, 1}, {0, 1, 1}, {0, 1, 0},
@@ -227,7 +227,8 @@ static int write(MRAG::Grid<TWavelets, TBlock> *inputGrid,
   std::vector<MRAG::BlockInfo> vInfo = inputGrid->getBlocksInfo();
   float x[3], y[3];
   FILE *file;
-  char xyz_path[FILENAME_MAX], topo_path[FILENAME_MAX], attr_path[FILENAME_MAX], xdmf_path[FILENAME_MAX];
+  char xyz_path[FILENAME_MAX], topo_path[FILENAME_MAX], attr_path[FILENAME_MAX],
+      xdmf_path[FILENAME_MAX];
   snprintf(xyz_path, sizeof xyz_path, "%s.xyz.raw", path);
   snprintf(topo_path, sizeof topo_path, "%s.topo.raw", path);
   snprintf(attr_path, sizeof attr_path, "%s.attr.raw", path);
@@ -241,18 +242,18 @@ static int write(MRAG::Grid<TWavelets, TBlock> *inputGrid,
   for (i = 0; i < vInfo.size(); i++) {
     for (iz = 0; iz < TBlock::sizeZ + 1; iz++)
       for (iy = 0; iy < TBlock::sizeY + 1; iy++)
-	for (ix = 0; ix < TBlock::sizeX + 1; ix++) {
-	  vInfo[i].pos(x, ix, iy, iz);
-	  y[0] = x[0] - TWavelets::CenteringOffset * vInfo[i].h[0];
-	  y[1] = x[1] - TWavelets::CenteringOffset * vInfo[i].h[1];
-	  y[2] = x[2] - TWavelets::CenteringOffset * vInfo[i].h[2];
-	  if (fwrite(y, sizeof y, 1, file) != 1) {
-	    fprintf(stderr, "%s:%d: error: fail to write\n", __FILE__,
-		    __LINE__);
-	    return 1;
-	  }
-	  np++;
-	}
+        for (ix = 0; ix < TBlock::sizeX + 1; ix++) {
+          vInfo[i].pos(x, ix, iy, iz);
+          y[0] = x[0] - TWavelets::CenteringOffset * vInfo[i].h[0];
+          y[1] = x[1] - TWavelets::CenteringOffset * vInfo[i].h[1];
+          y[2] = x[2] - TWavelets::CenteringOffset * vInfo[i].h[2];
+          if (fwrite(y, sizeof y, 1, file) != 1) {
+            fprintf(stderr, "%s:%d: error: fail to write\n", __FILE__,
+                    __LINE__);
+            return 1;
+          }
+          np++;
+        }
   }
   fclose(file);
 
@@ -262,23 +263,23 @@ static int write(MRAG::Grid<TWavelets, TBlock> *inputGrid,
   for (i = 0; i < vInfo.size(); i++) {
     for (iz = 0; iz < TBlock::sizeZ; iz++)
       for (iy = 0; iy < TBlock::sizeY; iy++)
-	for (ix = 0; ix < TBlock::sizeX; ix++) {
-	  for (j = 0; j < 8; j++) {
-	    ixx = ix + shift[j][0];
-	    iyy = iy + shift[j][1];
-	    izz = iz + shift[j][2];
-	    verts[j + 1] = i * (TBlock::sizeX + 1) * (TBlock::sizeY + 1) *
-			       (TBlock::sizeZ + 1) +
-			   izz * (TBlock::sizeX + 1) * (TBlock::sizeY + 1) +
-			   iyy * (TBlock::sizeX + 1) + ixx;
-	  }
-	  if (fwrite(verts, sizeof verts, 1, file) != 1) {
-	    fprintf(stderr, "%s:%d: error: fail to write\n", __FILE__,
-		    __LINE__);
-	    return 1;
-	  }
-	  nc++;
-	}
+        for (ix = 0; ix < TBlock::sizeX; ix++) {
+          for (j = 0; j < 8; j++) {
+            ixx = ix + shift[j][0];
+            iyy = iy + shift[j][1];
+            izz = iz + shift[j][2];
+            verts[j + 1] = i * (TBlock::sizeX + 1) * (TBlock::sizeY + 1) *
+                               (TBlock::sizeZ + 1) +
+                           izz * (TBlock::sizeX + 1) * (TBlock::sizeY + 1) +
+                           iyy * (TBlock::sizeX + 1) + ixx;
+          }
+          if (fwrite(verts, sizeof verts, 1, file) != 1) {
+            fprintf(stderr, "%s:%d: error: fail to write\n", __FILE__,
+                    __LINE__);
+            return 1;
+          }
+          nc++;
+        }
   }
   fclose(file);
   assert(TWavelets::CenteringOffset == 0);
@@ -293,56 +294,57 @@ static int write(MRAG::Grid<TWavelets, TBlock> *inputGrid,
     lab.load(info);
     for (iz = 0; iz < TBlock::sizeZ + 1; iz++)
       for (iy = 0; iy < TBlock::sizeY + 1; iy++)
-	for (ix = 0; ix < TBlock::sizeX + 1; ix++) {
-	  value = lab(ix, iy, iz).phi;
-	  if (fwrite(&value, sizeof value, 1, file) != 1) {
-	    fprintf(stderr, "%s:%d: error: fail to write\n", __FILE__,
-		    __LINE__);
-	    return 1;
-	  }
-	}
+        for (ix = 0; ix < TBlock::sizeX + 1; ix++) {
+          value = lab(ix, iy, iz).phi;
+          if (fwrite(&value, sizeof value, 1, file) != 1) {
+            fprintf(stderr, "%s:%d: error: fail to write\n", __FILE__,
+                    __LINE__);
+            return 1;
+          }
+        }
   }
   fclose(file);
   if ((file = fopen(xdmf_path, "w")) == NULL) {
-    fprintf(stderr, "%s:%d: fail to open '%s'\n", __FILE__, __LINE__, xdmf_path);
+    fprintf(stderr, "%s:%d: fail to open '%s'\n", __FILE__, __LINE__,
+            xdmf_path);
     return 1;
   }
   fprintf(file,
-	  "<Xdmf>\n"
-	  "  <Domain>\n"
-	  "    <Grid>\n"
-	  "      <Topology\n"
-	  "	  Dimensions=\"%d\"\n"
-	  "	  Type=\"Mixed\">\n"
-	  "	  <DataItem\n"
-	  "	      DataType=\"Int\"\n"
-	  "	      Dimensions=\"%d\"\n"
-	  "	      Format=\"Binary\"\n"
-	  "	      Precision=\"8\">\n"
-	  "	    %s\n"
-	  "	  </DataItem>\n"
-	  "      </Topology>\n"
-	  "      <Geometry>\n"
-	  "        <DataItem\n"
-	  "            Dimensions=\"%d 3\"\n"
-	  "            Format=\"Binary\">\n"
-	  "          %s\n"
-	  "        </DataItem>\n"
-	  "      </Geometry>\n",
-	  nc, nc * (8 + 1), xyz_path, np, topo_path);
+          "<Xdmf>\n"
+          "  <Domain>\n"
+          "    <Grid>\n"
+          "      <Topology\n"
+          "      Dimensions=\"%d\"\n"
+          "      TopologyType=\"Mixed\">\n"
+          "      <DataItem\n"
+          "          DataType=\"Int\"\n"
+          "          Dimensions=\"%d\"\n"
+          "          Format=\"Binary\"\n"
+          "          Precision=\"8\">\n"
+          "        %s\n"
+          "      </DataItem>\n"
+          "      </Topology>\n"
+          "      <Geometry>\n"
+          "        <DataItem\n"
+          "            Dimensions=\"%d 3\"\n"
+          "            Format=\"Binary\">\n"
+          "          %s\n"
+          "        </DataItem>\n"
+          "      </Geometry>\n",
+          nc, nc * (8 + 1), xyz_path, np, topo_path);
   fprintf(file,
-	  "      <Attribute\n"
-	  "          Name=\"%s\">\n"
-	  "        <DataItem\n"
-	  "	       Dimensions=\"%d\"\n"
-	  "	       Format=\"Binary\">\n"
-	  "	    %s\n"
-	  "	   </DataItem>\n"
-	  "      </Attribute>\n",
-	  "phi", np, attr_path);
+          "      <Attribute\n"
+          "          Name=\"%s\">\n"
+          "        <DataItem\n"
+          "           Dimensions=\"%d\"\n"
+          "           Format=\"Binary\">\n"
+          "        %s\n"
+          "       </DataItem>\n"
+          "      </Attribute>\n",
+          "phi", np, attr_path);
   fprintf(file, "    </Grid>\n"
-		"  </Domain>\n"
-		"</Xdmf>\n");
+                "  </Domain>\n"
+                "</Xdmf>\n");
   fclose(file);
   return 0;
 }
@@ -380,7 +382,8 @@ int brain_ini(struct BrainParams *params, struct Brain **pbrain) {
     return 1;
   }
   brain = new Brain;
-  brain->grid = new MRAG::Grid<W, B>(params->blocksPerDimension, params->blocksPerDimension,
+  brain->grid = new MRAG::Grid<W, B>(params->blocksPerDimension,
+                                     params->blocksPerDimension,
                                      params->blocksPerDimension, maxStencil);
   brain->blockfwt = new MRAG::BlockFWT<W, B, RD_Projector_Wavelets>;
   brain->blockProcessing = new BlockProcessing;
@@ -482,7 +485,8 @@ int brain_dump(struct Brain *brain, const char *path) {
 }
 
 int brain_project(struct Brain *brain, float *d) {
-  int ix, iy, iz, cx, cy, cz, mx, my, mz, gpd = brain->blocksPerDimension * blockSize;
+  int ix, iy, iz, cx, cy, cz, mx, my, mz,
+      gpd = brain->blocksPerDimension * blockSize;
   Real x[3];
   double h, hf = 1. / gpd, eps = hf * 0.5;
   std::vector<MRAG::BlockInfo> vInfo = brain->grid->getBlocksInfo();
@@ -525,4 +529,3 @@ int brain_project(struct Brain *brain, float *d) {
   }
   return 0;
 }
-
