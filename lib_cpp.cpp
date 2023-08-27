@@ -485,8 +485,7 @@ int brain_step(struct Brain *brain) {
 
 int brain_dump(struct Brain *brain, const char *path) {
   MRAG::BoundaryInfo *boundaryInfo = &brain->grid->getBoundaryInfo();
-  write<W, B, MRAG::BlockLab<B>>(brain->grid, boundaryInfo, path);
-  return 0;
+  return write<W, B, MRAG::BlockLab<B>>(brain->grid, boundaryInfo, path);
 }
 
 int brain_project(struct Brain *brain, float *d) {
