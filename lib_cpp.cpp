@@ -233,8 +233,11 @@ static int write(MRAG::Grid<TWavelets, TBlock> *inputGrid,
   snprintf(attr_path, sizeof attr_path, "%s.attr.raw", path);
   snprintf(xdmf_path, sizeof xdmf_path, "%s.xdmf2", path);
 
+  if ((file = fopen(xyz_path, "w")) == NULL) {
+    fprintf(stderr, "%s:%d: fail to open '%s'\n", __FILE__, __LINE__, xyz_path);
+    return 1;
+  }
   np = 0;
-  file = fopen(xyz_path, "w");
   for (i = 0; i < vInfo.size(); i++) {
     for (iz = 0; iz < TBlock::sizeZ + 1; iz++)
       for (iy = 0; iy < TBlock::sizeY + 1; iy++)
@@ -300,19 +303,14 @@ static int write(MRAG::Grid<TWavelets, TBlock> *inputGrid,
 	}
   }
   fclose(file);
-
-  file = fopen(xdmf_path, "w");
+  if ((file = fopen(xdmf_path, "w")) == NULL) {
+    fprintf(stderr, "%s:%d: fail to open '%s'\n", __FILE__, __LINE__, xdmf_path);
+    return 1;
+  }
   fprintf(file,
 	  "<Xdmf>\n"
 	  "  <Domain>\n"
 	  "    <Grid>\n"
-	  "      <Geometry>\n"
-	  "        <DataItem\n"
-	  "            Dimensions=\"%d 3\"\n"
-	  "            Format=\"Binary\">\n"
-	  "          %s\n"
-	  "        </DataItem>\n"
-	  "      </Geometry>\n"
 	  "      <Topology\n"
 	  "	  Dimensions=\"%d\"\n"
 	  "	  Type=\"Mixed\">\n"
@@ -323,9 +321,15 @@ static int write(MRAG::Grid<TWavelets, TBlock> *inputGrid,
 	  "	      Precision=\"8\">\n"
 	  "	    %s\n"
 	  "	  </DataItem>\n"
-	  "      </Topology>\n",
-	  np, xyz_path, nc, nc * (8 + 1), topo_path);
-
+	  "      </Topology>\n"
+	  "      <Geometry>\n"
+	  "        <DataItem\n"
+	  "            Dimensions=\"%d 3\"\n"
+	  "            Format=\"Binary\">\n"
+	  "          %s\n"
+	  "        </DataItem>\n"
+	  "      </Geometry>\n",
+	  nc, nc * (8 + 1), xyz_path, np, topo_path);
   fprintf(file,
 	  "      <Attribute\n"
 	  "          Name=\"%s\">\n"
