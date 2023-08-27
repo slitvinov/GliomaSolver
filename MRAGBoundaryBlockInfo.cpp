@@ -1,14 +1,11 @@
 #include <algorithm>
 #include <assert.h>
-#include <cstddef>
 #include <map>
 #include <math.h>
+#include <string.h>
 #include <queue>
 #include <stack>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <vector>
 #include "MRAG/MRAGcore/MRAGCommon.h"
 #include "MRAG/MRAGcore/MRAGBitStream.h"
 #include "MRAG/MRAGcore/MRAGEncoder.h"
