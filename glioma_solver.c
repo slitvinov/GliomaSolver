@@ -140,7 +140,10 @@ static PyObject *run(PyObject *self, PyObject *args) {
       break;
     if (period != 0 && step % period == 0) {
       sprintf(path, "a.%09d", step);
-      brain_dump(brain, path);
+      if (brain_dump(brain, path) != 0) {
+	PyErr_Format(PyExc_ValueError, "fail to write to '%s'", path);
+	return NULL;
+      }
     }
     brain_step(brain);
     t += params.dt;

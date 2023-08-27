@@ -44,7 +44,7 @@ ic = 0.64925073, 0.59093041, 0.37127833
 dw = 0.0013
 rho = 0.025
 tend = 300
-period = 0
+period = 10
 glioma_solver.run(bpd, GM, WM, ic, dw, rho, tend, period, HG)
 
 PET = read("tumPET.dat")
