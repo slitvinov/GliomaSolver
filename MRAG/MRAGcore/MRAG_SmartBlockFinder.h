@@ -294,7 +294,8 @@ SmartBlockFinder::findLyingNode(const int level, const int index[3]) const {
   const GridNode *result =
       destination[(i[0] - s[0]) + row_size * (i[1] - s[1]) +
                   slice_size * (i[2] - s[2])];
-
+  if (result == NULL)
+    return NULL;
   // assert(result->level == level);
   const int level_diff_gridnode = maxLevel - result->level;
   const int level_diff_centernode = maxLevel - refCenterNode->level;
