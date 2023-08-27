@@ -331,7 +331,7 @@ static int write(MRAG::Grid<TWavelets, TBlock> *inputGrid,
           "          %s\n"
           "        </DataItem>\n"
           "      </Geometry>\n",
-          nc, nc * (8 + 1), xyz_path, np, topo_path);
+          nc, nc * (8 + 1), topo_path, np, xyz_path);
   fprintf(file,
           "      <Attribute\n"
           "          Name=\"%s\">\n"
