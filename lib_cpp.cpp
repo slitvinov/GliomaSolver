@@ -395,7 +395,6 @@ int brain_ini(struct BrainParams *params, struct Brain **pbrain) {
     fprintf(stderr, "%s:%d: malloc failed\n", __FILE__, __LINE__);
     return 1;
   }
-  brain = new Brain;
   brain->grid = new MRAG::Grid<W, B>(params->blocksPerDimension,
                                      params->blocksPerDimension,
                                      params->blocksPerDimension, maxStencil);
