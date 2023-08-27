@@ -1,4 +1,5 @@
-<Xdmf>
+<Xdmf
+    Version="2">
   <Domain>
     <Grid>
       <Topology

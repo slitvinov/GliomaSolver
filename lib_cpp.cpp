@@ -223,7 +223,7 @@ static int write(MRAG::Grid<TWavelets, TBlock> *inputGrid,
       {0, 0, 0}, {0, 0, 1}, {0, 1, 1}, {0, 1, 0},
       {1, 0, 0}, {1, 0, 1}, {1, 1, 1}, {1, 1, 0},
   };
-  int64_t verts[1 + 8];
+  int32_t verts[8];
   std::vector<MRAG::BlockInfo> vInfo = inputGrid->getBlocksInfo();
   float x[3], y[3];
   FILE *file;
@@ -257,9 +257,12 @@ static int write(MRAG::Grid<TWavelets, TBlock> *inputGrid,
   }
   fclose(file);
 
-  file = fopen(topo_path, "w");
+  if ((file = fopen(topo_path, "w")) == NULL) {
+    fprintf(stderr, "%s:%d: fail to open '%s'\n", __FILE__, __LINE__,
+            topo_path);
+    return 1;
+  }
   nc = 0;
-  verts[0] = 9;
   for (i = 0; i < vInfo.size(); i++) {
     for (iz = 0; iz < TBlock::sizeZ; iz++)
       for (iy = 0; iy < TBlock::sizeY; iy++)
@@ -268,10 +271,10 @@ static int write(MRAG::Grid<TWavelets, TBlock> *inputGrid,
             ixx = ix + shift[j][0];
             iyy = iy + shift[j][1];
             izz = iz + shift[j][2];
-            verts[j + 1] = i * (TBlock::sizeX + 1) * (TBlock::sizeY + 1) *
-                               (TBlock::sizeZ + 1) +
-                           izz * (TBlock::sizeX + 1) * (TBlock::sizeY + 1) +
-                           iyy * (TBlock::sizeX + 1) + ixx;
+            verts[j] = i * (TBlock::sizeX + 1) * (TBlock::sizeY + 1) *
+                           (TBlock::sizeZ + 1) +
+                       izz * (TBlock::sizeX + 1) * (TBlock::sizeY + 1) +
+                       iyy * (TBlock::sizeX + 1) + ixx;
           }
           if (fwrite(verts, sizeof verts, 1, file) != 1) {
             fprintf(stderr, "%s:%d: error: fail to write\n", __FILE__,
@@ -315,12 +318,11 @@ static int write(MRAG::Grid<TWavelets, TBlock> *inputGrid,
           "    <Grid>\n"
           "      <Topology\n"
           "      Dimensions=\"%d\"\n"
-          "      TopologyType=\"Mixed\">\n"
+          "      TopologyType=\"Hexahedron\">\n"
           "      <DataItem\n"
           "          DataType=\"Int\"\n"
           "          Dimensions=\"%d\"\n"
-          "          Format=\"Binary\"\n"
-          "          Precision=\"8\">\n"
+          "          Format=\"Binary\">\n"
           "        %s\n"
           "      </DataItem>\n"
           "      </Topology>\n"
@@ -331,7 +333,7 @@ static int write(MRAG::Grid<TWavelets, TBlock> *inputGrid,
           "          %s\n"
           "        </DataItem>\n"
           "      </Geometry>\n",
-          nc, nc * (8 + 1), topo_path, np, xyz_path);
+          nc, 8 * nc, topo_path, np, xyz_path);
   fprintf(file,
           "      <Attribute\n"
           "          Name=\"%s\">\n"
