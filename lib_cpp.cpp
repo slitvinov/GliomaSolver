@@ -218,7 +218,8 @@ make_projector(RD_Projector_Wavelets, RD_projector_impl_wav);
 
 template <typename TWavelets, typename TBlock, typename TLab>
 static int write(MRAG::Grid<TWavelets, TBlock> *inputGrid,
-                 MRAG::BoundaryInfo *bInfo, const char *path) {
+                 MRAG::BoundaryInfo *bInfo, int nattr, size_t *offsets,
+                 const char *names[], const char *path) {
   int np, nc, i, iz, iy, ix, ixx, iyy, izz, j;
   const int shift[8][3] = {
       {0, 0, 0}, {0, 0, 1}, {0, 1, 1}, {0, 1, 0},
@@ -297,21 +298,21 @@ static int write(MRAG::Grid<TWavelets, TBlock> *inputGrid,
             attr_path);
     return 1;
   }
-  size_t offset = offsetof(struct Cell, phi);
-  for (i = 0; i < vInfo.size(); i++) {
-    MRAG::BlockInfo &info = vInfo[i];
-    lab.load(info);
-    for (iz = 0; iz < TBlock::sizeZ + 1; iz++)
-      for (iy = 0; iy < TBlock::sizeY + 1; iy++)
-        for (ix = 0; ix < TBlock::sizeX + 1; ix++) {
-          if (fwrite(&(lab(ix, iy, iz)) + offset, sizeof(float), 1, file) !=
-              1) {
-            fprintf(stderr, "%s:%d: error: fail to write\n", __FILE__,
-                    __LINE__);
-            return 1;
+  for (j = 0; j < nattr; j++)
+    for (i = 0; i < vInfo.size(); i++) {
+      MRAG::BlockInfo &info = vInfo[i];
+      lab.load(info);
+      for (iz = 0; iz < TBlock::sizeZ + 1; iz++)
+        for (iy = 0; iy < TBlock::sizeY + 1; iy++)
+          for (ix = 0; ix < TBlock::sizeX + 1; ix++) {
+            void *value = (char *)&lab(ix, iy, iz) + offsets[j];
+            if (fwrite(value, sizeof(float), 1, file) != 1) {
+              fprintf(stderr, "%s:%d: error: fail to write\n", __FILE__,
+                      __LINE__);
+              return 1;
+            }
           }
-        }
-  }
+    }
   fclose(file);
   if ((file = fopen(xdmf_path, "w")) == NULL) {
     fprintf(stderr, "%s:%d: fail to open '%s'\n", __FILE__, __LINE__,
@@ -341,17 +342,20 @@ static int write(MRAG::Grid<TWavelets, TBlock> *inputGrid,
           "        </DataItem>\n"
           "      </Geometry>\n",
           nc, nc, topo_path, np, xyz_path);
-  fprintf(file,
-          "      <Attribute\n"
-          "          Name=\"%s\"\n"
-          "          Center=\"Node\">\n"
-          "        <DataItem\n"
-          "            Dimensions=\"%d\"\n"
-          "            Format=\"Binary\">\n"
-          "          %s\n"
-          "        </DataItem>\n"
-          "      </Attribute>\n",
-          "phi", np, attr_path);
+
+  for (j = 0; j < nattr; j++)
+    fprintf(file,
+            "      <Attribute\n"
+            "          Name=\"%s\"\n"
+            "          Center=\"Node\">\n"
+            "        <DataItem\n"
+            "            Dimensions=\"%d\"\n"
+            "            Format=\"Binary\"\n"
+            "            Seek=\"%ld\">\n"
+            "          %s\n"
+            "        </DataItem>\n"
+            "      </Attribute>\n",
+            names[j], np, j * np * sizeof(float), attr_path);
   fprintf(file, "    </Grid>\n"
                 "  </Domain>\n"
                 "</Xdmf>\n");
@@ -489,8 +493,13 @@ int brain_step(struct Brain *brain) {
 }
 
 int brain_dump(struct Brain *brain, const char *path) {
+  int nattr;
   MRAG::BoundaryInfo *boundaryInfo = &brain->grid->getBoundaryInfo();
-  return write<W, B, MRAG::BlockLab<B>>(brain->grid, boundaryInfo, path);
+  size_t offsets[] = {offsetof(struct Cell, phi), offsetof(struct Cell, p_g)};
+  const char *names[] = {"phi", "p_g"};
+  nattr = sizeof names / sizeof *names;
+  return write<W, B, MRAG::BlockLab<B>>(brain->grid, boundaryInfo, nattr,
+                                        offsets, names, path);
 }
 
 int brain_project(struct Brain *brain, float *d) {
