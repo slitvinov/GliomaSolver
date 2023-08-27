@@ -44,7 +44,7 @@ int main(void) {
     }
   }
   model = (float *)malloc(gpd * gpd * gpd * sizeof *model);
-  if (model != NULL) {
+  if (model == NULL) {
     fprintf(stderr, "%s:%d: error: malloc failed\n", __FILE__, __LINE__);
     exit(1);
   }
