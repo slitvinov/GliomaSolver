@@ -3,7 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define max(a, b) ((a) > (b) ? (a) : (b))
+static int max(int a, int b) {
+  return a > b ? a : b;
+}
 int main(void) {
   struct Brain *brain;
   double whenToWrite, whenToWriteOffset, tend, h, t, L, ans;
@@ -43,8 +45,7 @@ int main(void) {
       whenToWrite = whenToWrite + whenToWriteOffset;
     }
   }
-  model = (float *)malloc(gpd * gpd * gpd * sizeof *model);
-  if (model == NULL) {
+  if ((model = (float *)malloc(gpd * gpd * gpd * sizeof *model)) == NULL) {
     fprintf(stderr, "%s:%d: error: malloc failed\n", __FILE__, __LINE__);
     exit(1);
   }
