@@ -1,10 +1,11 @@
 #!/usr/bin/python
 
-import sys
-import struct
 import glioma_solver
 import numpy as np
+import os
 import scipy
+import struct
+import sys
 
 
 def unpack(string, file):
@@ -50,6 +51,7 @@ def fun(x):
     err = np.linalg.norm(HG - PET[::2, ::2, ::2])
     sys.stderr.write("opt.py: %d: %.16e: %s\n" % (err, os.getpid(), str(x)))
     return err
+
 
 if __name__ == '__main__':
     bpd = 16

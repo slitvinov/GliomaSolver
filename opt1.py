@@ -1,12 +1,12 @@
 #!/usr/bin/python
 
-import os
-import sys
-import struct
+import cmaes
 import glioma_solver
 import numpy as np
+import os
 import scipy
-import cmaes
+import struct
+import sys
 
 
 def unpack(string, file):
