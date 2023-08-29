@@ -47,13 +47,13 @@ def sim(x):
 
 def fun(x):
     sim(x)
-    err = np.linalg.norm(HG - PET[::2, ::2, ::2])
-    sys.stderr.write("opt.py: %.4e: %s\n" % (err, str(x)))
+    err = np.linalg.norm(HG - PET)
+    sys.stderr.write("opt.py: %.16e: %s\n" % (err, str(x)))
     return err
 
 
 if __name__ == '__main__':
-    bpd = 16
+    bpd = 32
     GM = read("GM.dat")
     WM = read("WM.dat")
     PET = read("tumPET.dat")
@@ -69,6 +69,6 @@ if __name__ == '__main__':
                                                 polish=False,
                                                 disp=True,
                                                 workers=-1,
-                                                maxiter=2)
+                                                maxiter=4)
     sim(opt.x)
     write(HG)
