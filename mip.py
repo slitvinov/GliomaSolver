@@ -5,9 +5,11 @@ import struct
 import matplotlib.pylab as plt
 import numpy as np
 
+
 def unpack(string, file):
     buffer = file.read(struct.calcsize(string))
     return struct.unpack(string, buffer)
+
 
 def read(path):
     with open(path, "rb") as inp:
@@ -26,6 +28,7 @@ def read(path):
         mm = inp.read()
         dtype = np.dtype(type_name)
         return np.ndarray((nx, ny, nz), dtype, mm, seek, order='F')
+
 
 a = read(sys.argv[1])
 a = np.max(a, axis=2)

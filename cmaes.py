@@ -2,6 +2,7 @@ import scipy.special
 import numpy as np
 import math
 import random
+import multiprocessing
 
 try:
     import scipy.special
@@ -12,7 +13,8 @@ try:
 except ImportError:
     np = None
 
-def cmaes(fun, x0, sigma, g_max, trace=False):
+
+def cmaes(fun, x0, sigma, g_max, trace=False, workers=0):
     """CMA-ES optimization
 
         Parameters
@@ -46,6 +48,8 @@ def cmaes(fun, x0, sigma, g_max, trace=False):
         raise ModuleNotFoundError("cmaes needs scipy")
     if np == None:
         raise ModuleNotFoundError("cmaes needs nump")
+    if workers == -1:
+        workers = multiprocessing.cpu_count()
     xmean, N = x0[:], len(x0)
     lambd = 4 + int(3 * math.log(N))
     mu = lambd // 2
@@ -65,7 +69,11 @@ def cmaes(fun, x0, sigma, g_max, trace=False):
         x0 = [[random.gauss(0, 1) for d in range(N)] for i in range(lambd)]
         x1 = [sqrtC @ e for e in x0]
         xs = [xmean + sigma * e for e in x1]
-        ys = [fun(e) for e in xs]
+        if workers == 0:
+            ys = [fun(e) for e in xs]
+        else:
+            with multiprocessing.Pool(workers) as pool:
+                ys = pool.map(fun, xs)
         ys, x0, x1, xs = zip(*sorted(zip(ys, x0, x1, xs)))
         xmean = wsum(xs)
         ps = cumulation(cs, ps, wsum(x0))
