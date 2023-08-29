@@ -50,7 +50,7 @@ def sim(x):
 def fun(x):
     sim(x)
     err = np.linalg.norm(HG - PET[::2, ::2, ::2])
-    sys.stderr.write("opt.py: %d: %.4e: %s\n" % (err, os.getpid(), str(x)))
+    sys.stderr.write("opt.py: %d: %.16e: %s\n" % (err, os.getpid(), str(x)))
     return err
 
 
@@ -64,6 +64,6 @@ if __name__ == '__main__':
     dw = 0.0013
     tend = 300
     HG = np.empty_like(GM, shape=(8 * bpd, 8 * bpd, 8 * bpd))
-    opt = cmaes.cmaes(fun, (*ic0, rho0), 0.1, 100, workers=2)
+    opt = cmaes.cmaes(fun, (*ic0, rho0, dw), 0.05, 100, workers=2)
     sim(opt.x)
     write(HG)
