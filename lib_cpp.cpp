@@ -254,14 +254,18 @@ static int write(MRAG::Grid<TWavelets, TBlock> *inputGrid,
           y[1] = x[1] - TWavelets::CenteringOffset * vInfo[i].h[1];
           y[2] = x[2] - TWavelets::CenteringOffset * vInfo[i].h[2];
           if (fwrite(y, sizeof y, 1, file) != 1) {
-            fprintf(stderr, "%s:%d: error: fail to write\n", __FILE__,
-                    __LINE__);
+            fprintf(stderr, "%s:%d: error: fail to write '%s'\n", __FILE__,
+                    __LINE__, xyz_path);
             return 1;
           }
           np++;
         }
   }
-  fclose(file);
+  if (fclose(file) != 0) {
+    fprintf(stderr, "%s:%d: error: fail to close '%s'\n", __FILE__, __LINE__,
+            xyz_path);
+    return 1;
+  }
 
   if ((file = fopen(topo_path, "w")) == NULL) {
     fprintf(stderr, "%s:%d: fail to open '%s'\n", __FILE__, __LINE__,
@@ -290,7 +294,11 @@ static int write(MRAG::Grid<TWavelets, TBlock> *inputGrid,
           nc++;
         }
   }
-  fclose(file);
+  if (fclose(file) != 0) {
+    fprintf(stderr, "%s:%d: error: fail to close '%s'\n", __FILE__, __LINE__,
+            topo_path);
+    return 1;
+  }
   assert(TWavelets::CenteringOffset == 0);
   lab.prepare(inputGrid->getBlockCollection(), *bInfo, steStart, steEnd);
   if ((file = fopen(attr_path, "w")) == NULL) {
@@ -313,7 +321,11 @@ static int write(MRAG::Grid<TWavelets, TBlock> *inputGrid,
             }
           }
     }
-  fclose(file);
+  if (fclose(file) != 0) {
+    fprintf(stderr, "%s:%d: error: fail to close '%s'\n", __FILE__, __LINE__,
+            attr_path);
+    return 1;
+  }
   if ((file = fopen(xdmf_path, "w")) == NULL) {
     fprintf(stderr, "%s:%d: fail to open '%s'\n", __FILE__, __LINE__,
             xdmf_path);
@@ -359,7 +371,11 @@ static int write(MRAG::Grid<TWavelets, TBlock> *inputGrid,
   fprintf(file, "    </Grid>\n"
                 "  </Domain>\n"
                 "</Xdmf>\n");
-  fclose(file);
+  if (fclose(file) != 0) {
+    fprintf(stderr, "%s:%d: error: fail to close '%s'\n", __FILE__, __LINE__,
+            xdmf_path);
+    return 1;
+  }
   return 0;
 }
 
