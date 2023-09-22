@@ -7,6 +7,7 @@ import os
 import scipy
 import struct
 import sys
+import nibabel as nib
 
 
 def unpack(string, file):
@@ -14,7 +15,7 @@ def unpack(string, file):
     return struct.unpack(string, buffer)
 
 
-def read(path):
+def readDat(path):
     with open(path, "rb") as inp:
         magic, = unpack('i', inp)
         if magic != 1234:
@@ -32,6 +33,8 @@ def read(path):
         dtype = np.dtype(type_name)
         return np.ndarray((nx, ny, nz), dtype, mm, seek, order='F')
 
+def readNii(path):
+    return nib.load(path).get_fdata().astype(np.float32)
 
 def write(a):
     path = "%dx%dx%dle.raw" % np.shape(a)
@@ -39,6 +42,10 @@ def write(a):
         file.write(a.tobytes('F'))
     sys.stderr.write("opt.py: write: %s\n" % path)
 
+def writeNii(array):
+    path = "%dx%dx%dle.nii.gz" % np.shape(array)
+    nibImg = nib.Nifti1Image(array, np.eye(4))
+    nib.save(nibImg, path)
 
 def sim(x):
     ic = x[:3]
@@ -56,9 +63,9 @@ def fun(x):
 
 if __name__ == '__main__':
     bpd = 16
-    GM = read("GM.dat")
-    WM = read("WM.dat")
-    PET = read("tumPET.dat")
+    GM = readNii("GM.nii.gz")
+    WM = readNii("WM.nii.gz")
+    PET = readNii("tumPET.nii.gz")
     ic0 = np.divide(scipy.ndimage.center_of_mass(PET), np.shape(PET))
     rho0 = 0.025
     dw = 0.0013
