@@ -15,11 +15,11 @@ def read(path):
     with open(path, "rb") as inp:
         magic, = unpack('i', inp)
         if magic != 1234:
-            sys.stderr.write("fun.py error: '%s' not a dat file\n" % path)
+            sys.stderr.write("mip.py: error: '%s' not a dat file\n" % path)
             sys.exit(1)
         dim, = unpack('i', inp)
         if dim != 3:
-            sys.stderr.write("fun.py error: wrong dimension '%d'\n" % dim)
+            sys.stderr.write("mip.py: error: wrong dimension '%d'\n" % dim)
             sys.exit(1)
         nx, ny, nz, type_id = unpack('iiii', inp)
         seek = inp.tell()
