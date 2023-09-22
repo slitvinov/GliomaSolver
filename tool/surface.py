@@ -6,28 +6,40 @@ import numpy as np
 import skimage.measure
 import os
 import nibabel as nib
+import meshio
 
 def readNii(path):
     return nib.load(path).get_fdata()
 
-a = readNii(sys.argv[1])
-sx, sy, sz = 1, 1, 1
+a = np.array(readNii(sys.argv[1]))
 nx, ny, nz = np.shape(a)
-dx = 1.0 / nx / sx
-dy = 1.0 / ny / sy
-dz = 1.0 / nz / sz
-verts, faces, normals, values = skimage.measure.marching_cubes(a[::sx, ::sy, ::sz],
-                                                               0.5,
-                                                               spacing=(dx, dy,
-                                                                        dz))
+node = np.zeros_like(a)
+cnt = 0
+w = 0, 1
+for dx in w:
+    for dy in w:
+        for dz in w:
+            q = 1 / ((1 + abs(dx)) * (1 + abs(dy)) * (1 + abs(dz)))
+            print(dx, dy, dz, q)
+            node = node + q * np.roll(a, (dx, dy, dz))
+            cnt += q
+node /= cnt
+print(np.std(node), np.std(a), np.shape(node), np.shape(a))
+verts, faces, normals, values = skimage.measure.marching_cubes(node,
+                                                               0.9,
+                                                               spacing=(1/nx, 1/ny, 1/nz))
+mesh = meshio.Mesh(
+    verts,
+    (("triangle", faces),)
+)
+mesh.write("surface.vtk")
+
 path = "surface"
 xyz_path = "%s.xyz.raw" % path
 topo_path = "%s.topo.raw" % path
 xdmf_path = "%s.xdmf2" % path
-xyz = np.memmap(xyz_path, np.dtype("<f4"), "w+", shape=(len(verts), 3), order='C')
-topo = np.memmap(topo_path, np.dtype("<i4"), "w+", shape=(len(faces), 3), order='C')
-np.copyto(xyz, verts)
-np.copyto(topo, faces, 'no')
+verts.tofile(xyz_path)
+faces.tofile(topo_path)
 with open(xdmf_path, "w") as f:
     f.write("""\
 <Xdmf
