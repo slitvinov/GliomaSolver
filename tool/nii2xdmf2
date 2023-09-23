@@ -1,0 +1,76 @@
+#!/usr/bin/python
+
+import sys
+import os
+import re
+import numpy as np
+import nibabel as nib
+
+sx, sy, sz = 1, 1, 1
+try:
+    path = sys.argv[1]
+except IndexError:
+    sys.stderr.write("nii2xdmf2: error: needs an argument\n")
+    sys.exit(1)
+for path in sys.argv[1:]:
+    try:
+        a = nib.load(path).get_fdata()
+        nx, ny, nz = np.shape(a)
+        precision = a.itemsize
+        prefix = re.sub("\.nii\.gz$", "", path)
+        raw_path = "%s.raw" % prefix
+        a.tofile(raw_path)
+        nsx, nsy, nsz = nx // sx, ny // sy, nz // sz
+        nsxp, nsyp, nszp = nsx + 1, nsy + 1, nsz + 1
+        xdmf_path = "%s.xdmf2" % prefix
+        dx = 1.0 / nx / sx
+        dy = 1.0 / ny / sy
+        dz = 1.0 / nz / sz
+        sys.stderr.write("nii2xdmf2: %s\n" % xdmf_path)
+        with open(xdmf_path, "w") as xdmf:
+            xdmf.write("""\
+<Xdmf>
+  <Domain>
+    <Grid>
+      <Topology
+        TopologyType="3DCORECTMesh"
+        Dimensions="{nszp} {nsyp} {nsxp}"/>
+      <Geometry
+        GeometryType="ORIGIN_DXDYDZ">
+        <DataItem
+          Name="Origin"
+          Dimensions="3">
+                 0 0 0
+        </DataItem>
+        <DataItem
+          Name="Spacing"
+          Dimensions="3">
+                {dz} {dy} {dx}
+        </DataItem>
+      </Geometry>
+      <Attribute
+        Name="u"
+        Center="Cell">
+        <DataItem
+          ItemType="HyperSlab"
+          Dimensions="{nsz} {nsy} {nsx}">
+          <DataItem Dimensions="3 3">
+                    0 0 0
+                    {sz} {sy} {sx}
+                    {nsz} {nsy} {nsx}
+          </DataItem>
+          <DataItem
+            Dimensions="{nz} {ny} {nx}"
+            Format="Binary"
+            Precision="{precision}">
+                    {raw_path}
+          </DataItem>
+        </DataItem>
+      </Attribute>
+    </Grid>
+  </Domain>
+</Xdmf>
+""".format(**locals()))
+    except FileNotFoundError:
+        sys.stderr.write("nii2xdmf2: error: fail to open '%s'\n" % path)
+        sys.exit(1)
