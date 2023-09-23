@@ -13,12 +13,22 @@ def readNii(path):
     return nib.load(path).get_fdata()
 
 
-a = readNii(sys.argv[1])
+path = sys.argv[1]
+try:
+    a = readNii(path)
+except FileNotFoundError as e:
+    sys.stderr.write("surface.py: error: %s\n" % e)
+    sys.exit(1)
+except nib.filebasedimages.ImageFileError as e:
+    sys.stderr.write("surface.py: error: %s\n" % e)
+    sys.exit(1)
+
+sx, sy, sz = 1, 1, 1
 nx, ny, nz = np.shape(a)
 node = np.zeros_like(a)
-scipy.ndimage.gaussian_filter(a, sigma=2, output=node)
+scipy.ndimage.gaussian_filter(a, sigma=1, output=node)
 verts, faces, normals, values = skimage.measure.marching_cubes(
-    node, 0.5, spacing=(1 / nx, 1 / ny, 1 / nz))
+    node[::sx, ::sy, ::sz], 0.5, spacing=(sx / nx, sy / ny, sz / nz))
 path = "surface"
 xyz_path = "%s.xyz.raw" % path
 topo_path = "%s.topo.raw" % path
