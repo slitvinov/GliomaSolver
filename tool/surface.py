@@ -4,42 +4,28 @@ import sys
 import array
 import numpy as np
 import skimage.measure
+import scipy.ndimage
 import os
 import nibabel as nib
-import meshio
+
 
 def readNii(path):
     return nib.load(path).get_fdata()
 
-a = np.array(readNii(sys.argv[1]))
+
+a = readNii(sys.argv[1])
 nx, ny, nz = np.shape(a)
 node = np.zeros_like(a)
-cnt = 0
-w = 0, 1
-for dx in w:
-    for dy in w:
-        for dz in w:
-            q = 1 / ((1 + abs(dx)) * (1 + abs(dy)) * (1 + abs(dz)))
-            print(dx, dy, dz, q)
-            node = node + q * np.roll(a, (dx, dy, dz))
-            cnt += q
-node /= cnt
-print(np.std(node), np.std(a), np.shape(node), np.shape(a))
-verts, faces, normals, values = skimage.measure.marching_cubes(node,
-                                                               0.9,
-                                                               spacing=(1/nx, 1/ny, 1/nz))
-mesh = meshio.Mesh(
-    verts,
-    (("triangle", faces),)
-)
-mesh.write("surface.vtk")
-
+scipy.ndimage.gaussian_filter(a, sigma=2, output=node)
+verts, faces, normals, values = skimage.measure.marching_cubes(
+    node, 0.5, spacing=(1 / nx, 1 / ny, 1 / nz))
 path = "surface"
 xyz_path = "%s.xyz.raw" % path
 topo_path = "%s.topo.raw" % path
 xdmf_path = "%s.xdmf2" % path
 verts.tofile(xyz_path)
 faces.tofile(topo_path)
+sys.stderr.write("surface.py: %s\n" % xdmf_path)
 with open(xdmf_path, "w") as f:
     f.write("""\
 <Xdmf
@@ -59,6 +45,7 @@ with open(xdmf_path, "w") as f:
       <Geometry>
 	<DataItem
 	    Dimensions="%d 3"
+	    Precision="%d"
 	    Format="Binary">
           %s
 	</DataItem>
@@ -67,4 +54,4 @@ with open(xdmf_path, "w") as f:
   </Domain>
 </Xdmf>
 """ % (len(faces), len(faces), os.path.basename(topo_path), len(verts),
-       os.path.basename(xyz_path)))
+       verts.itemsize, os.path.basename(xyz_path)))
