@@ -14,7 +14,7 @@ except ImportError:
     np = None
 
 
-def cmaes(fun, x0, sigma, g_max, trace=False, workers=0):
+def cmaes(fun, x0, sigma, g_max, trace=False, workers=0, parameterRange=None):
     """CMA-ES optimization
 
         Parameters
@@ -29,6 +29,8 @@ def cmaes(fun, x0, sigma, g_max, trace=False, workers=0):
               maximum generation
         trace : bool
               return a trace of the algorithm (default: False)
+        parameterRange : list of ranges for each parameter [[min_x0, max_x0], [min_x1, max_x1],...]]
+              clips the parameters to the given range (default: None)
 
         Return
         ----------
@@ -69,6 +71,12 @@ def cmaes(fun, x0, sigma, g_max, trace=False, workers=0):
         x0 = [[random.gauss(0, 1) for d in range(N)] for i in range(lambd)]
         x1 = [sqrtC @ e for e in x0]
         xs = [xmean + sigma * e for e in x1]
+
+        if parameterRange:
+            for j in range(len(xs)):
+                for i in range(len(xs[j])):
+                    xs[j][i] = np.clip(xs[j][i], parameterRange[i][0], parameterRange[i][1])
+
         if workers == 0:
             ys = [fun(e) for e in xs]
         else:
