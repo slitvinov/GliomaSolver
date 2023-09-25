@@ -11,14 +11,19 @@ def probabilityOfDetectedTumor(x, threshold, sigma):
     # return: probability of detection with MRI
     return 0.5 + 0.5 * np.sign(x-threshold) * (1. - np.exp(- (x-threshold)**2 / sigma**2))
 
-def gaussianPrior(x, xPredicted, stdPredicted):
+
+def logGaussianPrior(x, xPredicted, stdPredicted):
     # x (1D array): values to calculate prior for
     # xPredicted (1D array): value known with a certain unserainty as gaussien
     # stdPredicted (1D array): standard deviation of the gaussian
     # return: prior probability for x
 
-    # TODO implement
-    return 1
+    x = np.array(x)
+    xPredicted = np.array(xPredicted)
+    stdPredicted = np.array(stdPredicted)
+
+    factor = 1 / np.sqrt(2 * np.pi * stdPredicted**2)
+    return np.sum(  np.log( factor * np.exp(- (x - xPredicted)**2 / (2 * stdPredicted**2)) ))
 
 def likelihood(x, xMeasured, stdMeasured):
     #TODO   
@@ -29,13 +34,23 @@ def dice(a, b):
     return 2 * np.sum(a * b) / (np.sum(a) + np.sum(b))
 
 # in addition it might make sense to use the minumum dice for several thresholds instead of infering the thresholds
-def diceLikelihood(proposedDistribution, flair_seg, t1_seg):
+def diceLogLikelihood(proposedDistribution, flair_seg, t1_seg):
     # TODO not working
     th_flair = 0.3
     th_core = 0.75
-    diceFlair = dice(proposedDistribution > th_flair, flair_seg)
+    diceFlair = dice(proposedDistribution > th_flair, flair_seg) 
     diceT1 = dice(proposedDistribution > th_core, t1_seg)
-    return diceFlair * diceT1
+
+    # add this to start convergence and prevent 0 dice
+    if diceFlair +diceT1 < 0.001:
+        additionalStartingDice = np.log(0.1 * dice(proposedDistribution > 0.01, flair_seg) + 0.0000001)
+    else:
+        additionalStartingDice = 0
+
+    print("additionalStartingDice:", additionalStartingDice)
+
+    return np.log(diceFlair+ 0.0000001) + np.log(diceT1+ 0.0000001) + additionalStartingDice
+
 
 # %% 
 if __name__ == '__main__':
