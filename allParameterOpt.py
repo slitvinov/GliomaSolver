@@ -29,13 +29,15 @@ def writeNii(array, path = ""):
 
 class CmaesSolver():
     def __init__(self,  settings, wm, gm, flair, t1c):
-        loss = settings["loss"]
-        if loss == "dice":
-            self.loss = calcLikelihood.diceLogLikelihood
-        elif loss == "bernoulli":
-            self.loss = calcLikelihood.logLikelihood
+        lossfunction = settings["lossfunction"]
+        if lossfunction == "dice":
+            self.lossfunction = calcLikelihood.diceLogLikelihood
+        elif lossfunction == "bernoulli":
+            self.lossfunction = calcLikelihood.logPosterior
 
         self.tend = 100
+        self.flair_th = 0.25
+        self.t1c_th = 0.675
 
         self.T1c = t1c
         self.FLAIR = flair
@@ -64,7 +66,7 @@ class CmaesSolver():
 
     def fun(self, x):
         self.sim(x)
-        err =  - calcLikelihood.diceLogLikelihood(self.HG, self.FLAIR, self.T1c) 
+        err =  - self.lossfunction(self.HG, self.FLAIR, self.T1c, self.flair_th, self.t1c_th) 
         
         # TODO compare original with dice likelihood on synthetic data
         sys.stderr.write("allParameterOpt.py: %d: %.16e: %s\n" % (err, os.getpid(), str(x)))
@@ -84,10 +86,10 @@ class CmaesSolver():
 
         resultDict = {}
 
-        resultDict["diceT1_75"] = calcLikelihood.dice(self.HG > 0.75, self.T1c)
-        resultDict["diceFLAIR_30"] = calcLikelihood.dice(self.HG > 0.3, self.FLAIR)
-        resultDict["likelihoodFlair_30"] = calcLikelihood.logLikelihood(self.HG, self.FLAIR, 0.3, 0.05)
-        resultDict["likelihoodT1_75"] = calcLikelihood.logLikelihood(self.HG, self.T1c, 0.75, 0.05)
+        resultDict["diceT1_75"] = calcLikelihood.dice(self.HG > 0.675, self.T1c)
+        resultDict["diceFLAIR_30"] = calcLikelihood.dice(self.HG > 0.25, self.FLAIR)
+        resultDict["likelihoodFlair_30"] = calcLikelihood.logLikelihood(self.HG, self.FLAIR, 0.25, 0.05)
+        resultDict["likelihoodT1_75"] = calcLikelihood.logLikelihood(self.HG, self.T1c, 0.675, 0.05)
         resultDict['final_loss'] = self.fun(opt)
         
         resultDict["opt_params"] = opt
@@ -115,15 +117,16 @@ if __name__ == '__main__':
     settings["dw0"] = 0.2
     settings["workers"] = 8
     settings["sigma0"] = 0.05
-    settings["generations"] = 100
-    settings["loss"] = "dice"#"bernoulli"
+    settings["generations"] =1000
+    settings["lossfunction"] = "bernoulli"#"dice"#
+    print('Lossfunction:', settings["lossfunction"])
 
     solver = CmaesSolver(settings, WM, GM, FLAIR, T1c)
     resultTumor, resultDict = solver.run()
 
     # save results
     datetime = time.strftime("%Y_%m_%d-%H_%M_%S")
-    path = "./results/"+ datetime +"_gen_"+ str(settings["generations"]) + "_loss_" + str(settings["loss"]) + "/"
+    path = "./results/"+ datetime +"_gen_"+ str(settings["generations"]) + "_loss_" + str(settings["lossfunction"]) + "/"
     os.makedirs(path, exist_ok=True)
     np.save(path + "settings.npy", settings)
     np.save(path + "results.npy", resultDict)
@@ -137,7 +140,7 @@ if __name__ == '__main__':
     print("opt_params",  resultDict["opt_params"])
 
 #%%
-if __name__ == '__main__':
+if False: #__name__ == '__main__':
     dict = np.load("/home/jonas/workspace/programs/GliomaSolver/results/2023_09_26-17_11_36_gen_10/results.npy", allow_pickle=True).item()
     params = dict['opt_params']
     #solver = CmaesSolver(settings, WM, GM, FLAIR, T1c, likelihoodFunction = "dice")
@@ -148,6 +151,5 @@ if __name__ == '__main__':
     writeNii(T1c, path = "./results/tumT1c.nii.gz")
     writeNii(FLAIR, path = "./results/tumFLAIR.nii.gz")
     # %%
-dict
 
 # %%

@@ -33,7 +33,7 @@ def logLikelihood( proposedDistribution, seg, threshold, sigma):
     
     return bernoulli
 
-def logPosterior(proposedDistribution, flair_seg, t1_seg, flair_threshold, t1_threshold,  sigma, addPrior = False, x = None, xMeasured = None, stdMeasured = None):
+def logPosterior(proposedDistribution, flair_seg, t1_seg, flair_threshold, t1_threshold,  sigma = 0.05, addPrior = False, x = None, xMeasured = None, stdMeasured = None):
     #TODO test
 
     logLikelihoodFlair = logLikelihood( proposedDistribution, flair_seg, flair_threshold, sigma)
@@ -53,10 +53,9 @@ def dice(a, b):
     return 2 * np.sum( np.logical_and(boolA, boolB)) / (np.sum(boolA) + np.sum(boolB))
 
 # in addition it might make sense to use the minumum dice for several thresholds instead of infering the thresholds
-def diceLogLikelihood(proposedDistribution, flair_seg, t1_seg):
+def diceLogLikelihood(proposedDistribution, flair_seg, t1_seg, th_flair = 0.3, th_core = 0.75):
     # TODO not working
-    th_flair = 0.3
-    th_core = 0.75
+
     diceFlair = dice(proposedDistribution > th_flair, flair_seg) 
     diceT1 = dice(proposedDistribution > th_core, t1_seg)
 
@@ -87,7 +86,7 @@ if __name__ == '__main__':
     diceFlair = dice(tumor > 0.3, FLAIR[::2, ::2, ::2])
     diceT1 = dice(tumor > 0.75, T1c[::2, ::2, ::2])
 
-    tumor = 0 * tumor+1
+    #tumor =  tumor+1
     #print(logLikelihood(tumor, T1c[::2, ::2, ::2], 0.3, 0.05))
     err = -logPosterior(tumor, FLAIR[::2, ::2, ::2], T1c[::2, ::2, ::2], 0.3, 0.75, 0.05, addPrior = False)
     errFlair = -logLikelihood(tumor, FLAIR[::2, ::2, ::2], 0.3, 0.05)
