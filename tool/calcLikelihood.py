@@ -3,13 +3,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def probabilityOfDetectedTumor(x, threshold, sigma):
+def probabilityOfDetectedTumor(x, threshold, sigma, janasNewVersion = False):
     # x: true tumor concentration
     # threshold: threshold for detection
     # sigma: width of the sigmoid
 
     # return: probability of detection with MRI
-    alpha = 0.5 + 0.5 * np.sign(x-threshold) * (1. - np.exp(- (x-threshold).astype(np.float128)**2 / sigma**2))
+    diff = (x-threshold)
+    if janasNewVersion:
+        diff[x>threshold] = 1
+    alpha = 0.5 + 0.5 * np.sign(x-threshold) * (1. - np.exp(- diff.astype(np.float128)**2 / sigma**2))
     return np.clip(alpha, 0.00000000000001, 0.99999999999999)
     #return np.clip( 0.5 + 0.5 * np.sign(x-threshold) * (1. - np.exp(- (x-threshold)**2 / sigma**2)), 0.00001, 0.99999 )
 
@@ -110,11 +113,18 @@ if __name__ == '__main__':
     titles = ["FLAIR", "T1c"]
     thresholds = [0.25, 0.75]
     for i in range(2):
-        y = probabilityOfDetectedTumor(x,thresholds[i],0.08)
-        plt.title("Jana - probability of detected tumor " )
-        plt.plot(x,y, label = titles[i])
-        plt.ylabel("Probability of Detection") 
-        plt.xlabel("True Tumor Concentration")
+        for cut in [True, False]:
+            y = probabilityOfDetectedTumor(x,thresholds[i],0.05,cut)
+
+            if cut:
+                plt.plot(x,y, label = titles[i] + " cutoff")
+            else:
+                plt.plot(x,y, label = titles[i])
+
+
+    plt.title("Probability of detecting Tumor in MRI" )
+    plt.ylabel("Probability of Detection") 
+    plt.xlabel("True Tumor Concentration")
 
     plt.legend()
 # %%
