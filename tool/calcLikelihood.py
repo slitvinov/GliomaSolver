@@ -7,7 +7,7 @@ def probabilityOfDetectedTumor(x, threshold, sigma, janasNewVersion = False):
     # x: true tumor concentration
     # threshold: threshold for detection
     # sigma: width of the sigmoid
-
+    x = np.clip(x, 0, 1000000000)
     # return: probability of detection with MRI
     diff = (x-threshold)
     if janasNewVersion:
@@ -26,8 +26,11 @@ def logGaussianPrior(x, xPredicted, stdPredicted):
     xPredicted = np.array(xPredicted)
     stdPredicted = np.array(stdPredicted)
 
-    factor = 1 / np.sqrt(2 * np.pi * stdPredicted**2)
-    return np.sum(  np.log( factor * np.exp(- (x - xPredicted)**2 / (2 * stdPredicted**2)) ))
+    #factor = 1 / np.sqrt(2 * np.pi * stdPredicted**2)
+    #return np.sum(  np.log( factor * np.exp(- (x - xPredicted)**2 / (2 * stdPredicted**2)) ))
+
+    return np.sum(-0.5 * np.log(2 * np.pi * stdPredicted**2) - ((x - xPredicted)**2 / (2 * stdPredicted**2)))
+
 
 def logLikelihood( proposedDistribution, seg, threshold, sigma):
 
@@ -36,7 +39,7 @@ def logLikelihood( proposedDistribution, seg, threshold, sigma):
     
     return bernoulli
 
-def logPosterior(proposedDistribution, flair_seg, t1_seg, flair_threshold, t1_threshold,  sigma = 0.05, addPrior = False, x = None, xMeasured = None, stdMeasured = None):
+def logPosteriorBern(proposedDistribution, flair_seg, t1_seg, flair_threshold, t1_threshold,  sigma = 0.05, addPrior = False, x = None, xMeasured = None, stdMeasured = None):
     #TODO test
 
     logLikelihoodFlair = logLikelihood( proposedDistribution, flair_seg, flair_threshold, sigma)
@@ -56,8 +59,7 @@ def dice(a, b):
     return 2 * np.sum( np.logical_and(boolA, boolB)) / (np.sum(boolA) + np.sum(boolB))
 
 # in addition it might make sense to use the minumum dice for several thresholds instead of infering the thresholds
-def diceLogLikelihood(proposedDistribution, flair_seg, t1_seg, th_flair = 0.3, th_core = 0.75):
-    # TODO not working
+def diceLogLikelihood(proposedDistribution, flair_seg, t1_seg, th_flair = 0.3, th_core = 0.75, ):
 
     diceFlair = dice(proposedDistribution > th_flair, flair_seg) 
     diceT1 = dice(proposedDistribution > th_core, t1_seg)
@@ -72,6 +74,22 @@ def diceLogLikelihood(proposedDistribution, flair_seg, t1_seg, th_flair = 0.3, t
 
     return np.log(diceFlair+ 0.0000001) + np.log(diceT1+ 0.0000001) + additionalStartingDice
 
+def logPosteriorDice(proposedDistribution, flair_seg, t1_seg, th_flair = 0.3, th_core = 0.75, addPrior = False, x = None, xMeasured = None, stdMeasured = None):
+    #TODO test
+
+    theDiceLogLikelihood = diceLogLikelihood(proposedDistribution, flair_seg, t1_seg, th_flair, th_core)
+
+    if addPrior:
+        logPrior = logGaussianPrior(x, xMeasured, stdMeasured)
+        return theDiceLogLikelihood + logPrior 
+    
+    else:
+        return theDiceLogLikelihood
+
+#%% check proir
+if __name__ == '__main__':
+    logPrior = logGaussianPrior(np.array([0.0, 0.0]), np.array([2, 2]), np.array([1,1]))
+    print(np.exp(logPrior))
 
 # %% check dice and probabiltiy of detectioy  
 if __name__ == '__main__':
@@ -91,12 +109,12 @@ if __name__ == '__main__':
 
     #tumor =  tumor+1
     #print(logLikelihood(tumor, T1c[::2, ::2, ::2], 0.3, 0.05))
-    err = -logPosterior(tumor, FLAIR[::2, ::2, ::2], T1c[::2, ::2, ::2], 0.3, 0.75, 0.05, addPrior = False)
+    err = -logPosteriorBern(tumor, FLAIR[::2, ::2, ::2], T1c[::2, ::2, ::2], 0.3, 0.75, 0.05, addPrior = False)
     errFlair = -logLikelihood(tumor, FLAIR[::2, ::2, ::2], 0.3, 0.05)
     errT1 = -logLikelihood(tumor, T1c[::2, ::2, ::2], 0.75, 0.05)
     print('err=',"%.2e" % errFlair, "%.2e" % errT1)
     print('errTot=',"%.2e" % err)
-    errZero = -logPosterior(np.zeros_like(tumor), FLAIR[::2, ::2, ::2], T1c[::2, ::2, ::2], 0.3, 0.75, 0.05, addPrior = False)
+    errZero = -logPosteriorBern(np.zeros_like(tumor), FLAIR[::2, ::2, ::2], T1c[::2, ::2, ::2], 0.3, 0.75, 0.05, addPrior = False)
     print('errZero=',"%.2e" % errZero)
     errFlairFlair = -logLikelihood(FLAIR[::2, ::2, ::2], FLAIR[::2, ::2, ::2], 0.3, 0.05)
     errT1Flair = -logLikelihood(FLAIR[::2, ::2, ::2], T1c[::2, ::2, ::2], 0.75, 0.05)
@@ -108,6 +126,9 @@ if __name__ == '__main__':
     # %%
 # %% 
 if __name__ == '__main__':
+    def stepFunction(x, threshold):
+        return np.array(x > threshold, dtype = np.float32)
+
     # janas paper example
     x = np.linspace(0,1,100)
     titles = ["FLAIR", "T1c"]
@@ -117,9 +138,13 @@ if __name__ == '__main__':
             y = probabilityOfDetectedTumor(x,thresholds[i],0.05,cut)
 
             if cut:
-                plt.plot(x,y, label = titles[i] + " cutoff")
+                
+                plt.plot(x,y, label = titles[i] + " new version")
+                
             else:
-                plt.plot(x,y, label = titles[i])
+                plt.plot(x,y, label = titles[i] + " old version")
+                plt.plot(x,stepFunction(x,thresholds[i]), label = titles[i] + " step function", linestyle = "--", linewidth = 0.5, color = 'black')
+                
 
 
     plt.title("Probability of detecting Tumor in MRI" )
