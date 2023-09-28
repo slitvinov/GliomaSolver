@@ -4,14 +4,30 @@ from  recPred.dataset_syntheticBrats import Dataset_SyntheticBrats
 from allParameterOpt import readNii, writeNii, CmaesSolver
 import numpy as np
 import os 
+import time
 #%%
+def extendTo256(a):
+    return np.repeat(np.repeat(np.repeat(a, 2, axis=0), 2, axis=1), 2, axis=2)
+
 if __name__ == '__main__':
     print("start")
 
-    GM = readNii("GM.nii.gz")#[::2, ::2, ::2]
-    WM = readNii("WM.nii.gz")#[::2, ::2, ::2]
-    T1c = readNii("tumT1c.nii.gz")[::2, ::2, ::2]
-    FLAIR = readNii("tumFLAIR.nii.gz")[::2, ::2, ::2]
+
+    directoryPath = "/mnt/8tb_slot8/jonas/datasets/lmiSynthetic/"
+
+    testDataset = Dataset_SyntheticBrats(directoryPath, "/mnt/8tb_slot8/jonas/workingDirDatasets/lmiSynthetic", deleteAndReloadWorkingDir=True)
+    patientID = 0
+
+    GM128 = testDataset.loadPatientImageEnumarated(patientID, "GM", '0', "dat128JanasSolver").astype(np.float32)
+    GM = GM128 #GM = np.asfortranarray(extendTo256(GM128))
+
+    WM128 = testDataset.loadPatientImageEnumarated(patientID, "WM", '0', "dat128JanasSolver").astype(np.float32)
+    WM = WM128 #np.asfortranarray(extendTo256(WM128))
+
+    T1c = testDataset.loadPatientImageEnumarated(patientID, "seg-t1c", '0', "dat128JanasSolver")[:-1,:-1,:-1]
+    FLAIR = testDataset.loadPatientImageEnumarated(patientID, "seg-flair", '0', "dat128JanasSolver")[:-1,:-1,:-1]
+
+
 
     settings = {}
     # ranges from LMI paper with T = 100
@@ -19,20 +35,38 @@ if __name__ == '__main__':
     settings["parameterRanges"] = parameterRanges
 
     settings["bpd"] = 16
-    settings["rho0"] = 0.025
+    settings["rho0"] = 0.1
     settings["dw0"] = 0.2
     settings["workers"] = 8
-    settings["sigma0"] = 0.05
-    settings["generations"] =50
+    settings["sigma0"] = 0.02
+    settings["generations"] = 100
     settings["lossfunction"] = "bernoulli"#"dice"#
-    print('Lossfunction:', settings["lossfunction"])
+
+
+    settings["addPrior"] = False
+    
+    #TODO delet None in getParams
+    params = testDataset.getParams(patientID, None)
+
+    # the factor to increase the range for the ensemble
+    settings["factorSTD"] = 3
+    settings["stdMeasured"], settings["xMeasured"] =[], []
+    for key in ["x", "y", "z", "D-cm-d", "rho1-d"]:
+        print(key, params[key]['ensemble'])
+
+        settings["xMeasured"].append(np.mean(params[key]['ensemble']))
+        settings["stdMeasured"].append(np.std(params[key]['ensemble']) * settings["factorSTD"])
+
+    if settings["addPrior"]:
+        settings["rho0"] = settings["xMeasured"][4]
+        settings["dw0"] = settings["xMeasured"][3]
 
     solver = CmaesSolver(settings, WM, GM, FLAIR, T1c)
     resultTumor, resultDict = solver.run()
 
     # save results
     datetime = time.strftime("%Y_%m_%d-%H_%M_%S")
-    path = "./resultsSynData/"+ datetime +"_gen_"+ str(settings["generations"]) + "_loss_" + str(settings["lossfunction"]) + "/"
+    path = "./resultsSynData/"+ 'patient_' + str(patientID) + '_dtime' + datetime +"_gen_"+ str(settings["generations"]) + "_loss_" + str(settings["lossfunction"]) + '_prior_' + str(settings["addPrior"]) + "_dw0_" + str(settings["dw0"]) + "_rho0_" + str(settings["rho0"])+"/"
     os.makedirs(path, exist_ok=True)
     np.save(path + "settings.npy", settings)
     np.save(path + "results.npy", resultDict)
@@ -78,9 +112,5 @@ if __name__ == '__main__':
 # %%
 
 # %%
-import pkgutil
 
-package = recPred
-for importer, modname, ispkg in pkgutil.iter_modules(package.__path__):
-    print(modname)
 # %%
