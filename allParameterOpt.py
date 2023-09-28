@@ -31,9 +31,9 @@ class CmaesSolver():
     def __init__(self,  settings, wm, gm, flair, t1c):
         lossfunction = settings["lossfunction"]
         if lossfunction == "dice":
-            self.lossfunction = calcLikelihood.diceLogLikelihood
+            self.lossfunction = calcLikelihood.logPosteriorDice
         elif lossfunction == "bernoulli":
-            self.lossfunction = calcLikelihood.logPosterior
+            self.lossfunction = calcLikelihood.logPosteriorBern
 
         self.tend = 100
         self.flair_th = 0.25
@@ -65,8 +65,12 @@ class CmaesSolver():
 
 
     def fun(self, x):
+        print("start fun - ", x)
         self.sim(x)
-        err =  - self.lossfunction(self.HG, self.FLAIR, self.T1c, self.flair_th, self.t1c_th) 
+        if self.settings["addPrior"]:
+            err =  - self.lossfunction(self.HG, self.FLAIR, self.T1c, self.flair_th, self.t1c_th, addPrior=self.settings["addPrior"], x=x, xMeasured=self.settings["xMeasured"], stdMeasured=self.settings["stdMeasured"])
+        else:
+            err =  - self.lossfunction(self.HG, self.FLAIR, self.T1c, self.flair_th, self.t1c_th, addPrior=self) 
         
         # TODO compare original with dice likelihood on synthetic data
         sys.stderr.write("allParameterOpt.py: %d: %.16e: %s\n" % (err, os.getpid(), str(x)))
@@ -80,16 +84,44 @@ class CmaesSolver():
         # set initial conditions
         ic0 = np.divide(scipy.ndimage.center_of_mass(self.FLAIR), np.shape(self.FLAIR))
         
-        opt = cmaes.cmaes(self.fun, ( *ic0, self.dw0, self.rho0), self.sigma0, self.generations, workers=self.workers, trace=False, parameterRange= self.parameterRanges)
+        trace = cmaes.cmaes(self.fun, ( *ic0, self.dw0, self.rho0), self.sigma0, self.generations, workers=self.workers, trace=True, parameterRange= self.parameterRanges)
+
+        #trace = np.array(trace)
+        nsamples, y0s, xs0s, sigmas, Cs, pss, pcs, Cmus, C1s, xmeans = [], [], [], [], [], [], [], [], [], []
+        for element in trace:
+            nsamples.append(element[0])
+            y0s.append(element[1])
+            xs0s.append(element[2])
+            sigmas.append(element[3])
+            Cs.append(element[4])
+            pss.append(element[5])
+            pcs.append(element[6])
+            Cmus.append(element[7])
+            C1s.append(element[8])
+            xmeans.append(element[9])
+
+        opt = xmeans[-1]
+
         self.sim(opt)
         end = time.time()
 
         resultDict = {}
 
-        resultDict["diceT1_75"] = calcLikelihood.dice(self.HG > 0.675, self.T1c)
-        resultDict["diceFLAIR_30"] = calcLikelihood.dice(self.HG > 0.25, self.FLAIR)
-        resultDict["likelihoodFlair_30"] = calcLikelihood.logLikelihood(self.HG, self.FLAIR, 0.25, 0.05)
-        resultDict["likelihoodT1_75"] = calcLikelihood.logLikelihood(self.HG, self.T1c, 0.675, 0.05)
+        resultDict["nsamples"] = nsamples
+        resultDict["y0s"] = y0s
+        resultDict["xs0s"] = xs0s
+        resultDict["sigmas"] = sigmas
+        resultDict["Cs"] = Cs
+        resultDict["pss"] = pss
+        resultDict["pcs"] = pcs
+        resultDict["Cmus"] = Cmus
+        resultDict["C1s"] = C1s
+        resultDict["xmeans"] = xmeans
+
+        resultDict["diceT1_67"] = calcLikelihood.dice(self.HG > 0.675, self.T1c)
+        resultDict["diceFLAIR_25"] = calcLikelihood.dice(self.HG > 0.25, self.FLAIR)
+        resultDict["likelihoodFlair_25"] = calcLikelihood.logLikelihood(self.HG, self.FLAIR, 0.25, 0.05)
+        resultDict["likelihoodT1_67"] = calcLikelihood.logLikelihood(self.HG, self.T1c, 0.675, 0.05)
         resultDict['final_loss'] = self.fun(opt)
         
         resultDict["opt_params"] = opt
@@ -106,7 +138,7 @@ if __name__ == '__main__':
     WM = readNii("WM.nii.gz")#[::2, ::2, ::2]
     T1c = readNii("tumT1c.nii.gz")[::2, ::2, ::2]
     FLAIR = readNii("tumFLAIR.nii.gz")[::2, ::2, ::2]
-
+#%%
     settings = {}
     # ranges from LMI paper with T = 100
     parameterRanges = [[0, 1], [0, 1], [0, 1], [0.0001, 0.225], [0.001, 3]] 
@@ -117,7 +149,7 @@ if __name__ == '__main__':
     settings["dw0"] = 0.2
     settings["workers"] = 8
     settings["sigma0"] = 0.05
-    settings["generations"] =1000
+    settings["generations"] =50
     settings["lossfunction"] = "bernoulli"#"dice"#
     print('Lossfunction:', settings["lossfunction"])
 
@@ -132,9 +164,9 @@ if __name__ == '__main__':
     np.save(path + "results.npy", resultDict)
     writeNii(resultTumor, path = path+"result.nii.gz")
     
-    print("diceT1_75",  resultDict["diceT1_75"])
-    print("diceFLAIR_30",  resultDict["diceFLAIR_30"])
-    print("likelihoodFlair_30",  resultDict["likelihoodFlair_30"])
+    print("diceT1_67",  resultDict["diceT1_67"])
+    print("diceFLAIR_25",  resultDict["diceFLAIR_25"])
+    print("likelihoodFlair_25",  resultDict["likelihoodFlair_25"])
     print("likelihoodT1_75",  resultDict["likelihoodT1_75"])
     print("final_loss",  resultDict["final_loss"])
     print("opt_params",  resultDict["opt_params"])
