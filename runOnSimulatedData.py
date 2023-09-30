@@ -37,11 +37,15 @@ if __name__ == '__main__':
     settings["bpd"] = 16
     settings["rho0"] = 0.1
     settings["dw0"] = 0.2
-    settings["workers"] = 8
+    settings["workers"] = 2
     settings["sigma0"] = 0.02
-    settings["generations"] = 100
+    settings["generations"] = 500
     settings["lossfunction"] = "bernoulli"#"dice"#
 
+    debugMode = False
+    if debugMode == True:
+        settings["generations"] = 1
+        settings["workers"] = 0
 
     settings["addPrior"] = False
     
