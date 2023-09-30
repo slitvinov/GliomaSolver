@@ -11,41 +11,44 @@ import nibabel as nib
 def readNii(path):
     return nib.load(path).get_fdata().astype(np.float32)
 
-def write(a):
-    path = "%dx%dx%dle.raw" % np.shape(a)
-    with open(path, "wb") as file:
-        file.write(a.tobytes('F'))
-    sys.stderr.write("opt.py: write: %s\n" % path)
-
 def writeNii(array):
     path = "%dx%dx%dle.nii.gz" % np.shape(array)
     nibImg = nib.Nifti1Image(array, np.eye(4))
     nib.save(nibImg, path)
 
-def sim(x):
-    ic = x[:3]
-    rho = x[3]
-    period = 0
-    glioma_solver.run(bpd, GM, WM, ic, dw, rho, tend, period, HG)
+def clip(x):
+    if x < 0:
+        return x
+    if x > 1:
+        return 1
+    return 0
 
+def sim(x):
+    ix, iy, iz, rho, dw = x
+    ix = clip(ix)
+    iy = clip(iy)
+    iz = clip(iz)
+    dw = abs(dw)
+    rho = abs(rho)
+    glioma_solver.run(bpd, GM, WM, (ix, iy, iz), dw, rho, tend, period, HG)
 
 def fun(x):
     sim(x)
     err = np.linalg.norm(HG - PET[::2, ::2, ::2])
-    sys.stderr.write("opt.py: %d: %.16e: %s\n" % (err, os.getpid(), str(x)))
+    sys.stderr.write("opt1.py: %d: %.16e: %s\n" % (os.getpid(), err, str(x)))
     return err
 
-
-if __name__ == '__main__':
-    bpd = 16
-    GM = readNii("GM.nii.gz")
-    WM = readNii("WM.nii.gz")
-    PET = readNii("tumPET.nii.gz")
-    ic0 = np.divide(scipy.ndimage.center_of_mass(PET), np.shape(PET))
-    rho0 = 0.025
-    dw = 0.0013
-    tend = 300
-    HG = np.empty_like(GM, shape=(8 * bpd, 8 * bpd, 8 * bpd))
-    opt = cmaes.cmaes(fun, (*ic0, rho0), 0.05, 100, workers=2)
-    sim(opt)
-    write(HG)
+bpd = 16
+period = 0
+GM = readNii("GM.nii.gz")
+WM = readNii("WM.nii.gz")
+PET = readNii("tumPET.nii.gz")
+ic0 = np.divide(scipy.ndimage.center_of_mass(PET), np.shape(PET))
+rho0 = 0.025
+dw0 = 0.0013
+tend = 300
+HG = np.empty_like(GM, shape=(8 * bpd, 8 * bpd, 8 * bpd))
+opt = cmaes.cmaes(fun, (*ic0, rho0, dw0), sigma=0.01, g_max=100, workers=3)
+period = 10
+sim(opt)
+writeNii(HG)
