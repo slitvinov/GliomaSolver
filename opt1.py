@@ -21,7 +21,7 @@ def clip(x):
         return x
     if x > 1:
         return 1
-    return 0
+    return x
 
 def sim(x):
     ix, iy, iz, rho, dw = x
