@@ -60,11 +60,6 @@ $ ./fun.py
 256x256x256le.raw
 ```
 
-```
-:; ./likelihood/likelihood
-2.5588270414102585e+07
-```
-
 ## Hacking
 
 Coverage report
