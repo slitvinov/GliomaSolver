@@ -48,6 +48,7 @@
 ## Install and run
 
 ```
+$ python -m pip install nibabel numpy
 $ python -m pip install -e .
 ```
 
